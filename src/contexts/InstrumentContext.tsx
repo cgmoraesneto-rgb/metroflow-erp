@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { InstrumentCard } from '../types';
 import { toast } from 'sonner';
 import { apiClient } from '../services/apiClient';
+import { useAudit } from './AuditContext';
 
 interface InstrumentContextType {
   instrumentCards: InstrumentCard[];
@@ -14,6 +15,7 @@ const InstrumentContext = createContext<InstrumentContextType | undefined>(undef
 
 export function InstrumentProvider({ children }: { children: React.ReactNode }) {
   const [instrumentCards, setInstrumentCards] = useState<InstrumentCard[]>([]);
+  const { logAction } = useAudit();
 
   const fetchInstruments = async () => {
     try {
@@ -36,7 +38,12 @@ export function InstrumentProvider({ children }: { children: React.ReactNode }) 
     });
 
     const promise = apiClient.post<InstrumentCard>('/api/mock/instrument_cards', card)
-      .then(() => fetchInstruments());
+      .then(async (saved) => {
+        const previous = instrumentCards.find(c => c.id === card.id);
+        await logAction(previous ? 'UPDATE' : 'CREATE', card.id, 'instrument_cards', previous, card);
+        fetchInstruments();
+        return saved;
+      });
 
     toast.promise(promise, {
       loading: 'Salvando prontuário...',
@@ -53,7 +60,11 @@ export function InstrumentProvider({ children }: { children: React.ReactNode }) 
     setInstrumentCards(prev => prev.filter(c => c.id !== id));
 
     const promise = apiClient.delete(`/api/mock/instrument_cards/${id}`)
-      .then(() => fetchInstruments())
+      .then(async () => {
+        const deleted = instrumentCards.find(c => c.id === id);
+        await logAction('DELETE', id, 'instrument_cards', deleted, null);
+        fetchInstruments();
+      })
       .catch(() => setInstrumentCards(previous));
 
     toast.promise(promise, {

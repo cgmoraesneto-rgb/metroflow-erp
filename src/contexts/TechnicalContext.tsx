@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { CalibrationRecord, CalibrationResult, MaskVersion, CertificateMask } from '../types';
 import { toast } from 'sonner';
 import { apiClient } from '../services/apiClient';
+import { useAudit } from './AuditContext';
 
 interface TechnicalContextType {
   records: CalibrationRecord[];
@@ -21,6 +22,7 @@ export function TechnicalProvider({ children }: { children: React.ReactNode }) {
   const [results, setResults] = useState<CalibrationResult[]>([]);
   const [masks, setMasks] = useState<CertificateMask[]>([]);
   const [maskVersions, setMaskVersions] = useState<MaskVersion[]>([]);
+  const { logAction } = useAudit();
 
   const loadData = async () => {
     try {
@@ -50,7 +52,12 @@ export function TechnicalProvider({ children }: { children: React.ReactNode }) {
     });
 
     const promise = apiClient.post<CalibrationRecord>('/api/mock/calibration_records', record)
-      .then(() => apiClient.fetch<CalibrationRecord>('/api/mock/calibration_records').then(setRecords));
+      .then(async (saved) => {
+        const previous = records.find(r => r.id === record.id);
+        await logAction(previous ? 'UPDATE' : 'CREATE', record.id, 'calibration_records', previous, record);
+        apiClient.fetch<CalibrationRecord>('/api/mock/calibration_records').then(setRecords);
+        return saved;
+      });
 
     toast.promise(promise, {
       loading: 'Salvando registro...',
@@ -86,7 +93,12 @@ export function TechnicalProvider({ children }: { children: React.ReactNode }) {
     });
 
     const promise = apiClient.post<CertificateMask>('/api/mock/certificate_masks', mask)
-      .then(() => apiClient.fetch<CertificateMask>('/api/mock/certificate_masks').then(setMasks));
+      .then(async (saved) => {
+        const previous = masks.find(m => m.id === mask.id);
+        await logAction(previous ? 'UPDATE' : 'CREATE', mask.id, 'certificate_masks', previous, mask);
+        apiClient.fetch<CertificateMask>('/api/mock/certificate_masks').then(setMasks);
+        return saved;
+      });
 
     toast.promise(promise, {
       loading: 'Salvando máscara...',

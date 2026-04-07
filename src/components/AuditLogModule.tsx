@@ -3,7 +3,7 @@ import { useAudit } from '../contexts/AuditContext';
 import {
   ShieldCheck, Search, Download, Filter, Calendar,
   UserCircle, Database, ChevronDown, ChevronRight,
-  Plus, Edit3, Trash2, X, AlertTriangle, Eye
+  Plus, Edit3, Trash2, X, AlertTriangle, Eye, FileCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -13,6 +13,9 @@ const ACTION_CONFIG: Record<string, { label: string; color: string; bg: string; 
   CREATE: { label: 'Criação',   color: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20', border: 'border-emerald-200 dark:border-emerald-800', icon: Plus    },
   UPDATE: { label: 'Alteração', color: 'text-amber-700 dark:text-amber-400',    bg: 'bg-amber-50 dark:bg-amber-900/20',    border: 'border-amber-200 dark:border-amber-800',   icon: Edit3   },
   DELETE: { label: 'Exclusão',  color: 'text-rose-700 dark:text-rose-400',      bg: 'bg-rose-50 dark:bg-rose-900/20',      border: 'border-rose-200 dark:border-rose-800',     icon: Trash2  },
+  APROVACAO_L1: { label: 'Aprov. Técnica (L1)', color: 'text-indigo-700 dark:text-indigo-400', bg: 'bg-indigo-50 dark:bg-indigo-900/20', border: 'border-indigo-200 dark:border-indigo-800', icon: ShieldCheck },
+  APROVACAO_L2: { label: 'Aprov. Final (L2)', color: 'text-purple-700 dark:text-purple-400', bg: 'bg-purple-50 dark:bg-purple-900/20', border: 'border-purple-200 dark:border-purple-800', icon: FileCheck },
+  DEVOLUCAO: { label: 'Devolvido', color: 'text-orange-700 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-900/20', border: 'border-orange-200 dark:border-orange-800', icon: AlertTriangle },
 };
 
 const getActionConfig = (action: string) =>

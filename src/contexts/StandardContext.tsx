@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { StandardInstrument, StandardInstrumentLog } from '../types';
 import { toast } from 'sonner';
 import { apiClient } from '../services/apiClient';
+import { useAudit } from './AuditContext';
 
 interface StandardContextType {
   standards: StandardInstrument[];
@@ -16,6 +17,7 @@ const StandardContext = createContext<StandardContextType | undefined>(undefined
 export function StandardProvider({ children }: { children: React.ReactNode }) {
   const [standards, setStandards] = useState<StandardInstrument[]>([]);
   const [logs, setLogs] = useState<StandardInstrumentLog[]>([]);
+  const { logAction } = useAudit();
 
   const fetchStandards = async () => {
     try {
@@ -48,7 +50,12 @@ export function StandardProvider({ children }: { children: React.ReactNode }) {
     });
 
     const promise = apiClient.post<StandardInstrument>('/api/mock/standard_instruments', si)
-      .then(() => fetchStandards());
+      .then(async (saved) => {
+        const previous = standards.find(s => s.id === si.id);
+        await logAction(previous ? 'UPDATE' : 'CREATE', si.id, 'standard_instruments', previous, si);
+        fetchStandards();
+        return saved;
+      });
 
     toast.promise(promise, {
       loading: 'Salvando padrão...',
@@ -64,7 +71,11 @@ export function StandardProvider({ children }: { children: React.ReactNode }) {
     setStandards(prev => prev.filter(s => s.id !== id));
 
     const promise = apiClient.delete(`/api/mock/standard_instruments/${id}`)
-      .then(() => fetchStandards())
+      .then(async () => {
+        const deleted = standards.find(s => s.id === id);
+        await logAction('DELETE', id, 'standard_instruments', deleted, null);
+        fetchStandards();
+      })
       .catch(() => setStandards(previous));
 
     toast.promise(promise, {
