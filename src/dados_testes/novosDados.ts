@@ -262,7 +262,7 @@ export const testEmployees: Employee[] = [
     telefone: '(11) 90000-0000',
     isSignatory: true,
     signatureBase64: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
-    permissions: [Module.DASHBOARD, Module.CLIENTS, Module.COMMERCIAL, Module.TECHNICAL, Module.QUALITY, Module.FINANCE, Module.REGISTRY]
+    permissions: [Module.DASHBOARD, Module.COMMERCIAL, Module.TECHNICAL, Module.QUALITY, Module.FINANCE, Module.REGISTRY]
   }
 ];
 
