@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "banco-dado-metroflow-erp"
+  },
+  "targets": {
+    "banco-dado-metroflow-erp": {
+      "hosting": {
+        "main": [
+          "metroflowerp"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
