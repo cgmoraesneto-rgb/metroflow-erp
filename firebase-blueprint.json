@@ -1,0 +1,79 @@
+{
+  "entities": {
+    "Employee": {
+      "title": "Employee",
+      "description": "System user with specific module permissions",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "nome": { "type": "string" },
+        "cargo": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "telefone": { "type": "string" },
+        "permissions": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["nome", "email", "permissions"]
+    }
+  },
+  "firestore": {
+    "/employees/{employeeId}": {
+      "schema": "Employee",
+      "description": "Collection of employees and their permissions"
+    },
+    "/clients/{clientId}": {
+      "schema": "object",
+      "description": "Collection of clients"
+    },
+    "/quotes/{quoteId}": {
+      "schema": "object",
+      "description": "Collection of quotes"
+    },
+    "/service_orders/{soId}": {
+      "schema": "object",
+      "description": "Collection of service orders"
+    },
+    "/standard_instruments/{siId}": {
+      "schema": "object",
+      "description": "Collection of standard instruments"
+    },
+    "/calibration_records/{crId}": {
+      "schema": "object",
+      "description": "Collection of calibration records"
+    },
+    "/financial_controls/{fcId}": {
+      "schema": "object",
+      "description": "Collection of financial controls"
+    },
+    "/price_tables/{ptId}": {
+      "schema": "object",
+      "description": "Collection of price tables"
+    },
+    "/instrument_types/{itId}": {
+      "schema": "object",
+      "description": "Collection of instrument types"
+    },
+    "/certificate_masks/{cmId}": {
+      "schema": "object",
+      "description": "Collection of certificate masks"
+    },
+    "/procedures/{pId}": {
+      "schema": "object",
+      "description": "Collection of procedures"
+    },
+    "/payment_methods/{pmId}": {
+      "schema": "object",
+      "description": "Collection of payment methods"
+    },
+    "/banks/{bId}": {
+      "schema": "object",
+      "description": "Collection of banks"
+    },
+    "/units_of_measure/{uomId}": {
+      "schema": "object",
+      "description": "Collection of units of measure"
+    }
+  }
+}
