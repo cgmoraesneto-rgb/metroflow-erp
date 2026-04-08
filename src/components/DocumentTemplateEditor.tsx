@@ -45,9 +45,14 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({ isOpen,
       
       setForm(prev => ({ ...prev, [field]: downloadURL }));
       toast.success("Imagem enviada com sucesso!");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Upload error:", error);
-      toast.error("Erro ao enviar imagem. Verifique sua conexão.");
+      const msg = error.code === 'storage/unauthorized' 
+        ? "Sem permissão para upload. Verifique as regras do Firebase Storage."
+        : error.code === 'storage/retry-limit-exceeded'
+        ? "Erro de conexão ou tempo limite excedido."
+        : `Erro ao enviar: ${error.message || "Verifique sua conexão"}`;
+      toast.error(msg);
     } finally {
       setIsUploading(false);
     }

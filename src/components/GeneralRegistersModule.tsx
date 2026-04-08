@@ -83,9 +83,9 @@ export default function GeneralRegistersModule({
       const url = await getDownloadURL(storageRef);
       setEmployeeForm(prev => ({ ...prev, signatureBase64: url }));
       toast.success('Assinatura carregada com sucesso!');
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error uploading signature:", error);
-      toast.error('Erro ao carregar assinatura.');
+      toast.error(`Erro ao carregar assinatura: ${error.message || "Conexão falhou"}`);
     } finally {
       setIsUploadingSignature(false);
     }
