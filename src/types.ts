@@ -295,6 +295,7 @@ export interface CalibrationGroupRecord {
 export interface CalibrationRecord {
   id: string;
   serviceOrderId: string;
+  clientId?: string;
   quoteItemIndex?: number;
   unitIndex?: number;
   instrumentName: string;
