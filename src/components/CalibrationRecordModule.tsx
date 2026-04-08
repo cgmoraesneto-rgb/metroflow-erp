@@ -74,6 +74,9 @@ export default function CalibrationRecordModule({
     const [observations, setObservations] = useState('');
     const [attachments, setAttachments] = useState<string[]>([]);
     
+    const [isAvulsoMode, setIsAvulsoMode] = useState(false);
+    const [selectedClientId, setSelectedClientId] = useState('');
+    
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
     
     const [instrumentDetails, setInstrumentDetails] = useState({
@@ -107,16 +110,27 @@ export default function CalibrationRecordModule({
     const [kFactorJustification, setKFactorJustification] = useState<'Padrão (k=2 para 95.45%)' | 'Welch-Satterthwaite'>('Padrão (k=2 para 95.45%)');
 
     const handleSaveHeader = async (isOfficial: boolean = false) => {
-        if (!selectedOS || selectedQuoteItemIndex === null || !topDetails.technicianName) {
+        if (!isAvulsoMode && (!selectedOS || selectedQuoteItemIndex === null)) {
             toast.error("Preencha todos os campos obrigatórios do cabeçalho.");
+            return;
+        }
+
+        if (isAvulsoMode && (!selectedClientId || !instrumentDetails.instrumentName)) {
+            toast.error("Selecione o cliente e informe o nome do instrumento.");
+            return;
+        }
+
+        if (!topDetails.technicianName) {
+            toast.error("Selecione o técnico responsável.");
             return;
         }
 
         setIsSaving(true);
         const record: CalibrationRecord = {
             id: editingRecordId || `CAL-${Date.now()}`,
-            serviceOrderId: selectedOS.id,
-            quoteItemIndex: selectedQuoteItemIndex,
+            serviceOrderId: isAvulsoMode ? 'AVULSO' : (selectedOS?.id || 'AVULSO'),
+            clientId: isAvulsoMode ? selectedClientId : undefined,
+            quoteItemIndex: isAvulsoMode ? -1 : (selectedQuoteItemIndex as number),
             unitIndex: selectedUnitIndex !== null ? selectedUnitIndex : undefined,
             instrumentName: instrumentDetails.instrumentName,
             certificateNumber: topDetails.certificateNumber,
@@ -449,7 +463,10 @@ export default function CalibrationRecordModule({
                             <h3 className="text-xl font-black text-indigo-600">{selectedOS.id}</h3>
                         </div>
                         <button 
-                            onClick={() => setSelectedOS(null)} 
+                            onClick={() => {
+                                setSelectedOS(null);
+                                setIsAvulsoMode(false);
+                            }} 
                             className="flex items-center px-4 py-2 bg-white text-slate-600 rounded-xl font-bold text-sm hover:shadow-md transition-all border border-slate-200"
                         >
                             <ArrowLeft className="w-4 h-4 mr-2" /> Voltar para lista de O.S.
@@ -550,13 +567,17 @@ export default function CalibrationRecordModule({
                         </div>
                         <button 
                             onClick={() => {
-                                setSelectedQuoteItemIndex(null);
-                                setSelectedUnitIndex(null);
-                                setEditingRecordId(null);
+                                if (isAvulsoMode) {
+                                    setSelectedQuoteItemIndex(null);
+                                } else {
+                                    setSelectedQuoteItemIndex(null);
+                                    setSelectedUnitIndex(null);
+                                    setEditingRecordId(null);
+                                }
                             }} 
                             className="flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold text-sm transition-all border border-white/20"
                         >
-                            <ArrowLeft className="w-4 h-4 mr-2" /> Voltar para itens
+                            <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
                         </button>
                     </div>
 

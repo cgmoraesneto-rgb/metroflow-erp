@@ -17,6 +17,7 @@ import { financeiroService } from '../services/financeiroService';
 import { logisticaService } from '../services/logisticaService';
 import { apiClient } from '../services/apiClient';
 import { useAudit } from './AuditContext';
+import { urlToBase64 } from '../utils/imageUtils';
 
 interface DataContextType {
   clients: Client[];
@@ -235,19 +236,28 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         logisticaService.getStandardCustodies()
       ]);
 
+      // Pre-process employees to convert signature URLs to base64
+      const processedEmployees = await Promise.all(empData.map(async (e: Employee) => {
+        if (e.signatureBase64?.startsWith('http')) {
+          const base64 = await urlToBase64(e.signatureBase64);
+          return { ...e, signatureBase64: base64 };
+        }
+        return e;
+      }));
+
       setClients(clientsData);
       setQuotes(quotesData);
       setServiceOrders(soData);
       setStandardInstruments(stdData);
       setCalibrationRecords(calData);
       setFinancialControls(finData);
-      setEmployees(empData);
+      setEmployees(processedEmployees);
       setFleetLogs(fleetData);
       setVehicles(vehData);
       setStandardCustodies(custodyData);
 
       // Fetch secondary collections via apiClient (Firestore)
-      const [ptData, itData, cmData, procData, pmData, bankData, uomData, dtData] = await Promise.all([
+      const [ptData, itData, cmData, procData, pmData, bankData, uomData, dtRawData] = await Promise.all([
         apiClient.fetch<any>('/api/mock/price_tables'),
         apiClient.fetch<InstrumentType>('/api/mock/instrument_types'),
         apiClient.fetch<CertificateMask>('/api/mock/certificate_masks'),
@@ -257,6 +267,17 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         apiClient.fetch<UnitOfMeasure>('/api/mock/units_of_measure'),
         apiClient.fetch<DocumentTemplate>('/api/mock/document_templates'),
       ]);
+
+      // Pre-process templates to convert remote URLs to base64 for PDF generator
+      const dtData = await Promise.all(dtRawData.map(async (t: DocumentTemplate) => {
+        if (t.letterheadBase64?.startsWith('http')) {
+          t.letterheadBase64 = await urlToBase64(t.letterheadBase64);
+        }
+        if (t.footerBase64?.startsWith('http')) {
+          t.footerBase64 = await urlToBase64(t.footerBase64);
+        }
+        return t;
+      }));
 
       setPriceTables(ptData);
       setInstrumentTypes(itData);
@@ -297,7 +318,16 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Re-fetch templates once if any were added
       if (templatesUpdated) {
-        const updatedTemplates = await apiClient.fetch<DocumentTemplate>('/api/mock/document_templates');
+        const updatedTemplatesRaw = await apiClient.fetch<DocumentTemplate>('/api/mock/document_templates');
+        const updatedTemplates = await Promise.all(updatedTemplatesRaw.map(async (t: DocumentTemplate) => {
+          if (t.letterheadBase64?.startsWith('http')) {
+            t.letterheadBase64 = await urlToBase64(t.letterheadBase64);
+          }
+          if (t.footerBase64?.startsWith('http')) {
+            t.footerBase64 = await urlToBase64(t.footerBase64);
+          }
+          return t;
+        }));
         setDocumentTemplates(updatedTemplates);
       }
     } catch (e) {

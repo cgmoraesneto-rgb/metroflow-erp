@@ -155,7 +155,7 @@ export const addStandardHeader = ({
   const margin = 20;
 
   // Header images are usually full width or positioned at top
-  if (letterhead && typeof letterhead === 'string' && letterhead.startsWith('data:image')) {
+  if (letterhead && typeof letterhead === 'string' && (letterhead.startsWith('data:image') || letterhead.startsWith('http'))) {
     try {
       doc.addImage(letterhead, 'PNG', 0, 0, 210, 297, undefined, 'FAST');
     } catch (e) {

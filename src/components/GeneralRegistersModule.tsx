@@ -5,6 +5,9 @@ import AuditLogModule from './AuditLogModule';
 import { Users, Landmark, Ruler, Plus, Edit2, Trash2, XCircle, FileText, CreditCard, ShieldCheck, Mail, Phone, Briefcase, Hash, Globe, ChevronRight, Car, ActivitySquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useData } from '../contexts/DataContext';
+import { storage } from '../firebaseConfig';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { toast } from 'sonner';
 
 interface GeneralRegistersModuleProps {
   employees: Employee[];
@@ -61,16 +64,31 @@ export default function GeneralRegistersModule({
   // Employee State
   const [employeeForm, setEmployeeForm] = useState<Omit<Employee, 'id'>>({ nome: '', username: '', cargo: '', email: '', telefone: '', permissions: [], password: '', signatureBase64: '', isSignatory: false, mustChangePassword: true });
   const [editingEmployeeId, setEditingEmployeeId] = useState<string | null>(null);
+  const [isUploadingSignature, setIsUploadingSignature] = useState(false);
 
-  const handleEmployeeSignatureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEmployeeSignatureUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setEmployeeForm(prev => ({ ...prev, signatureBase64: reader.result as string }));
-    };
-    reader.readAsDataURL(file);
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Assinatura muito grande. Limite de 2MB.');
+      return;
+    }
+
+    setIsUploadingSignature(true);
+    try {
+      const employeeId = editingEmployeeId || `EMP-${Date.now()}`;
+      const storageRef = ref(storage, `employees/${employeeId}/signature`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      setEmployeeForm(prev => ({ ...prev, signatureBase64: url }));
+      toast.success('Assinatura carregada com sucesso!');
+    } catch (error) {
+      console.error("Error uploading signature:", error);
+      toast.error('Erro ao carregar assinatura.');
+    } finally {
+      setIsUploadingSignature(false);
+    }
   };
 
   // Bank State
@@ -243,7 +261,12 @@ export default function GeneralRegistersModule({
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Assinatura (PNG/JPG)</label>
                     <div className="relative flex items-center gap-4 p-4 border border-dashed border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-900/50">
-                      <input type="file" accept="image/*" onChange={handleEmployeeSignatureUpload} className="w-full text-xs" />
+                      <input type="file" accept="image/*" onChange={handleEmployeeSignatureUpload} className="w-full text-xs" disabled={isUploadingSignature} />
+                      {isUploadingSignature && (
+                        <div className="absolute inset-0 bg-white/50 dark:bg-slate-900/50 flex items-center justify-center rounded-2xl">
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-600"></div>
+                        </div>
+                      )}
                     </div>
                     {employeeForm.signatureBase64 && (
                       <div className="flex items-center gap-3">
