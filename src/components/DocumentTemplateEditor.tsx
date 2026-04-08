@@ -54,6 +54,17 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({ isOpen,
   };
 
   const handleSave = () => {
+    // PREVENT FIRESTORE SIZE ERROR:
+    // If the image is still a base64 string and exceeded 1MB, we block saving.
+    // The user must re-upload using the new storage logic to fix this.
+    const isLetterheadTooBig = (form.letterheadBase64?.length || 0) > 1048487; // Firestore limit
+    const isFooterTooBig = (form.footerBase64?.length || 0) > 1048487;
+
+    if (isLetterheadTooBig || isFooterTooBig) {
+      toast.error("Este template contém uma imagem antiga muito grande. Por favor, anexe a imagem novamente clicando no botão de upload para convertê-la para o novo formato compatível.");
+      return;
+    }
+
     onSave(form);
     onClose();
   };
