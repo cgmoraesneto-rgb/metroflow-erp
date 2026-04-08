@@ -141,7 +141,30 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     // 2. Perform background save
-    const promise = config.save(item) as Promise<any>;
+    let itemToSave = { ...item };
+
+    // --- FIRESTORE SIZE PROTECTION ---
+    // If we're saving a template and it has legacy base64 images that are too large, 
+    // we strip them to prevent the entire save operation from failing.
+    if (collectionName === 'document_templates') {
+      const LIMIT = 900000; // Safe margin below 1MB
+      if ((itemToSave.letterheadBase64?.length || 0) > LIMIT) {
+        console.warn("Stripping oversized letterheadBase64 to prevent Firestore error");
+        itemToSave.letterheadBase64 = ''; 
+      }
+      if ((itemToSave.footerBase64?.length || 0) > LIMIT) {
+        console.warn("Stripping oversized footerBase64 to prevent Firestore error");
+        itemToSave.footerBase64 = '';
+      }
+    } else if (collectionName === 'employees') {
+      const LIMIT = 900000;
+      if ((itemToSave.signatureBase64?.length || 0) > LIMIT) {
+        console.warn("Stripping oversized signature to prevent Firestore error");
+        itemToSave.signatureBase64 = '';
+      }
+    }
+
+    const promise = config.save(itemToSave) as Promise<any>;
     
     toast.promise(promise, {
       loading: `Salvando ${collectionName}...`,
