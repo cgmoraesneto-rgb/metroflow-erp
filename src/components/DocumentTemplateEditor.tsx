@@ -26,7 +26,7 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({ isOpen,
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'letterheadBase64' | 'footerBase64') => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !form) return;
 
     if (file.size > 5 * 1024 * 1024) {
       toast.error("Imagem muito grande. Limite de 5MB.");
@@ -51,32 +51,43 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({ isOpen,
       );
 
       const downloadURL = await Promise.race([uploadTask(), timeoutPromise]);
-      console.log("URL obtida:", downloadURL);
+      console.log("URL obtida com sucesso.");
       
-      setForm(prev => ({ ...prev, [field]: downloadURL }));
+      setForm(prev => {
+        if (!prev) return prev;
+        return { ...prev, [field]: downloadURL };
+      });
       toast.success("Imagem enviada com sucesso!");
     } catch (error: any) {
       console.error("Erro detalhado no upload:", error);
-      toast.error(`Erro ao enviar: ${error.message || "Verifique as permissões de rede/Storage"}`);
+      const isAuthError = error.code === 'storage/unauthorized';
+      toast.error(isAuthError 
+        ? "Erro de Permissão: Você precisa estar logado com um usuário real do Firebase para enviar arquivos."
+        : `Erro ao enviar: ${error.message || "Verifique a conexão"}`);
     } finally {
       setIsUploading(false);
     }
   };
 
   const handleSave = () => {
-    // PREVENT FIRESTORE SIZE ERROR:
-    // If the image is still a base64 string and exceeded 1MB, we block saving.
-    // The user must re-upload using the new storage logic to fix this.
-    const isLetterheadTooBig = (form.letterheadBase64?.length || 0) > 1048487; // Firestore limit
-    const isFooterTooBig = (form.footerBase64?.length || 0) > 1048487;
+    if (!form) return;
+    
+    try {
+      // PREVENT FIRESTORE SIZE ERROR:
+      const isLetterheadTooBig = (form.letterheadBase64?.length || 0) > 1000000; 
+      const isFooterTooBig = (form.footerBase64?.length || 0) > 1000000;
 
-    if (isLetterheadTooBig || isFooterTooBig) {
-      toast.error("Este template contém uma imagem antiga muito grande. Por favor, anexe a imagem novamente clicando no botão de upload para convertê-la para o novo formato compatível.");
-      return;
+      if (isLetterheadTooBig || isFooterTooBig) {
+        toast.error("Este template contém uma imagem antiga muito grande. Por favor, anexe a imagem novamente clicando no botão de upload.");
+        return;
+      }
+
+      onSave(form);
+      onClose();
+    } catch (err) {
+      console.error("Save error:", err);
+      toast.error("Falha ao salvar as configurações.");
     }
-
-    onSave(form);
-    onClose();
   };
 
   return (

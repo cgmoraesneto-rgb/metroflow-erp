@@ -302,8 +302,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ];
 
       let templatesUpdated = false;
+      // Defensive check to ensure dtRawData is an array before processing
+      const validDtRawData = Array.isArray(dtRawData) ? dtRawData : [];
+
       for (const req of requiredTypes) {
-        if (!dtRawData.find((t: DocumentTemplate) => t.id === req.id || t.applyTo === req.applyTo)) {
+        if (!validDtRawData.find((t: DocumentTemplate) => t.id === req.id || t.applyTo === req.applyTo)) {
           const newConfig: DocumentTemplate = {
             id: req.id,
             name: req.name,
