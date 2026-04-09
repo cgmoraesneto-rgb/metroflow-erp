@@ -38,20 +38,26 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({ isOpen,
       const pathId = form.id || 'default';
       const storageRef = ref(storage, `document_templates/${pathId}/${field}`);
       
-      // Using a timeout to prevent infinite loading if the network hangs
-      const uploadPromise = uploadBytes(storageRef, file);
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("Tempo limite de upload excedido. Verifique sua conexão.")), 30000)
+      console.log(`Iniciando upload para: document_templates/${pathId}/${field}`);
+
+      const uploadTask = async () => {
+        await uploadBytes(storageRef, file);
+        console.log("Upload concluído, obtendo URL...");
+        return await getDownloadURL(storageRef);
+      };
+
+      const timeoutPromise = new Promise<string>((_, reject) => 
+        setTimeout(() => reject(new Error("Tempo limite excedido (30s). Verifique sua conexão com o Firebase.")), 30000)
       );
 
-      await Promise.race([uploadPromise, timeoutPromise]);
-      const downloadURL = await getDownloadURL(storageRef);
+      const downloadURL = await Promise.race([uploadTask(), timeoutPromise]);
+      console.log("URL obtida:", downloadURL);
       
       setForm(prev => ({ ...prev, [field]: downloadURL }));
       toast.success("Imagem enviada com sucesso!");
     } catch (error: any) {
-      console.error("Upload error:", error);
-      toast.error(`Erro ao enviar: ${error.message || "Conexão falhou"}`);
+      console.error("Erro detalhado no upload:", error);
+      toast.error(`Erro ao enviar: ${error.message || "Verifique as permissões de rede/Storage"}`);
     } finally {
       setIsUploading(false);
     }

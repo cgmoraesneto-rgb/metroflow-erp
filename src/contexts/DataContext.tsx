@@ -303,7 +303,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       let templatesUpdated = false;
       for (const req of requiredTypes) {
-        if (!dtData.find((t: DocumentTemplate) => t.id === req.id || t.applyTo === req.applyTo)) {
+        if (!dtRawData.find((t: DocumentTemplate) => t.id === req.id || t.applyTo === req.applyTo)) {
           const newConfig: DocumentTemplate = {
             id: req.id,
             name: req.name,
