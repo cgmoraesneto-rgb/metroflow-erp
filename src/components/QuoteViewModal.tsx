@@ -32,36 +32,41 @@ interface QuoteViewModalProps {
 const QuoteViewModal: React.FC<QuoteViewModalProps> = ({ quote, client, onClose, onApprove }) => {
   const { documentTemplates } = useData();
   const [confirmApprove, setConfirmApprove] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
-  const [numPages, setNumPages] = useState<number>();
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
 
-  function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
-    setNumPages(numPages);
-  }
+  React.useEffect(() => {
+    let active = true;
+    if (showPreview) {
+      const loadPreview = async () => {
+        setIsGeneratingPreview(true);
+        try {
+          const url = await generateQuotePdf(quote, client, documentTemplates, true);
+          if (active) setPreviewUrl(url as string);
+        } catch (err) {
+          console.error("Preview generation error:", err);
+          toast.error("Erro ao gerar prévia do PDF.");
+        } finally {
+          if (active) setIsGeneratingPreview(false);
+        }
+      };
+      loadPreview();
+    } else {
+      setPreviewUrl(null);
+    }
+    return () => { active = false; };
+  }, [showPreview, quote, client, documentTemplates]);
 
-  const getClientName = (id: string) => client?.razaoSocial || id;
-  const total = quote.items.reduce((s, i) => s + (i.valorTotal || 0), 0);
-  const isApproved = quote.status === QuoteStatus.APPROVED;
-
-  const handleApprove = () => {
-    const newSO: ServiceOrder = {
-      id: `OS-${Date.now()}`,
-      orcamentoId: quote.id,
-      clienteId: quote.clienteId,
-      dataEntrada: new Date().toISOString().split('T')[0],
-      dataSaida: '',
-      responsavelEntrada: '',
-      responsavelSaida: '',
-      tecnicoExecutante: '',
-      statusServico: 'Pendente' as any,
-      statusCertificado: CertificateStatus.PENDING,
-      observacoes: `OS gerada automaticamente a partir do orçamento ${quote.id}`,
-    };
-    const approvedQuote: Quote = { ...quote, status: QuoteStatus.APPROVED };
-    onApprove(approvedQuote, newSO);
+  const handleDownloadPdf = async () => {
+    try {
+      await generateQuotePdf(quote, client, documentTemplates);
+    } catch (err) {
+      console.error("PDF download error:", err);
+      toast.error("Erro ao gerar PDF para download.");
+    }
   };
 
-  const currentPreviewUrl = showPreview ? (generateQuotePdf(quote, client, documentTemplates, true) as unknown as string) : null;
+  const getClientName = (id: string) => client?.razaoSocial || id;
 
   return (
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onClick={onClose}>
@@ -101,8 +106,8 @@ const QuoteViewModal: React.FC<QuoteViewModalProps> = ({ quote, client, onClose,
                 </button>
 
                 <button 
-                  onClick={() => generateQuotePdf(quote, client, documentTemplates)}
-                  className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-500 rounded-2xl hover:bg-slate-100 transition-all border border-slate-100 dark:border-slate-700"
+                  onClick={handleDownloadPdf}
+                  className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-500 rounded-2xl hover:bg-slate-100 transition-all border border-slate-100 dark:border-slate-700 disabled:opacity-50"
                   title="Download PDF"
                 >
                   <Printer className="w-6 h-6" />
@@ -243,11 +248,16 @@ const QuoteViewModal: React.FC<QuoteViewModalProps> = ({ quote, client, onClose,
                 className="w-1/2 ml-8 pl-8 border-l border-slate-100 flex flex-col overflow-hidden"
               >
                 <div className="flex-1 bg-slate-50 dark:bg-slate-800/30 rounded-[2rem] overflow-y-auto custom-scrollbar p-6 flex flex-col items-center border border-slate-100 dark:border-slate-800">
-                  {currentPreviewUrl && (
+                  {isGeneratingPreview ? (
+                    <div className="flex flex-col items-center justify-center p-20 gap-4">
+                      <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Gerando prévia...</p>
+                    </div>
+                  ) : previewUrl && (
                     <Document
-                      file={currentPreviewUrl}
+                      file={previewUrl}
                       onLoadSuccess={onDocumentLoadSuccess}
-                      loading={<div className="flex items-center justify-center p-20"><Loader2 className="w-8 h-8 text-indigo-600 animate-spin" /></div>}
+                      loading={<div className="flex items-center justify-center p-20"><Loader2 className="w-10 h-10 text-indigo-600 animate-spin" /></div>}
                       className="shadow-2xl rounded-lg overflow-hidden border border-slate-200"
                     >
                       {Array.from(new Array(numPages), (el, index) => (
@@ -266,7 +276,7 @@ const QuoteViewModal: React.FC<QuoteViewModalProps> = ({ quote, client, onClose,
                 <div className="mt-6 flex justify-between items-center">
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Confira todos os itens antes de aprovar.</p>
                   <button 
-                    onClick={() => generateQuotePdf(quote, client, documentTemplates)}
+                    onClick={handleDownloadPdf}
                     className="px-6 py-3 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-100 transition-all flex items-center gap-2 border border-indigo-100 dark:border-indigo-800"
                   >
                     <Download className="w-4 h-4" /> Baixar PDF Final

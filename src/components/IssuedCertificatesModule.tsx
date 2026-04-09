@@ -89,7 +89,7 @@ export default function IssuedCertificatesModule({
         setExpandedYears(prev => ({ ...prev, [clientYear]: !prev[clientYear] }));
     };
 
-    const handleClientReport = (clientName: string, year: number) => {
+    const handleClientReport = async (clientName: string, year: number) => {
         const client = clients.find(c => c.razaoSocial === clientName);
         const yearRecords = groupedData[clientName][year];
         
@@ -99,7 +99,12 @@ export default function IssuedCertificatesModule({
         }
 
         toast.info(`Gerando relatório consolidado (${year}) para: ${clientName}`);
-        generateClientReportPdf(yearRecords, client, year, documentTemplates);
+        try {
+            await generateClientReportPdf(yearRecords, client, year, documentTemplates);
+        } catch (err) {
+            console.error("Client report generation error:", err);
+            toast.error("Erro ao gerar relatório consolidado.");
+        }
     };
 
     const handleUnpublish = async (record: CalibrationRecord, reason: string) => {

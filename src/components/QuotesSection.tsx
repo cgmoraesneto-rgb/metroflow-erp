@@ -9,6 +9,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { formatDate, formatCurrency, formatNumber } from '../utils/formatters';
 import { generateQuotePdf } from '../utils/pdfGenerator';
 
+const handleDownloadPdf = async (quote: Quote, client: Client | undefined, documentTemplates: DocumentTemplate[]) => {
+  try {
+    await generateQuotePdf(quote, client, documentTemplates);
+  } catch (err) {
+    console.error("PDF generation error:", err);
+    toast.error("Erro ao gerar PDF.");
+  }
+};
+
 const FinancialValue = ({ value, className = "" }: { value: number | string | undefined, className?: string }) => (
   <div className={`financial-cell ${className}`}>
     <span className="currency">R$</span>
@@ -196,7 +205,7 @@ export default function QuotesSection({
                           {!isApproved && (
                             <button onClick={() => { setEditingQuote(quote); setIsQuoteModalOpen(true); }} className="p-2 text-slate-400 hover:text-amber-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all" title="Editar"><Pencil className="w-4 h-4" /></button>
                           )}
-                          <button onClick={() => generateQuotePdf(quote, clients.find(c => c.id === quote.clienteId), documentTemplates)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all" title="Gerar PDF"><FileText className="w-4 h-4" /></button>
+                          <button onClick={() => handleDownloadPdf(quote, clients.find(c => c.id === quote.clienteId), documentTemplates)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all" title="Gerar PDF"><FileText className="w-4 h-4" /></button>
                           {!isApproved && (
                             <button onClick={() => onDeleteQuote(quote.id)} className="p-2 text-slate-400 hover:text-rose-500 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all" title="Excluir"><Trash2 className="w-4 h-4" /></button>
                           )}
@@ -243,7 +252,7 @@ export default function QuotesSection({
                     {!isApproved && (
                       <button onClick={() => { setEditingQuote(quote); setIsQuoteModalOpen(true); }} className="p-2 text-slate-400 hover:text-amber-600"><Pencil className="w-4 h-4" /></button>
                     )}
-                    <button onClick={() => generateQuotePdf(quote, clients.find(c => c.id === quote.clienteId), documentTemplates)} className="p-2 text-slate-400 hover:text-blue-600"><FileText className="w-4 h-4" /></button>
+                    <button onClick={() => handleDownloadPdf(quote, clients.find(c => c.id === quote.clienteId), documentTemplates)} className="p-2 text-slate-400 hover:text-blue-600"><FileText className="w-4 h-4" /></button>
                   </div>
                 </div>
               );

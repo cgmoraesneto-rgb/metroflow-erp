@@ -16,10 +16,10 @@ import {
   DigitalSignature,
   Employee
 } from '../types';
-import { CERTIFICATE_LETTERHEAD, GENERAL_LETTERHEAD } from './letterheads';
 import { formatDate, formatCurrency, parseNumericInput } from './formatters';
 import { getMetrologyValue } from './metrologyMapper';
 import { getDefaultMetrologyField } from '../metrologyDefaults';
+import { urlToBase64 } from './imageUtils';
 import Chart from 'chart.js/auto';
 
 const generateChartImage = async (group: any, record: any, groupMask: any): Promise<string | null> => {
@@ -134,6 +134,13 @@ interface HeaderOptions {
   customLetterhead?: string;
   footerLetterhead?: string; // Standardize name
 }
+
+export const loadRemoteImage = async (url: string): Promise<string> => {
+  if (url.startsWith('http')) {
+    return await urlToBase64(url);
+  }
+  return url;
+};
 
 export const addStandardHeader = ({
   doc,
@@ -270,6 +277,9 @@ export const generateCertificatePdf = async (
 
   const template = documentTemplates.find(t => t.id === 'CALIBRATION_CERTIFICATE' || t.applyTo === 'CALIBRATION_CERTIFICATE');
 
+  let letterhead = template?.letterheadBase64;
+  if (letterhead?.startsWith('http')) letterhead = await loadRemoteImage(letterhead);
+
   const callHeader = (document: jsPDF) => {
     // Escondendo metadados porque os desenharemos aqui
     currentY = addStandardHeader({
@@ -277,7 +287,7 @@ export const generateCertificatePdf = async (
       title: '', // Evita título duplicado gerado pela função base
       isCertificate: true,
       hideMeta: true,
-      customLetterhead: template?.letterheadBase64
+      customLetterhead: letterhead
     });
     
     currentY = marginTop; // Fix header to respect our spacing instead of default from addStandardHeader
@@ -580,8 +590,11 @@ export const generateCertificatePdf = async (
   const signatureX2 = pageWidth - marginX - 15 - signatureWidth;
   const signatureHeight = 20;
 
-  if (authorizedEmployee?.signatureBase64 && authorizedEmployee.signatureBase64.startsWith('data:image')) {
-    try { doc.addImage(authorizedEmployee.signatureBase64, 'PNG', signatureX2, currentY - signatureHeight, signatureWidth, signatureHeight, undefined, 'FAST'); } catch (e) {}
+  let sigBase64 = authorizedEmployee?.signatureBase64;
+  if (sigBase64?.startsWith('http')) sigBase64 = await loadRemoteImage(sigBase64);
+
+  if (sigBase64 && (sigBase64.startsWith('data:image') || sigBase64.startsWith('http'))) {
+    try { doc.addImage(sigBase64, 'PNG', signatureX2, currentY - signatureHeight, signatureWidth, signatureHeight, undefined, 'FAST'); } catch (e) {}
   }
 
   doc.setDrawColor(0,0,0);
@@ -659,7 +672,10 @@ export const generateCertificatePdf = async (
     }
   }
   
-  addStandardFooter(doc, true, template?.footerBase64);
+  let footerImage = template?.footerBase64;
+  if (footerImage?.startsWith('http')) footerImage = await loadRemoteImage(footerImage);
+  
+  addStandardFooter(doc, true, footerImage);
 
   if (typeof doc.putTotalPages === 'function') {
     doc.putTotalPages(totalPagesExp);
@@ -674,13 +690,20 @@ export const generateCertificatePdf = async (
   }
 };
 
-export const generateClientReportPdf = (
+export const generateClientReportPdf = async (
   records: CalibrationRecord[],
   client: Client | undefined,
   year: number,
   documentTemplates: DocumentTemplate[] = []
-): void => {
+): Promise<void> => {
   const template = documentTemplates.find(t => t.applyTo === 'ALL');
+  
+  let letterhead = template?.letterheadBase64;
+  if (letterhead?.startsWith('http')) letterhead = await loadRemoteImage(letterhead);
+  
+  let footerImage = template?.footerBase64;
+  if (footerImage?.startsWith('http')) footerImage = await loadRemoteImage(footerImage);
+
   const doc = new jsPDF('p', 'mm', 'a4');
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 15;
@@ -692,7 +715,7 @@ export const generateClientReportPdf = (
     title: 'RESUMO DE EQUIPAMENTOS CERTIFICADOS',
     subtitle: `Ano de Referência: ${year}`,
     isCertificate: false,
-    customLetterhead: template?.letterheadBase64
+    customLetterhead: letterhead
   });
 
   // Client Info
@@ -726,15 +749,21 @@ export const generateClientReportPdf = (
   });
 
   // Footer with potential dynamic logo
-  addStandardFooter(doc, true, template?.footerBase64);
+  addStandardFooter(doc, true, footerImage);
 
   const fileName = `Relatorio_Certificados_${(client?.razaoSocial || 'Cliente').replace(/[^a-z0-9]/gi, '_')}_${year}.pdf`;
   doc.save(fileName);
 };
 
-export const generateQuotePdf = (quote: Quote, client: Client | undefined, documentTemplates: DocumentTemplate[] = [], returnBlobUrl: boolean = false) => {
+export const generateQuotePdf = async (quote: Quote, client: Client | undefined, documentTemplates: DocumentTemplate[] = [], returnBlobUrl: boolean = false): Promise<string | void> => {
   const template = documentTemplates.find(t => t.applyTo === 'QUOTE') || documentTemplates.find(t => t.applyTo === 'ALL');
   
+  let letterhead = template?.letterheadBase64;
+  if (letterhead?.startsWith('http')) letterhead = await loadRemoteImage(letterhead);
+  
+  let footerImage = template?.footerBase64;
+  if (footerImage?.startsWith('http')) footerImage = await loadRemoteImage(footerImage);
+
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const marginLeft = 10; // Maximized width (1.0cm) to remove any "leftover" margins
@@ -750,8 +779,11 @@ export const generateQuotePdf = (quote: Quote, client: Client | undefined, docum
     title: '', 
     isCertificate: false,
     hideMeta: true,
-    customLetterhead: template?.letterheadBase64
+    customLetterhead: letterhead
   });
+
+  // Footer on page 1
+  addStandardFooter(doc, false, footerImage);
 
   // Intercept doc.addPage to automatically draw the background
   const originalAddPage = doc.addPage.bind(doc);
@@ -762,8 +794,9 @@ export const generateQuotePdf = (quote: Quote, client: Client | undefined, docum
       title: '', 
       isCertificate: false, 
       hideMeta: true, 
-      customLetterhead: template?.letterheadBase64 
+      customLetterhead: letterhead 
     });
+    addStandardFooter(doc, false, footerImage);
     return doc;
   };
 

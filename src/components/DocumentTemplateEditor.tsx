@@ -28,7 +28,6 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({ isOpen,
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Check file size (optional but good practice)
     if (file.size > 5 * 1024 * 1024) {
       toast.error("Imagem muito grande. Limite de 5MB.");
       return;
@@ -36,23 +35,23 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({ isOpen,
 
     setIsUploading(true);
     try {
-      // Use the template ID or a generic path if ID is missing (should not be missing)
       const pathId = form.id || 'default';
       const storageRef = ref(storage, `document_templates/${pathId}/${field}`);
       
-      await uploadBytes(storageRef, file);
+      // Using a timeout to prevent infinite loading if the network hangs
+      const uploadPromise = uploadBytes(storageRef, file);
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("Tempo limite de upload excedido. Verifique sua conexão.")), 30000)
+      );
+
+      await Promise.race([uploadPromise, timeoutPromise]);
       const downloadURL = await getDownloadURL(storageRef);
       
       setForm(prev => ({ ...prev, [field]: downloadURL }));
       toast.success("Imagem enviada com sucesso!");
     } catch (error: any) {
       console.error("Upload error:", error);
-      const msg = error.code === 'storage/unauthorized' 
-        ? "Sem permissão para upload. Verifique as regras do Firebase Storage."
-        : error.code === 'storage/retry-limit-exceeded'
-        ? "Erro de conexão ou tempo limite excedido."
-        : `Erro ao enviar: ${error.message || "Verifique sua conexão"}`;
-      toast.error(msg);
+      toast.error(`Erro ao enviar: ${error.message || "Conexão falhou"}`);
     } finally {
       setIsUploading(false);
     }

@@ -259,22 +259,13 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         logisticaService.getStandardCustodies()
       ]);
 
-      // Pre-process employees to convert signature URLs to base64
-      const processedEmployees = await Promise.all(empData.map(async (e: Employee) => {
-        if (e.signatureBase64?.startsWith('http')) {
-          const base64 = await urlToBase64(e.signatureBase64);
-          return { ...e, signatureBase64: base64 };
-        }
-        return e;
-      }));
-
       setClients(clientsData);
       setQuotes(quotesData);
       setServiceOrders(soData);
       setStandardInstruments(stdData);
       setCalibrationRecords(calData);
       setFinancialControls(finData);
-      setEmployees(processedEmployees);
+      setEmployees(empData);
       setFleetLogs(fleetData);
       setVehicles(vehData);
       setStandardCustodies(custodyData);
@@ -291,17 +282,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         apiClient.fetch<DocumentTemplate>('/api/mock/document_templates'),
       ]);
 
-      // Pre-process templates to convert remote URLs to base64 for PDF generator
-      const dtData = await Promise.all(dtRawData.map(async (t: DocumentTemplate) => {
-        if (t.letterheadBase64?.startsWith('http')) {
-          t.letterheadBase64 = await urlToBase64(t.letterheadBase64);
-        }
-        if (t.footerBase64?.startsWith('http')) {
-          t.footerBase64 = await urlToBase64(t.footerBase64);
-        }
-        return t;
-      }));
-
       setPriceTables(ptData);
       setInstrumentTypes(itData);
       setCertificateMasks(cmData);
@@ -309,7 +289,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setPaymentMethods(pmData);
       setBanks(bankData);
       setUnitsOfMeasure(uomData);
-      setDocumentTemplates(dtData);
+      setDocumentTemplates(dtRawData);
 
       // Initialize default document template configurations if missing
       const requiredTypes = [
@@ -341,16 +321,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Re-fetch templates once if any were added
       if (templatesUpdated) {
-        const updatedTemplatesRaw = await apiClient.fetch<DocumentTemplate>('/api/mock/document_templates');
-        const updatedTemplates = await Promise.all(updatedTemplatesRaw.map(async (t: DocumentTemplate) => {
-          if (t.letterheadBase64?.startsWith('http')) {
-            t.letterheadBase64 = await urlToBase64(t.letterheadBase64);
-          }
-          if (t.footerBase64?.startsWith('http')) {
-            t.footerBase64 = await urlToBase64(t.footerBase64);
-          }
-          return t;
-        }));
+        const updatedTemplates = await apiClient.fetch<DocumentTemplate>('/api/mock/document_templates');
         setDocumentTemplates(updatedTemplates);
       }
     } catch (e) {

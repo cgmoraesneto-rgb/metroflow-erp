@@ -1,9 +1,4 @@
-
-/**
- * Converts a remote URL to a base64 string.
- * Used to pre-load images for jsPDF since its addImage is synchronous when using base64
- * but can be problematic with remote URLs in synchronous PDF generation.
- */
+// src/utils/imageUtils.ts
 export const urlToBase64 = async (url: string): Promise<string> => {
   try {
     const response = await fetch(url);
@@ -15,7 +10,7 @@ export const urlToBase64 = async (url: string): Promise<string> => {
       reader.readAsDataURL(blob);
     });
   } catch (error) {
-    console.error("Error converting URL to base64:", error);
+    console.error('Error converting URL to base64:', error);
     return url; // Fallback to original URL
   }
 };

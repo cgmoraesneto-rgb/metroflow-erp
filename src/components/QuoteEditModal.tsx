@@ -247,9 +247,14 @@ export default function QuoteEditModal({
 
   const { documentTemplates } = useData();
 
-  const handleGeneratePdf = () => {
+  const handleGeneratePdf = async () => {
     if (formData) {
-      generateQuotePdf(formData, clients.find(c => c.id === formData.clienteId), documentTemplates);
+      try {
+        await generateQuotePdf(formData, clients.find(c => c.id === formData.clienteId), documentTemplates);
+      } catch (err) {
+        console.error("PDF generation error:", err);
+        toast.error("Erro ao gerar PDF.");
+      }
     }
   };
 
