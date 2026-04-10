@@ -90,6 +90,7 @@ const LogisticsProtocolModal: React.FC<LogisticsProtocolModalProps> = ({
     try {
       const selectedItems = items.filter(i => i.selected);
       
+      if (previewOnly) {
           const promise = generateProtocolPdf(
             os,
             client,

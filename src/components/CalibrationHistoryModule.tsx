@@ -388,7 +388,6 @@ export default function CalibrationHistoryModule({
                                                             <span className="text-[8px] font-bold text-emerald-500 uppercase">Publicado</span>
                                                         </div>
                                                     )}
-                                                </div>
                                             </td>
                                             <td className="rectilinear-td text-center font-mono text-xs font-bold text-slate-600 dark:text-slate-400 tabular-nums">
                                                 {formatDate(record.calibrationDate)}

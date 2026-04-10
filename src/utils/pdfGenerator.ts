@@ -252,7 +252,7 @@ export const addStandardHeader = ({
   return headerTitleY + 20;
 };
 
-export const addStandardFooter = (doc: jsPDF, isCertificate: boolean = false, customFooter?: string, extraLegend?: string) => {
+export const addStandardFooter = (doc: jsPDF, isCertificate: boolean = false, customFooter?: string, extraLegend?: string, legendStartPage: number = 1) => {
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 20;
@@ -284,7 +284,7 @@ export const addStandardFooter = (doc: jsPDF, isCertificate: boolean = false, cu
     // or overlay if it's just a background
     doc.text(disclaimer, pageWidth / 2, pageHeight - 15, { align: 'center' });
 
-    if (extraLegend) {
+    if (extraLegend && i >= legendStartPage) {
       doc.setFont('helvetica', 'bold');
       doc.text(extraLegend, pageWidth / 2, pageHeight - 18, { align: 'center' });
       doc.setFont('helvetica', 'normal');
@@ -1336,6 +1336,7 @@ export const generateServiceOrderPdf = async (
 
   // --- PARTE 3: Relatório de Serviço Externo (Operacional) ---
   doc.addPage();
+  const reportStartPage = doc.getNumberOfPages();
   currentY = callHeader(doc, 'RELATÓRIO DE SERVIÇO EXTERNO');
 
   doc.setFontSize(10); doc.setFont('helvetica', 'bold');
@@ -1370,10 +1371,21 @@ export const generateServiceOrderPdf = async (
     });
   }
 
-  addStandardFooter(doc, false, template?.footerBase64, "LEGENDA DE STATUS: 1. Equipamento realizado; 2. Não disponível; 3. Não encontrado; 4. Não operante; 5. Coletado.");
+  const currentTotalPages = doc.getNumberOfPages();
+  // We want the legend only on the Report pages. 
+  // Let's assume the report starts on the page we just added or last page.
+  // PARTE 3 starts at doc.addPage() which is usually the last page or second to last.
+  // For safety, we'll use the page count before the report started if we had tracked it.
+  // But let's just use the current page count logic.
+  
+  // Since we don't have the exact start page of Part 3 easily available without more logic,
+  // I will just use the fact that Part 3 usually starts at the last few pages.
+  // Actually, I'll just pass a calculated start page.
+  
+  addStandardFooter(doc, false, template?.footerBase64, "LEGENDA DE STATUS: 1. Equipamento realizado; 2. Não disponível; 3. Não encontrado; 4. Não operante; 5. Coletado.", reportStartPage);
   
   if (preview) {
-    return doc.output('bloburl');
+    return doc.output('bloburl') as any;
   }
   doc.save(`OS_Relatorio_Campo_${os.id}.pdf`);
 };
@@ -1502,7 +1514,7 @@ export const generateProtocolPdf = async (
   addStandardFooter(doc, false, template?.footerBase64);
   
   if (preview) {
-    return doc.output('bloburl');
+    return doc.output('bloburl') as any;
   }
   doc.save(`Protocolo_${type}_${os.id}.pdf`);
 };

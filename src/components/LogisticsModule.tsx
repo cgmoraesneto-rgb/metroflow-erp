@@ -76,7 +76,7 @@ export default function LogisticsModule({ serviceOrders = [], clients = [], quot
     });
   };
 
-  const handleSaveOS = () => {
+  const handleSaveOS = async () => {
     if (editingOS) {
       let newStatus = InstrumentStatus.PENDING;
       if (editForm.dataSaida) {
