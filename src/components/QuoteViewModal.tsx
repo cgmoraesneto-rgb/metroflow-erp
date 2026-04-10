@@ -4,7 +4,7 @@ import {
   X, CheckCircle, FileText, Printer, Clock, User, Mail, 
   Hash, Calendar, DollarSign, Search, Download, LayoutGrid, Loader2
 } from 'lucide-react';
-import { Quote, Client, QuoteStatus, ServiceOrder, CertificateStatus, DocumentTemplate } from '../types';
+import { Quote, Client, QuoteStatus, ServiceOrder, CertificateStatus, DocumentTemplate, InstrumentStatus } from '../types';
 import { formatDate, formatNumber } from '../utils/formatters';
 import { generateQuotePdf } from '../utils/pdfGenerator';
 import { useData } from '../contexts/DataContext';
@@ -34,6 +34,32 @@ const QuoteViewModal: React.FC<QuoteViewModalProps> = ({ quote, client, onClose,
   const [confirmApprove, setConfirmApprove] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [numPages, setNumPages] = useState<number | null>(null);
+
+  const isApproved = quote.status === QuoteStatus.APPROVED;
+
+  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
+    setNumPages(numPages);
+  };
+
+  const handleApprove = () => {
+    // 4. O.S. Validation: ...obrigatoriamente preencher o campo dataEntrada com a data atual...
+    const newServiceOrder: ServiceOrder = {
+      id: `WS${Date.now().toString().slice(-6)}`, // generate proper formatting
+      orcamentoId: quote.id,
+      clienteId: quote.clienteId,
+      dataEmissao: new Date().toISOString(), 
+      dataEntrada: new Date().toISOString().split('T')[0],
+      dataSaida: '',
+      responsavelEntrada: 'Sistema',
+      responsavelSaida: '',
+      tecnicoExecutante: '',
+      statusServico: InstrumentStatus.PENDING as unknown as any,
+      statusCertificado: CertificateStatus.PENDING as unknown as any,
+    };
+    onApprove(quote, newServiceOrder);
+  };
 
   React.useEffect(() => {
     let active = true;
@@ -190,7 +216,7 @@ const QuoteViewModal: React.FC<QuoteViewModalProps> = ({ quote, client, onClose,
               <div className="mt-6 p-8 bg-slate-900 dark:bg-indigo-600 rounded-[2.5rem] flex justify-between items-center text-white shadow-2xl shadow-indigo-500/30">
                 <div>
                   <p className="font-black text-indigo-200 text-[10px] uppercase tracking-[0.3em] mb-2 px-[10px]">Investimento Total</p>
-                  <FinancialValue value={total} className="text-3xl font-black text-white" />
+                  <FinancialValue value={quote.items.reduce((s, i) => s + (i.valorTotal || 0), 0)} className="text-3xl font-black text-white" />
                 </div>
                 {!showPreview && <Printer className="w-10 h-10 text-white/20" />}
               </div>

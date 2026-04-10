@@ -254,7 +254,12 @@ export default function CalibrationHistoryModule({
                                                                     <div className="flex-1">
                                                                         <div className="flex items-center gap-3 mb-2">
                                                                             <span className="text-[9px] font-black text-slate-400 bg-slate-100 px-2 py-0.5 rounded uppercase tracking-widest">O.S. {record.serviceOrderId}</span>
-                                                                            <span className="text-base font-black text-slate-900">{record.certificateNumber}</span>
+                                                                            <div className="flex items-center gap-2">
+                                                                                <span className="text-base font-black text-slate-900">{record.certificateNumber}</span>
+                                                                                {record.isAccredited && (
+                                                                                    <span className="bg-indigo-600 text-white text-[8px] font-black px-2 py-0.5 rounded-md uppercase shadow-sm">RBC</span>
+                                                                                )}
+                                                                            </div>
                                                                             {statusBadge(record.status)}
                                                                             {record.isPublished && (
                                                                                 <span className="bg-emerald-100 text-emerald-700 text-[9px] font-black px-2 py-0.5 rounded-full uppercase flex items-center">
@@ -368,9 +373,15 @@ export default function CalibrationHistoryModule({
                                     return (
                                         <tr key={record.id} className="rectilinear-tr group">
                                             <td className="rectilinear-td text-center pl-8">
-                                                <div className="flex flex-col items-center justify-center">
-                                                    <span className="text-slate-900 dark:text-white font-black truncate tabular-nums">{record.certificateNumber}</span>
-                                                    <span className="text-[10px] text-indigo-600 font-black uppercase tracking-tighter tabular-nums">O.S. {record.serviceOrderId}</span>
+                                                    <div className="flex flex-col items-center justify-center">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-slate-900 dark:text-white font-black truncate tabular-nums">{record.certificateNumber}</span>
+                                                            {record.isAccredited && (
+                                                                <span className="bg-indigo-600 text-white text-[8px] font-black px-2 py-0.5 rounded-md uppercase shadow-sm">RBC</span>
+                                                            )}
+                                                        </div>
+                                                        <span className="text-[10px] text-indigo-600 font-black uppercase tracking-tighter tabular-nums">O.S. {record.serviceOrderId}</span>
+                                                    </div>
                                                     {record.isPublished && (
                                                         <div className="flex items-center gap-1 mt-1 justify-center">
                                                             <Globe className="w-3 h-3 text-emerald-500" />

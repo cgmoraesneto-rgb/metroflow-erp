@@ -74,9 +74,6 @@ export default function CalibrationRecordModule({
     const [observations, setObservations] = useState('');
     const [attachments, setAttachments] = useState<string[]>([]);
     
-    const [isAvulsoMode, setIsAvulsoMode] = useState(false);
-    const [selectedClientId, setSelectedClientId] = useState('');
-    
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
     
     const [instrumentDetails, setInstrumentDetails] = useState({
@@ -101,6 +98,8 @@ export default function CalibrationRecordModule({
         technicianName: ''
     });
 
+    const [isAccredited, setIsAccredited] = useState<boolean>(false);
+
     const [envConditions, setEnvConditions] = useState({
         temperature: 20,
         humidity: 50,
@@ -110,13 +109,8 @@ export default function CalibrationRecordModule({
     const [kFactorJustification, setKFactorJustification] = useState<'Padrão (k=2 para 95.45%)' | 'Welch-Satterthwaite'>('Padrão (k=2 para 95.45%)');
 
     const handleSaveHeader = async (isOfficial: boolean = false) => {
-        if (!isAvulsoMode && (!selectedOS || selectedQuoteItemIndex === null)) {
+        if (!selectedOS || selectedQuoteItemIndex === null) {
             toast.error("Preencha todos os campos obrigatórios do cabeçalho.");
-            return;
-        }
-
-        if (isAvulsoMode && (!selectedClientId || !instrumentDetails.instrumentName)) {
-            toast.error("Selecione o cliente e informe o nome do instrumento.");
             return;
         }
 
@@ -128,12 +122,13 @@ export default function CalibrationRecordModule({
         setIsSaving(true);
         const record: CalibrationRecord = {
             id: editingRecordId || `CAL-${Date.now()}`,
-            serviceOrderId: isAvulsoMode ? 'AVULSO' : (selectedOS?.id || 'AVULSO'),
-            clientId: isAvulsoMode ? selectedClientId : undefined,
-            quoteItemIndex: isAvulsoMode ? -1 : (selectedQuoteItemIndex as number),
+            serviceOrderId: selectedOS.id,
+            clientId: undefined,
+            quoteItemIndex: selectedQuoteItemIndex as number,
             unitIndex: selectedUnitIndex !== null ? selectedUnitIndex : undefined,
             instrumentName: instrumentDetails.instrumentName,
             certificateNumber: topDetails.certificateNumber,
+            isAccredited: isAccredited,
             calibrationDate: topDetails.calibrationDate,
             nextCalibrationDate: topDetails.nextCalibrationDate,
             technicianName: topDetails.technicianName,
@@ -218,6 +213,7 @@ export default function CalibrationRecordModule({
         });
         
         setKFactorJustification(record.kFactorJustification || 'Padrão (k=2 para 95.45%)');
+        setIsAccredited(record.isAccredited || false);
         setObservations(record.observations);
         setAttachments(record.attachments || []);
     };
@@ -240,6 +236,7 @@ export default function CalibrationRecordModule({
             periodicity: '12 meses',
             calibrationLocation: 'Laboratório'
         });
+        setIsAccredited(false);
         setAttachments([]);
     };
 
@@ -267,6 +264,7 @@ export default function CalibrationRecordModule({
             certificateMaskId: maskId || launchModalRecord.certificateMaskId,
             procedureId: mask?.procedureId || launchModalRecord.procedureId,
             standardInstrumentIds: mask?.standardInstrumentIds || launchModalRecord.standardInstrumentIds,
+            maskSnapshot: mask || launchModalRecord.maskSnapshot,
             status: CertificateStatus.IN_ANALYSIS,
             isDraft: false 
         };
@@ -292,6 +290,7 @@ export default function CalibrationRecordModule({
             certificateMaskId: maskId || launchModalRecord.certificateMaskId,
             procedureId: mask?.procedureId || launchModalRecord.procedureId,
             standardInstrumentIds: mask?.standardInstrumentIds || launchModalRecord.standardInstrumentIds,
+            maskSnapshot: mask || launchModalRecord.maskSnapshot,
         };
         
         await onSaveCalibrationRecord(updatedRecord);
@@ -465,7 +464,6 @@ export default function CalibrationRecordModule({
                         <button 
                             onClick={() => {
                                 setSelectedOS(null);
-                                setIsAvulsoMode(false);
                             }} 
                             className="flex items-center px-4 py-2 bg-white text-slate-600 rounded-xl font-bold text-sm hover:shadow-md transition-all border border-slate-200"
                         >
@@ -499,14 +497,22 @@ export default function CalibrationRecordModule({
                                                     <div className="flex items-center justify-center gap-2">
                                                         {existingRecord ? (
                                                             <>
-                                                                <span className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase ${
-                                                                    existingRecord.status === CertificateStatus.IN_ANALYSIS ? 'bg-amber-100 text-amber-700' :
-                                                                    existingRecord.headerValidated ? 'bg-indigo-100 text-indigo-700' :
-                                                                    'bg-slate-100 text-slate-400'
-                                                                }`}>
-                                                                    {existingRecord.status === CertificateStatus.IN_ANALYSIS ? 'Em Análise' :
-                                                                     existingRecord.headerValidated ? 'Apto p/ Lanç' : 'Rascunho'}
-                                                                </span>
+                                                                <div className="flex flex-col items-center gap-1">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-[10px] font-black text-slate-900 dark:text-white tabular-nums">{existingRecord.certificateNumber}</span>
+                                                                        {existingRecord.isAccredited && (
+                                                                            <span className="bg-indigo-600 text-white text-[8px] font-black px-2 py-0.5 rounded-md uppercase shadow-sm">RBC</span>
+                                                                        )}
+                                                                    </div>
+                                                                    <span className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase ${
+                                                                        existingRecord.status === CertificateStatus.IN_ANALYSIS ? 'bg-amber-100 text-amber-700' :
+                                                                        existingRecord.headerValidated ? 'bg-indigo-100 text-indigo-700' :
+                                                                        'bg-slate-100 text-slate-400'
+                                                                    }`}>
+                                                                        {existingRecord.status === CertificateStatus.IN_ANALYSIS ? 'Em Análise' :
+                                                                         existingRecord.headerValidated ? 'Apto p/ Lanç' : 'Rascunho'}
+                                                                    </span>
+                                                                </div>
                                                                 {existingRecord.revisionOf && (
                                                                     <span className="bg-orange-100 text-orange-700 text-[9px] font-black px-2 py-0.5 rounded-full uppercase">Rev</span>
                                                                 )}
@@ -567,13 +573,9 @@ export default function CalibrationRecordModule({
                         </div>
                         <button 
                             onClick={() => {
-                                if (isAvulsoMode) {
-                                    setSelectedQuoteItemIndex(null);
-                                } else {
-                                    setSelectedQuoteItemIndex(null);
-                                    setSelectedUnitIndex(null);
-                                    setEditingRecordId(null);
-                                }
+                                setSelectedQuoteItemIndex(null);
+                                setSelectedUnitIndex(null);
+                                setEditingRecordId(null);
                             }} 
                             className="flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold text-sm transition-all border border-white/20"
                         >
@@ -618,6 +620,27 @@ export default function CalibrationRecordModule({
                                     onChange={(val) => setTopDetails(prev => ({ ...prev, technicianName: val }))}
                                     placeholder="Selecione o técnico"
                                 />
+                            </div>
+                            <div className="col-span-full md:col-span-2 lg:col-span-4 mt-2">
+                                <label className={`flex items-center space-x-3 p-4 rounded-xl border transition-all cursor-pointer select-none ${isAccredited 
+                                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700' 
+                                    : 'bg-white border-slate-200 text-slate-500'}`}>
+                                    <input 
+                                        type="checkbox" 
+                                        className="hidden" 
+                                        checked={isAccredited} 
+                                        onChange={(e) => setIsAccredited(e.target.checked)} 
+                                    />
+                                    <div className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${isAccredited ? 'bg-indigo-500 border-indigo-500' : 'border-slate-300'}`}>
+                                        {isAccredited && <CheckCircle className="w-3.5 h-3.5 text-white" />}
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
+                                            Acreditação RBC
+                                        </p>
+                                        <p className="text-[9px] font-medium opacity-70">Marque se o certificado fará parte do escopo acreditado (Layout RBC).</p>
+                                    </div>
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -725,7 +748,33 @@ export default function CalibrationRecordModule({
                                             const reader = new FileReader();
                                             reader.onload = (ev) => {
                                                 if (ev.target?.result) {
-                                                    setAttachments(prev => [...prev, ev.target.result as string]);
+                                                    const img = new Image();
+                                                    img.onload = () => {
+                                                        const canvas = document.createElement('canvas');
+                                                        const MAX_WIDTH = 800;
+                                                        const MAX_HEIGHT = 800;
+                                                        let width = img.width;
+                                                        let height = img.height;
+                                                        
+                                                        if (width > height) {
+                                                            if (width > MAX_WIDTH) {
+                                                                height *= MAX_WIDTH / width;
+                                                                width = MAX_WIDTH;
+                                                            }
+                                                        } else {
+                                                            if (height > MAX_HEIGHT) {
+                                                                width *= MAX_HEIGHT / height;
+                                                                height = MAX_HEIGHT;
+                                                            }
+                                                        }
+                                                        canvas.width = width;
+                                                        canvas.height = height;
+                                                        const ctx = canvas.getContext('2d');
+                                                        ctx?.drawImage(img, 0, 0, width, height);
+                                                        const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                                                        setAttachments(prev => [...prev, dataUrl]);
+                                                    };
+                                                    img.src = ev.target.result as string;
                                                 }
                                             };
                                             reader.readAsDataURL(file);

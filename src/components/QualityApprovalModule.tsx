@@ -188,7 +188,14 @@ export default function QualityApprovalModule({
                                     const status = record.status || serviceOrder?.statusCertificado;
                                     return (
                                         <tr key={record.id} className="rectilinear-tr group">
-                                            <td className="rectilinear-td text-center pl-8 font-black text-slate-900 dark:text-white tabular-nums">{record.certificateNumber}</td>
+                                            <td className="rectilinear-td text-center pl-8">
+                                                <div className="flex items-center justify-center gap-2">
+                                                    <span className="font-black text-slate-900 dark:text-white tabular-nums">{record.certificateNumber}</span>
+                                                    {record.isAccredited && (
+                                                        <span className="bg-indigo-600 text-white text-[8px] font-black px-2 py-0.5 rounded-md uppercase shadow-sm">RBC</span>
+                                                    )}
+                                                </div>
+                                            </td>
                                             <td className="rectilinear-td text-left font-bold text-slate-500 truncate" title={client?.razaoSocial}>{client?.razaoSocial || '—'}</td>
                                             <td className="rectilinear-td text-left font-bold text-slate-500 truncate" title={record.instrumentName}>{record.instrumentName}</td>
                                             <td className="rectilinear-td text-center font-mono text-xs tabular-nums">{formatDate(record.calibrationDate)}</td>
@@ -231,7 +238,12 @@ export default function QualityApprovalModule({
                             <div key={record.id} className="rectilinear-card group flex flex-col justify-between hover:border-indigo-500">
                                 <div>
                                     <div className="flex justify-between mb-4">
-                                        <span className="text-[10px] font-black text-indigo-600 uppercase tabular-nums">{record.certificateNumber}</span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-[10px] font-black text-indigo-600 uppercase tabular-nums">{record.certificateNumber}</span>
+                                            {record.isAccredited && (
+                                                <span className="bg-indigo-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase shadow-sm">RBC</span>
+                                            )}
+                                        </div>
                                         <span className={`text-[8px] font-black px-2 py-0.5 rounded uppercase ${status === CertificateStatus.IN_ANALYSIS ? 'bg-amber-50 text-amber-600' : 'bg-indigo-50 text-indigo-600'}`}>{status}</span>
                                     </div>
                                     <h4 className="font-extrabold text-slate-900 dark:text-white truncate" title={client?.razaoSocial}>{client?.razaoSocial}</h4>

@@ -32,7 +32,7 @@ export default function FinanceModule({
   onDeleteFinancialControl
 }: FinanceModuleProps) {
 
-  const [activeSubTab, setActiveSubTab] = useState<'dashboard' | 'billing'>('dashboard');
+  const [activeSubTab, setActiveSubTab] = useState<'dashboard' | 'billing' | 'commissions'>('dashboard');
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [selectedServiceOrder, setSelectedServiceOrder] = useState<ServiceOrder | null>(null);
   const [invoiceData, setInvoiceData] = useState<Partial<FinancialControl> | null>(null);
@@ -163,6 +163,16 @@ export default function FinanceModule({
               <Receipt className="mr-2 w-4 h-4" />
               Faturamento
             </button>
+            <button
+              onClick={() => setActiveSubTab('commissions')}
+              className={`flex items-center px-6 py-2.5 text-xs font-black rounded-xl transition-all duration-300 ${activeSubTab === 'commissions'
+                ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm'
+                : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+            >
+              <DollarSign className="mr-2 w-4 h-4" />
+              Comissões
+            </button>
           </div>
         </div>
       </div>
@@ -196,7 +206,7 @@ export default function FinanceModule({
                 </motion.div>
               ))}
             </div>
-          ) : (
+          ) : activeSubTab === 'billing' ? (
             <div className="space-y-12">
               <section>
                 <div className="flex items-center justify-between mb-8">
@@ -316,6 +326,80 @@ export default function FinanceModule({
                                 <button onClick={() => handleEditInvoice(fc)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-slate-50 rounded-lg transition-all"><Edit2 className="w-4 h-4" /></button>
                                 <button onClick={() => handleDeleteInvoice(fc)} className="p-2 text-slate-400 hover:text-rose-500 hover:bg-slate-50 rounded-lg transition-all"><Trash2 className="w-4 h-4" /></button>
                               </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            </div>
+          ) : (
+            <div className="space-y-12">
+              <section>
+                <div className="flex items-center justify-between mb-8">
+                  <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center">
+                    <div className="w-2 h-8 bg-amber-500 rounded-full mr-4"></div>
+                    Gestão de Comissões
+                  </h3>
+                </div>
+
+                <div className="rectilinear-container custom-scrollbar shadow-sm">
+                  <table className="rectilinear-table">
+                    <thead>
+                      <tr>
+                        <th className="rectilinear-th col-sm text-center pl-8">NF / Doc</th>
+                        <th className="rectilinear-th col-sm text-center">Orçamento</th>
+                        <th className="rectilinear-th col-md text-center">Comissionado</th>
+                        <th className="rectilinear-th col-md text-center">Valor Total</th>
+                        <th className="rectilinear-th col-sm text-center">% Comiss.</th>
+                        <th className="rectilinear-th col-sm text-center">V. Comiss.</th>
+                        <th className="rectilinear-th col-sm text-center pr-8">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
+                      {financialControls.filter(fc => {
+                        const quote = quotes.find(q => q.id === fc.orcamentoId);
+                        return quote?.comissaoVendedor;
+                      }).map((fc) => {
+                        const quote = quotes.find(q => q.id === fc.orcamentoId);
+                        const comissaoPerc = fc.percentualComissao || 0;
+                        const vComiss = ((fc.valorBruto || 0) * (comissaoPerc / 100));
+                        return (
+                          <tr key={fc.id || fc.numeroNF} className="rectilinear-tr group">
+                            <td className="rectilinear-td text-center pl-8 font-black text-slate-900 tabular-nums">
+                              {fc.numeroNF}
+                            </td>
+                            <td className="rectilinear-td text-center text-xs font-bold text-indigo-600">
+                              {fc.orcamentoId}
+                            </td>
+                            <td className="rectilinear-td text-center font-bold text-slate-700">
+                              {quote?.nomeComissionado || '—'}
+                            </td>
+                            <td className="rectilinear-td text-center text-sm font-black text-slate-500 tabular-nums">
+                              R$ {formatNumber(fc.valorBruto ?? 0)}
+                            </td>
+                            <td className="rectilinear-td text-center">
+                              <input
+                                type="number"
+                                className="w-16 p-1 text-center border rounded bg-transparent"
+                                value={comissaoPerc}
+                                onChange={(e) => onSaveFinancialControl({ ...fc, percentualComissao: Number(e.target.value) })}
+                              /> %
+                            </td>
+                            <td className="rectilinear-td text-center font-black text-indigo-600 tabular-nums">
+                              R$ {formatNumber(vComiss)}
+                            </td>
+                            <td className="rectilinear-td text-center pr-8">
+                              <select
+                                className={`text-xs font-black uppercase rounded p-1 cursor-pointer outline-none ${fc.statusComissao === 'Pago' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}
+                                value={fc.statusComissao || 'Pendente'}
+                                onChange={(e) => onSaveFinancialControl({ ...fc, statusComissao: e.target.value as 'Pago' | 'Pendente' })}
+                              >
+                                <option value="Pendente">Pendente</option>
+                                <option value="Pago">Pago</option>
+                              </select>
                             </td>
                           </tr>
                         );

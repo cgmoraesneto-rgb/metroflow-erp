@@ -244,6 +244,9 @@ export default function IssuedCertificatesModule({
                                                                                      {isRevision && (
                                                                                          <span className="bg-slate-900 text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase">REV {record.revisionNumber}</span>
                                                                                      )}
+                                                                                     {record.isAccredited && (
+                                                                                         <span className="bg-indigo-600 text-white text-[8px] font-black px-2 py-0.5 rounded-md uppercase ml-1 shadow-sm">RBC</span>
+                                                                                     )}
                                                                                  </div>
                                                                              </td>
                                                                             <td className="rectilinear-td text-left text-xs font-bold text-slate-700 dark:text-slate-300 truncate" title={record.instrumentName}>

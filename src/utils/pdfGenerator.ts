@@ -20,6 +20,7 @@ import { formatDate, formatCurrency, parseNumericInput } from './formatters';
 import { getMetrologyValue } from './metrologyMapper';
 import { getDefaultMetrologyField } from '../metrologyDefaults';
 import { urlToBase64 } from './imageUtils';
+import { GENERAL_LETTERHEAD, CERTIFICATE_LETTERHEAD } from './letterheads';
 import Chart from 'chart.js/auto';
 
 const generateChartImage = async (group: any, record: any, groupMask: any): Promise<string | null> => {
@@ -278,6 +279,10 @@ export const generateCertificatePdf = async (
   const template = documentTemplates.find(t => t.id === 'CALIBRATION_CERTIFICATE' || t.applyTo === 'CALIBRATION_CERTIFICATE');
 
   let letterhead = template?.letterheadBase64;
+  if (record.isAccredited && template?.accreditedLetterheadBase64) {
+    letterhead = template.accreditedLetterheadBase64;
+  }
+  
   if (letterhead?.startsWith('http')) letterhead = await loadRemoteImage(letterhead);
 
   const callHeader = (document: jsPDF) => {
@@ -822,6 +827,7 @@ export const generateQuotePdf = async (quote: Quote, client: Client | undefined,
     body: [
       ['Emitido em:', formatDate(quote.dataEmissao), 'Válido até:', formatDate(quote.validade)],
       ['Cliente:', client?.razaoSocial || 'N/A', 'CNPJ:', quote.clienteCnpj || 'N/A'],
+      ['Insc. Estadual:', client?.inscricaoEstadual || 'Isento', 'Insc. Municipal:', client?.inscricaoMunicipal || 'Isento'],
       ['Endereço:', { content: quote.clienteEndereco || 'N/A', colSpan: 3 }],
       ['Solicitante:', quote.clienteSolicitanteNome || 'N/A', 'Telefone:', quote.clienteSolicitanteContato || 'N/A'],
       ['E-mail:', { content: quote.clienteSolicitanteEmail || 'N/A', colSpan: 3 }],
@@ -1094,10 +1100,18 @@ export const generateQuotePdf = async (quote: Quote, client: Client | undefined,
   doc.setFont('helvetica', 'bold'); doc.setTextColor(0, 0, 0); doc.setFontSize(10);
   doc.text('Colocamo-nos ao seu dispor, para os eventuais esclarecimentos adicionais que se fizerem necessários.', pageWidth / 2, lineY, { align: 'center' });
 
+  if (quote.criadoPor) {
+    lineY += 10;
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'italic');
+    doc.setTextColor(150, 150, 150);
+    doc.text(`Orçamento criado por ${quote.criadoPor} em ${quote.criadoEm || ''}`, marginLeft, lineY);
+  }
+
   addStandardFooter(doc, false, template?.footerBase64);
   
   if (returnBlobUrl) {
-    return doc.output('bloburl');
+    return doc.output('bloburl') as any;
   } else {
     doc.save(`Orcamento_${quote.id}.pdf`);
   }

@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "id": "cli-001",
+    "razaoSocial": "Indústrias Metalúrgicas MetroTest S.A.",
+    "nomeFantasia": "MetroTest",
+    "cnpj": "12.345.678/0001-99",
+    "email": "contato@metrotest.com.br",
+    "telefone": "(11) 4004-0000",
+    "enderecoPrincipal": "Av. Teste, 1000 - São Paulo/SP",
+    "status": "Ativo"
+  },
+  {
+    "id": "cli-002",
+    "razaoSocial": "Laboratório de Precisão Alpha Ltda",
+    "nomeFantasia": "Alpha Lab",
+    "cnpj": "98.765.432/0001-11",
+    "email": "quality@alphalab.com",
+    "telefone": "(19) 3322-1100",
+    "enderecoPrincipal": "Rua Técnica, 42 - Campinas/SP",
+    "status": "Ativo"
+  }
+]

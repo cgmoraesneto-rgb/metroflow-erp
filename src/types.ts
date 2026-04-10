@@ -21,6 +21,8 @@ export interface Client {
   restricaoPagamento: boolean;
   funcionarioCadastro: string;
   senha?: string; // Para portal do cliente
+  inscricaoMunicipal?: string;
+  inscricaoEstadual?: string;
 }
 
 export interface DocumentTemplate {
@@ -28,6 +30,7 @@ export interface DocumentTemplate {
   name: string; 
   applyTo?: string;
   letterheadBase64?: string;
+  accreditedLetterheadBase64?: string;
   footerBase64?: string;
   commercialConditions?: string;
   technicalInformation?: string;
@@ -59,6 +62,7 @@ export interface Quote {
   dataEmissao: string;
   validade: string;
   comissaoVendedor: boolean;
+  nomeComissionado?: string;
   tabelaPrecos: string;
   formaPagamento: string;
   items: QuoteItem[];
@@ -73,6 +77,8 @@ export interface Quote {
   observacoes?: string;
   parentQuoteId?: string; // NEW: Identification of the original quote
   revision?: number;      // NEW: Revision number (0 = original)
+  criadoPor?: string;
+  criadoEm?: string;
 }
 
 export enum InstrumentStatus {
@@ -300,6 +306,7 @@ export interface CalibrationRecord {
   unitIndex?: number;
   instrumentName: string;
   certificateNumber: string;
+  isAccredited?: boolean;
   calibrationDate: string;
   nextCalibrationDate: string;
   technicianName: string;
@@ -337,8 +344,9 @@ export interface CalibrationRecord {
   returnJustification?: string;
   // 2-step calibration flow
   isDraft?: boolean;
+  maskSnapshot?: CertificateMask;
   headerSaved?: boolean;
-  headerValidated?: boolean; // New: finalized header
+  headerValidated?: boolean;
   // Certificate revision
   revisionOf?: string;
   revisionNumber?: number;
@@ -391,6 +399,8 @@ export interface FinancialControl {
   formaPagamento: string;
   banco: string;
   comissao: number;
+  percentualComissao?: number;
+  statusComissao?: 'Pendente' | 'Pago';
   statusPagamento: PaymentStatus;
   clienteId: string;
   orcamentoId: string;

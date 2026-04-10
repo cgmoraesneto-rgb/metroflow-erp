@@ -122,8 +122,16 @@ export default function CalibrationLaunchModal({
 
     if (record.standardInstrumentUncertainties?.length) {
       setStandardDetails(record.standardInstrumentUncertainties);
-    } else if (currentMask?.standardInstrumentUncertainties?.length) {
-      setStandardDetails(currentMask.standardInstrumentUncertainties);
+    } else if (currentMask?.standardInstrumentIds?.length) {
+      const freshDetails = currentMask.standardInstrumentIds.map(id => {
+        const std = standardInstruments.find(s => s.id === id);
+        return {
+          instrumentId: id,
+          declaredU: std?.uncertainty || 0,
+          certificateK: 2
+        };
+      });
+      setStandardDetails(freshDetails);
     }
 
     if (existingResult?.groups?.length) {
@@ -223,8 +231,16 @@ export default function CalibrationLaunchModal({
       };
     });
 
-    if (mask.standardInstrumentUncertainties) {
-      setStandardDetails(mask.standardInstrumentUncertainties);
+    if (mask.standardInstrumentIds?.length) {
+      const freshDetails = mask.standardInstrumentIds.map(id => {
+        const std = standardInstruments.find(s => s.id === id);
+        return {
+          instrumentId: id,
+          declaredU: std?.uncertainty || 0,
+          certificateK: 2
+        };
+      });
+      setStandardDetails(freshDetails);
     }
 
     setGroups(newGroups);

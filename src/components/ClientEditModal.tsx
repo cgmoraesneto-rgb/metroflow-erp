@@ -39,6 +39,8 @@ export default function ClientEditModal({ client, isOpen, onClose, onSave, onDel
       restricaoPagamento: false,
       status: ClientStatus.NOT_UPDATED,
       funcionarioCadastro: '',
+      inscricaoMunicipal: '',
+      inscricaoEstadual: '',
     },
     mode: 'onChange'
   });
@@ -61,6 +63,8 @@ export default function ClientEditModal({ client, isOpen, onClose, onSave, onDel
         restricaoPagamento: false,
         status: ClientStatus.NOT_UPDATED,
         funcionarioCadastro: '',
+        inscricaoMunicipal: '',
+        inscricaoEstadual: '',
       });
     }
   }, [client, reset]);
@@ -235,6 +239,24 @@ export default function ClientEditModal({ client, isOpen, onClose, onSave, onDel
                           placeholder="••••••••"
                         />
                       </div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 mt-6">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Inscrição Municipal</label>
+                      <input
+                        {...register('inscricaoMunicipal')}
+                        className="w-full px-5 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-8 focus:ring-indigo-500/5 focus:border-indigo-500/30 outline-none font-bold text-sm transition-all dark:text-white"
+                        placeholder="Caso possua"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Inscrição Estadual</label>
+                      <input
+                        {...register('inscricaoEstadual')}
+                        className="w-full px-5 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-8 focus:ring-indigo-500/5 focus:border-indigo-500/30 outline-none font-bold text-sm transition-all dark:text-white"
+                        placeholder="Caso possua"
+                      />
                     </div>
                   </div>
                 </div>

@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "id": "ORC-999",
+    "clienteId": "cli-001",
+    "dataEmissao": "2026-04-01",
+    "status": "APPROVED",
+    "items": [
+      {
+        "descricao": "Micrômetro Externo 0-25mm",
+        "quantidade": 1,
+        "valorUnitario": 150.0,
+        "identificacao": "MIC-01"
+      }
+    ],
+    "valorTotal": 150.0,
+    "validadeDias": 30
+  }
+]

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useData } from '../contexts/DataContext';
-import { Quote, Client, PriceTable, PaymentMethod, QuoteStatus, ServiceOrder } from '../types';
+import { useAuth } from '../contexts/AuthContext';
+import { Quote, Client, PriceTable, PaymentMethod, QuoteStatus, ServiceOrder, DocumentTemplate } from '../types';
 import QuoteEditModal from './QuoteEditModal';
 import QuoteViewModal from './QuoteViewModal';
 import { Eye, Pencil, Trash2, Plus, LayoutGrid, List, CheckCircle, FileText } from 'lucide-react';
@@ -47,6 +48,7 @@ export default function QuotesSection({
   onApproveQuote,
 }: QuotesSectionProps) {
   const { documentTemplates } = useData();
+  const { employee } = useAuth();
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
   const [editingQuote, setEditingQuote] = useState<Quote | null>(null);
   const [viewingQuote, setViewingQuote] = useState<Quote | null>(null);
@@ -98,6 +100,8 @@ export default function QuotesSection({
       clienteRetencaoImpostoFonte: false,
       status: QuoteStatus.PENDING,
       revision: 0,
+      criadoPor: employee?.nome || 'Sistema',
+      criadoEm: new Date().toLocaleString('pt-BR'),
     };
     setEditingQuote(newQuote);
     setIsQuoteModalOpen(true);

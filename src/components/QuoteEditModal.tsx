@@ -353,6 +353,7 @@ export default function QuoteEditModal({
                 disabled
               />
             </div>
+            {/* Financeiro row: 1 col param, 2 cols checkboxes */}
             <div>
               <label htmlFor="clienteEmailFinanceiro" className="block text-sm font-medium text-gray-700">Email Financeiro</label>
               <input
@@ -365,29 +366,33 @@ export default function QuoteEditModal({
                 disabled
               />
             </div>
-            <div className="flex items-center mt-4">
-              <input
-                type="checkbox"
-                name="clienteRetencaoImpostoFonte"
-                id="clienteRetencaoImpostoFonte"
-                checked={formData.clienteRetencaoImpostoFonte}
-                onChange={handleChange}
-                className="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                disabled
-              />
-              <label htmlFor="clienteRetencaoImpostoFonte" className="ml-2 block text-sm text-gray-900">Retenção de Imposto na Fonte</label>
+            <div className="col-span-2 flex items-center gap-6 mt-6">
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  name="clienteRetencaoImpostoFonte"
+                  id="clienteRetencaoImpostoFonte"
+                  checked={formData.clienteRetencaoImpostoFonte}
+                  onChange={handleChange}
+                  className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                  disabled
+                />
+                <label htmlFor="clienteRetencaoImpostoFonte" className="ml-2 block text-sm text-gray-900">Retenção de Imposto na Fonte</label>
+              </div>
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  name="comissaoVendedor"
+                  id="comissaoVendedor"
+                  checked={formData.comissaoVendedor}
+                  onChange={handleChange}
+                  className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                />
+                <label htmlFor="comissaoVendedor" className="ml-2 block text-sm text-gray-900 font-bold text-indigo-600">Comissão para Vendedor</label>
+              </div>
             </div>
-            <div className="flex items-center mt-4">
-              <input
-                type="checkbox"
-                name="comissaoVendedor"
-                id="comissaoVendedor"
-                checked={formData.comissaoVendedor}
-                onChange={handleChange}
-                className="h-4 w-4 text-blue-600 border-gray-300 rounded"
-              />
-              <label htmlFor="comissaoVendedor" className="ml-2 block text-sm text-gray-900 font-bold text-indigo-600">Comissão para Vendedor</label>
-            </div>
+
+            {/* Price Table, Payment, Commissioner */}
             <div>
               <label htmlFor="tabelaPrecos" className="block text-sm font-medium text-gray-700">Tabela de Preços</label>
               <select
@@ -420,43 +425,63 @@ export default function QuoteEditModal({
                 ))}
               </select>
             </div>
-            <div className="col-span-2">
+            
+            {formData.comissaoVendedor ? (
+              <div>
+                <label htmlFor="nomeComissionado" className="block text-sm font-medium text-gray-700">Nome do Comissionado</label>
+                <input
+                  type="text"
+                  name="nomeComissionado"
+                  id="nomeComissionado"
+                  value={formData.nomeComissionado || ''}
+                  onChange={handleChange}
+                  placeholder="Nome de quem recebe a comissão"
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  required
+                />
+              </div>
+            ) : (
+              <div></div> /* Empty div to keep the 3-column grid aligned if nothing else fits */
+            )}
+
+            <div className="col-span-1 md:col-span-2">
               <label htmlFor="observacoes" className="block text-sm font-medium text-gray-700">Observações</label>
               <textarea
                 name="observacoes"
                 id="observacoes"
-                rows={4}
+                rows={5}
                 value={formData.observacoes || ''}
                 onChange={handleChange}
-                placeholder="Anotações adicionais que aparecerão no orçamento e na O.S. (ex: prazo especial, condições acordadas, etc.)"
+                placeholder="Anotações adicionais que aparecerão no orçamento e na O.S."
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 resize-none text-sm"
               />
             </div>
-            <div>
-              <label htmlFor="dataEmissao" className="block text-sm font-medium text-gray-700">Data de Emissão</label>
-              <input
-                type="date"
-                name="dataEmissao"
-                id="dataEmissao"
-                value={formData.dataEmissao}
-                onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                required
-                disabled
-              />
-            </div>
-            <div>
-              <label htmlFor="validade" className="block text-sm font-medium text-gray-700">Validade</label>
-              <input
-                type="date"
-                name="validade"
-                id="validade"
-                value={formData.validade}
-                onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                required
-                disabled
-              />
+
+            <div className="flex flex-col gap-4">
+              <div>
+                <label htmlFor="dataEmissao" className="block text-sm font-medium text-gray-700">Data de Emissão <span className="text-xs text-gray-400 font-normal italic">(Calculado)</span></label>
+                <input
+                  type="date"
+                  name="dataEmissao"
+                  id="dataEmissao"
+                  value={formData.dataEmissao}
+                  className="mt-1 block w-full border border-gray-200 bg-gray-100 cursor-not-allowed text-gray-500 rounded-md shadow-sm p-2"
+                  required
+                  disabled
+                />
+              </div>
+              <div>
+                <label htmlFor="validade" className="block text-sm font-medium text-gray-700">Validade <span className="text-xs text-gray-400 font-normal italic">(30 Dias)</span></label>
+                <input
+                  type="date"
+                  name="validade"
+                  id="validade"
+                  value={formData.validade}
+                  className="mt-1 block w-full border border-gray-200 bg-gray-100 cursor-not-allowed text-gray-500 rounded-md shadow-sm p-2"
+                  required
+                  disabled
+                />
+              </div>
             </div>
 
           </div>
@@ -647,6 +672,13 @@ export default function QuoteEditModal({
               </button>
             )}
           </div>
+          {formData.criadoPor && (
+            <div className="mt-2 text-right">
+              <span className="text-xs text-gray-400 font-medium italic">
+                Criado por {formData.criadoPor} em {formData.criadoEm || ''}
+              </span>
+            </div>
+          )}
         </form>
       </div>
     </div>

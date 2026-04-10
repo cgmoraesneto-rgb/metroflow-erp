@@ -132,6 +132,8 @@ const ClientsSection: React.FC<ClientsSectionProps> = ({
                                     <div className="space-y-4 text-sm">
                                         {[
                                             { label: 'CNPJ', value: viewingClient.cnpj },
+                                            { label: 'Insc. Municipal', value: viewingClient.inscricaoMunicipal },
+                                            { label: 'Insc. Estadual', value: viewingClient.inscricaoEstadual },
                                             { label: 'Endereço Principal', value: viewingClient.enderecoPrincipal },
                                             { label: 'Endereço de Coleta', value: viewingClient.enderecoColeta },
                                             { label: 'Solicitante', value: viewingClient.solicitanteNome },

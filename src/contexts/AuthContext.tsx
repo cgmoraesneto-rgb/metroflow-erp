@@ -105,7 +105,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       try {
         const employees = await apiClient.fetch<Employee>('/api/mock/employees');
-        empData = employees.find(e => e.username === username || e.email === username);
+        empData = employees.find(e => 
+          (e.username && e.username.toLowerCase() === username.toLowerCase()) || 
+          (e.email && e.email.toLowerCase() === username.toLowerCase())
+        );
       } catch (mockError) {
         console.warn('Mock employee fetch falhou, tentaremos Firebase:', mockError);
       }

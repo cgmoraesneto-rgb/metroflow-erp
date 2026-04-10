@@ -21,6 +21,8 @@ export const ClientSchema = z.object({
   restricaoPagamento: z.boolean().optional(),
   funcionarioCadastro: z.string().optional(),
   senha: z.string().optional(),
+  inscricaoMunicipal: z.string().optional(),
+  inscricaoEstadual: z.string().optional(),
 });
 
 export type ClientFormData = z.infer<typeof ClientSchema>;

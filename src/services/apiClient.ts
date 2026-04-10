@@ -16,7 +16,7 @@ export class ApiError extends Error {
 // -------------------------------------------------------------
 export const apiClient = {
   // Flag to force real database usage in production/staging
-  useRealDatabase: true, 
+  useRealDatabase: import.meta.env.PROD, 
 
   async fetch<T extends { id?: string }>(url: string, schema?: z.ZodSchema<T>): Promise<T[]> {
     if (this.useRealDatabase) {

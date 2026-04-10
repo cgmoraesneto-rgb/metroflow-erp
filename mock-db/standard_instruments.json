@@ -1,1 +1,28 @@
-[]
+[
+  {
+    "id": "std-001",
+    "identificacao": "TH-001",
+    "nome": "Termohigrômetro Digital",
+    "fabricante": "Testo",
+    "modelo": "608-H1",
+    "serialNumber": "SN-TH9988",
+    "certificadoCalibracao": "CERT-2024-001",
+    "orgaoCalibrador": "Labs RBC",
+    "dataValidadeCalibracao": "2025-12-31",
+    "uncertainty": 0.5,
+    "statusMovimentacao": "Disponível"
+  },
+  {
+    "id": "std-002",
+    "identificacao": "PAQ-005",
+    "nome": "Paquímetro Digital 150mm",
+    "fabricante": "Mitutoyo",
+    "modelo": "500-196-30",
+    "serialNumber": "SN-MIT-5432",
+    "certificadoCalibracao": "CERT-RBC-7766",
+    "orgaoCalibrador": "Mitutoyo Brasil",
+    "dataValidadeCalibracao": "2025-06-15",
+    "uncertainty": 0.01,
+    "statusMovimentacao": "Disponível"
+  }
+]

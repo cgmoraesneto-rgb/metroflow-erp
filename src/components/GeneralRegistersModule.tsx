@@ -716,9 +716,7 @@ export default function GeneralRegistersModule({
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{template.applyTo || 'N/A'}</p>
                       </div>
                     </div>
-                    {template.commercialConditions && (
-                      <p className="text-xs text-slate-500 font-medium mb-4 line-clamp-2">{template.commercialConditions}</p>
-                    )}
+
                     <div className="flex justify-between items-center pt-4 border-t border-slate-50 dark:border-slate-800/30">
                       <span className="px-2 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-[8px] font-black uppercase tracking-widest">
                         Ativo

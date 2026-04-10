@@ -20,6 +20,7 @@ import {
     Truck
 } from 'lucide-react';
 import { Module } from '../types';
+import TopNotifications from './TopNotifications';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { user, employee, logout } = useAuth();
@@ -192,10 +193,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     </div>
 
                     <div className="flex items-center space-x-3 sm:space-x-6">
-                        <button className="p-2.5 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all relative group">
-                            <Bell className="w-5 h-5" />
-                            <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-white dark:border-slate-950 group-hover:scale-125 transition-transform"></span>
-                        </button>
+                        <TopNotifications />
                     </div>
                 </header>
 

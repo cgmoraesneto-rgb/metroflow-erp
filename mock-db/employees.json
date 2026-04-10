@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "id": "admin-1",
+    "nome": "C.G. Moraes Neto",
+    "email": "c.g.moraesneto@gmail.com",
+    "username": "admin",
+    "password": "123456",
+    "cargo": "Administrador do Sistema",
+    "role": "ADMIN",
+    "permissions": ["Dashboard", "Clientes", "Comercial", "Logística", "Técnico", "Qualidade", "Financeiro", "Cadastros"],
+    "isSignatory": true,
+    "mustChangePassword": false
+  }
+]
