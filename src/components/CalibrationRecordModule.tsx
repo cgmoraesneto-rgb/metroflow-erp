@@ -108,6 +108,33 @@ export default function CalibrationRecordModule({
 
     const [kFactorJustification, setKFactorJustification] = useState<'Padrão (k=2 para 95.45%)' | 'Welch-Satterthwaite'>('Padrão (k=2 para 95.45%)');
 
+    useEffect(() => {
+        // Only auto-generate for NEW records
+        if (!editingRecordId && selectedOS && selectedQuoteItemIndex !== null) {
+            const quote = quotes.find(q => q.id === selectedOS.orcamentoId);
+            const item = quote?.items[selectedQuoteItemIndex];
+            const isEnsaio = item?.tipoServico?.toLowerCase().includes('ensaio');
+            
+            let prefix = 'CRW26';
+            if (isEnsaio) {
+                prefix = isAccredited ? 'RTW26' : 'REW26';
+            }
+
+            // Find max sequence in ALL records that follow this pattern
+            let maxSeq = 0;
+            calibrationRecords.forEach(r => {
+                const match = r.certificateNumber?.match(/^[A-Z]{2,3}W26(\d+)$/);
+                if (match && match[1]) {
+                    const seq = parseInt(match[1], 10);
+                    if (seq > maxSeq) maxSeq = seq;
+                }
+            });
+
+            const newNumber = `${prefix}${(maxSeq + 1).toString().padStart(3, '0')}`;
+            setTopDetails(prev => ({ ...prev, certificateNumber: newNumber }));
+        }
+    }, [selectedOS, selectedQuoteItemIndex, isAccredited, editingRecordId, calibrationRecords, quotes]);
+
     const handleSaveHeader = async (isOfficial: boolean = false) => {
         if (!selectedOS || selectedQuoteItemIndex === null) {
             toast.error("Preencha todos os campos obrigatórios do cabeçalho.");

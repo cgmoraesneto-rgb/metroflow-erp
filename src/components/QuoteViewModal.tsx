@@ -58,7 +58,7 @@ const QuoteViewModal: React.FC<QuoteViewModalProps> = ({ quote, client, onClose,
       statusServico: InstrumentStatus.PENDING as unknown as any,
       statusCertificado: CertificateStatus.PENDING as unknown as any,
     };
-    onApprove(quote, newServiceOrder);
+    onApprove({ ...quote, status: QuoteStatus.APPROVED }, newServiceOrder);
   };
 
   React.useEffect(() => {

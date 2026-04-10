@@ -286,7 +286,11 @@ export const addStandardFooter = (doc: jsPDF, isCertificate: boolean = false, cu
 
     if (extraLegend && i >= legendStartPage) {
       doc.setFont('helvetica', 'bold');
-      doc.text(extraLegend, pageWidth / 2, pageHeight - 18, { align: 'center' });
+      doc.setFontSize(9);
+      doc.setTextColor(0, 0, 0); 
+      doc.text(extraLegend, pageWidth / 2, pageHeight - 20, { align: 'center' });
+      doc.setTextColor(150, 150, 150);
+      doc.setFontSize(7);
       doc.setFont('helvetica', 'normal');
     }
     
@@ -314,9 +318,9 @@ export const generateCertificatePdf = async (
   const doc = new jsPDF('p', 'mm', 'a4');
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
-  const marginX = 15;
-  const marginTop = 45; // Margem superior para respeitar o papel timbrado
-  const marginBottom = 50; // Margem inferior espacada
+  const marginX = 20;
+  const marginTop = 35; // Standardized margin
+  const marginBottom = 25; 
   const contentWidth = pageWidth - marginX * 2;
 
   const mask = certificateMasks.find(m => m.id === record.certificateMaskId);
@@ -843,10 +847,10 @@ export const generateQuotePdf = async (quote: Quote, client: Client | undefined,
 
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
-  const marginLeft = 10; // Maximized width (1.0cm) to remove any "leftover" margins
-  const marginRight = 10;
-  const marginTop = 35;  // 3.5cm top
-  const marginBottom = 15;
+  const marginLeft = 20; 
+  const marginRight = 20;
+  const marginTop = 45; 
+  const marginBottom = 20;
   const contentWidth = pageWidth - marginLeft - marginRight;
   const primaryBlue: [number, number, number] = [0, 51, 102];
 
@@ -905,7 +909,7 @@ export const generateQuotePdf = async (quote: Quote, client: Client | undefined,
       ['E-mail:', { content: quote.clienteSolicitanteEmail || 'N/A', colSpan: 3 }],
       ['Financeiro:', quote.clienteEmailFinanceiro || 'N/A', 'Retenção:', quote.clienteRetencaoImpostoFonte ? 'SIM' : 'NÃO']
     ],
-    margin: { left: marginLeft, right: marginRight }
+    margin: { left: marginLeft, right: marginRight, top: marginTop }
   });
 
   // Top Yellow Warning
@@ -1039,7 +1043,7 @@ export const generateQuotePdf = async (quote: Quote, client: Client | undefined,
         }
       }
     },
-    margin: { left: marginLeft, right: marginRight, top: marginTop, bottom: marginBottom }
+    margin: { left: marginLeft, right: marginRight, top: 45, bottom: marginBottom }
   });
 
   // RBC Yellow Warning
@@ -1050,7 +1054,7 @@ export const generateQuotePdf = async (quote: Quote, client: Client | undefined,
     theme: 'plain',
     styles: { cellPadding: 3, fontSize: 12, fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 0], textColor: [0, 0, 0] },
     body: [['Caso necessite de calibração RBC, consulte-nos!']],
-    margin: { left: marginLeft, right: marginRight, top: marginTop, bottom: marginBottom }
+    margin: { left: marginLeft, right: marginRight, top: 45, bottom: marginBottom }
   });
 
   // Definition 
@@ -1061,7 +1065,7 @@ export const generateQuotePdf = async (quote: Quote, client: Client | undefined,
     theme: 'plain',
     styles: { cellPadding: 3, fontSize: 10, fontStyle: 'italic', halign: 'justify', textColor: [0, 0, 0] },
     body: [['Calibração é a operação que estabelece, sob condições específicas, numa primeira etapa, uma relação entre os valores e as incertezas de medição fornecidos por padrões e as indicações correspondentes com as incertezas associadas. Não se aplicando manutenção ou ajustes.']],
-    margin: { left: marginLeft, right: marginRight, top: marginTop, bottom: marginBottom }
+    margin: { left: marginLeft, right: marginRight, top: 45, bottom: marginBottom }
   });
 
   // Sections 2, 3, 4 Terms
@@ -1074,7 +1078,7 @@ export const generateQuotePdf = async (quote: Quote, client: Client | undefined,
       theme: 'plain',
       styles: { cellPadding: 2, fontSize: 12, fontStyle: 'bold', fillColor: [180, 180, 180], textColor: [0, 0, 0] },
       body: [[title]],
-      margin: { left: marginLeft, right: marginRight, top: marginTop, bottom: marginBottom }
+      margin: { left: marginLeft, right: marginRight, top: 45, bottom: marginBottom }
     });
 
     // 2. Terms Body
@@ -1089,7 +1093,7 @@ export const generateQuotePdf = async (quote: Quote, client: Client | undefined,
         0: { fontStyle: 'bold', cellWidth: 'wrap' },
         1: { cellWidth: 'auto', halign: 'justify' }
       },
-      margin: { left: marginLeft, right: marginRight, top: marginTop, bottom: marginBottom }
+      margin: { left: marginLeft, right: marginRight, top: 45, bottom: marginBottom }
     });
   };
 
@@ -1159,7 +1163,7 @@ export const generateQuotePdf = async (quote: Quote, client: Client | undefined,
         [{ content: 'Observações:', styles: { fontStyle: 'bold' } }],
         [quote.observacoes]
       ],
-      margin: { left: marginLeft, right: marginRight, top: marginTop, bottom: marginBottom }
+      margin: { left: marginLeft, right: marginRight, top: 45, bottom: marginBottom }
     });
     // @ts-ignore
     lineY = doc.lastAutoTable.finalY + 10;
@@ -1174,10 +1178,10 @@ export const generateQuotePdf = async (quote: Quote, client: Client | undefined,
 
   if (quote.criadoPor) {
     lineY += 10;
-    doc.setFontSize(7);
-    doc.setFont('helvetica', 'italic');
-    doc.setTextColor(150, 150, 150);
-    doc.text(`Orçamento criado por ${quote.criadoPor} em ${quote.criadoEm || ''}`, marginLeft, lineY);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(50, 50, 50);
+    doc.text(`Orçamento confeccionado por ${quote.criadoPor} ${quote.criadoEm ? 'em ' + quote.criadoEm : ''}`, marginLeft, lineY);
   }
 
   addStandardFooter(doc, false, template?.footerBase64);
@@ -1204,18 +1208,26 @@ export const generateServiceOrderPdf = async (
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
-  const margin = 15;
+  const margin = 20;
   const primaryBlue: [number, number, number] = [0, 51, 102];
 
   // Header Drawing
   const callHeader = (document: jsPDF, title: string) => {
-    return addStandardHeader({
+    addStandardHeader({
       doc: document,
-      title: `${title} Nº ${os.id}`,
+      title: '', 
       isCertificate: false,
       hideMeta: true,
       customLetterhead: letterhead
     });
+
+    const titleY = 46;
+    document.setFontSize(18);
+    document.setFont('helvetica', 'bold');
+    document.setTextColor(0, 0, 0);
+    document.text(`${title} Nº ${os.id}`, pageWidth / 2, titleY, { align: 'center' });
+
+    return titleY + 6;
   };
 
   // --- PARTE 1: Ordem de Serviço (Administrativa) ---
@@ -1340,8 +1352,8 @@ export const generateServiceOrderPdf = async (
   currentY = callHeader(doc, 'RELATÓRIO DE SERVIÇO EXTERNO');
 
   doc.setFontSize(10); doc.setFont('helvetica', 'bold');
-  doc.text(`CLIENTE: ${client?.razaoSocial || 'N/A'}`, margin, currentY);
-  currentY += 8;
+  doc.text(`CLIENTE: ${client?.razaoSocial || 'N/A'}`, margin, currentY + 4);
+  currentY += 12;
 
   // Tabela Desmembrada com 5 colunas de Status e Numbering Contínuo
   if (quote) {

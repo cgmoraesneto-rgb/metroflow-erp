@@ -58,7 +58,7 @@ export default function ServiceOrdersSection({ clients, quotes, serviceOrders, c
 
     let maxSeq = 0;
     serviceOrders.forEach(os => {
-      const match = os.id.match(/^OSW26(\d+)$/);
+      const match = os.id.match(/^26(\d+)$/);
       if (match && match[1]) {
         const seq = parseInt(match[1], 10);
         if (seq > maxSeq) {
@@ -67,8 +67,8 @@ export default function ServiceOrdersSection({ clients, quotes, serviceOrders, c
       }
     });
 
-    const newSeq = (maxSeq + 1).toString().padStart(4, '0');
-    const newServiceOrderId = `OSW26${newSeq}`;
+    const newSeq = (maxSeq + 1).toString().padStart(3, '0');
+    const newServiceOrderId = `26${newSeq}`;
 
     const entryDate = new Date().toISOString().split('T')[0];
 

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Client, Quote, ServiceOrder, FinancialControl, CalibrationRecord, InstrumentStatus, StandardInstrument, PaymentStatus, CertificateStatus, QuoteStatus } from '../types';
-import { Users, FileText, ClipboardList, CircleDollarSign, Activity, CheckCircle, Clock, Calendar, AlertCircle, ChevronRight, ArrowUpRight, TrendingUp, PackageCheck, Hourglass, AlertTriangle } from 'lucide-react';
+import { Users, FileText, ClipboardList, CircleDollarSign, Activity, CheckCircle, Clock, Calendar, AlertCircle, ChevronRight, ArrowUpRight, TrendingUp, PackageCheck, Hourglass, AlertTriangle, Database, RefreshCw, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDate, formatCurrency } from '../utils/formatters';
+import { migrateERPData } from '../utils/migration';
+import { toast } from 'sonner';
 
 interface DashboardModuleProps {
   clients: Client[];
@@ -12,9 +14,14 @@ interface DashboardModuleProps {
   financialControls: FinancialControl[];
   calibrationRecords: CalibrationRecord[];
   standardInstruments: StandardInstrument[];
+  saveItem?: (collection: string, item: any) => Promise<void>;
+  deleteItem?: (collection: string, id: string) => Promise<void>;
 }
 
-export default function DashboardModule({ clients, quotes, serviceOrders, financialControls, calibrationRecords, standardInstruments }: DashboardModuleProps) {
+export default function DashboardModule({ 
+  clients, quotes, serviceOrders, financialControls, calibrationRecords, standardInstruments,
+  saveItem, deleteItem
+}: DashboardModuleProps) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'overview' | 'standards'>('overview');
   const [selectedMonth, setSelectedMonth] = useState<string>(new Date().toISOString().substring(0, 7));
@@ -244,6 +251,62 @@ export default function DashboardModule({ clients, quotes, serviceOrders, financ
                     </div>
                   </motion.div>
                 ))}
+              </div>
+
+              {/* MAINTENANCE & STANDARDIZATION PANEL (PROMINENT POSITION) */}
+              <div className="mt-10 p-8 rounded-[2.5rem] bg-indigo-900 text-white shadow-2xl relative overflow-hidden group">
+                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-white/10 transition-all duration-700"></div>
+                 <div className="relative z-10">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                       <div className="flex items-center gap-5">
+                          <div className="p-4 bg-white/10 rounded-2xl backdrop-blur-md border border-white/10 translate-y-0 group-hover:-translate-y-1 transition-transform">
+                             <RefreshCw className="w-8 h-8 text-indigo-300 animate-[spin_10s_linear_infinite]" />
+                          </div>
+                          <div>
+                             <h4 className="text-2xl font-black tracking-tight">Standardização da Base de Dados</h4>
+                             <p className="text-indigo-200 text-sm font-medium mt-1">
+                                Atualize todos os registros históricos (OS e Orçamentos) para o novo padrão **v26**.
+                             </p>
+                          </div>
+                       </div>
+                       
+                       <button 
+                          onClick={async () => {
+                             if (!saveItem || !deleteItem) return;
+                             const confirmed = confirm("ATENÇÃO: Este processo irá reescrever IDs de documentos históricos (OCW, OS, Certificados) para o novo padrão v26. Esta ação é irreversível. Deseja prosseguir?");
+                             if (!confirmed) return;
+
+                             const t = toast.loading("Standardizando base de dados...");
+                             try {
+                                const result = migrateERPData(quotes, serviceOrders, calibrationRecords, financialControls);
+                                
+                                for (const q of result.quotes) await saveItem('quotes', q);
+                                for (const os of result.serviceOrders) await saveItem('service_orders', os);
+                                for (const r of result.calibrationRecords) await saveItem('calibration_records', r);
+                                for (const f of result.financialControls) await saveItem('financial_controls', f);
+
+                                const oldQuoteIds = quotes.map(q => q.id);
+                                for (const id of oldQuoteIds) {
+                                   if (!result.quotes.find(nq => nq.id === id)) await deleteItem('quotes', id);
+                                }
+                                const oldOSIds = serviceOrders.map(os => os.id);
+                                for (const id of oldOSIds) {
+                                   if (!result.serviceOrders.find(no => no.id === id)) await deleteItem('service_orders', id);
+                                }
+
+                                toast.success("Base de dados standardizada com sucesso!", { id: t });
+                                setTimeout(() => window.location.reload(), 2000);
+                             } catch (e) {
+                                toast.error("Erro durante a migração.", { id: t });
+                                console.error(e);
+                             }
+                          }}
+                          className="w-full md:w-auto px-8 py-5 bg-white text-indigo-900 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-50 transition-all shadow-xl active:scale-95"
+                       >
+                          Executar Standardização v26
+                       </button>
+                    </div>
+                 </div>
               </div>
 
               {/* Financial Summary */}

@@ -188,7 +188,7 @@ export default function App() {
 }
 
 function DashboardWrapper() {
-  const { clients, quotes, serviceOrders, financialControls, calibrationRecords, standardInstruments } = useData();
+  const { clients, quotes, serviceOrders, financialControls, calibrationRecords, standardInstruments, saveItem, deleteItem } = useData();
   return (
     <DashboardModule
       clients={clients}
@@ -197,6 +197,8 @@ function DashboardWrapper() {
       financialControls={financialControls}
       calibrationRecords={calibrationRecords}
       standardInstruments={standardInstruments}
+      saveItem={saveItem}
+      deleteItem={deleteItem}
     />
   );
 }

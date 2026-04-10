@@ -11,7 +11,13 @@ export const formatDate = (dateString: string | null | undefined): string => {
     try {
         const [year, month, day] = dateString.split('-');
         if (!year || !month || !day) return dateString; // Return original if not YYYY-MM-DD
-        return `${day}/${month}/${year}`;
+        
+        // If day contains time component (e.g. 10T14:53...), strip it
+        const cleanDay = day.includes('T') ? day.split('T')[0] : day;
+        
+        const result = `${cleanDay}/${month}/${year}`;
+        // Extra protection: if result still has 'T' or other ISO junk, clean the part before '/'
+        return result.split('/')[0].includes('T') ? `${result.split('/')[0].split('T')[0]}/${month}/${year}` : result;
     } catch (e) {
         return dateString;
     }
