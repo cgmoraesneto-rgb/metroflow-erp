@@ -143,7 +143,7 @@ export const loadRemoteImage = async (url: string): Promise<string> => {
     if (base64 && base64.startsWith('data:image')) return base64;
     return url;
   } catch (error) {
-    console.error("Error loading remote image:", url, error);
+    console.warn("Could not convert image to base64, using original URL:", url);
     return url;
   }
 };
@@ -153,6 +153,42 @@ const getImageFormat = (dataUrl: string): any => {
   if (dataUrl.startsWith('data:image/jpeg') || dataUrl.startsWith('data:image/jpg')) return 'JPEG';
   if (dataUrl.startsWith('data:image/webp')) return 'WEBP';
   return undefined; // Let jsPDF try to auto-detect
+};
+
+const addImageToDoc = async (doc: jsPDF, imageData: string, x: number, y: number, w: number, h: number) => {
+  if (!imageData || imageData.length < 10) return;
+  
+  return new Promise<void>((resolve) => {
+    try {
+      const format = imageData.startsWith('data:image') ? getImageFormat(imageData) : undefined;
+      
+      // If it's a URL, we attempt to load it as an image object for better jsPDF compatibility
+      if (imageData.startsWith('http')) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous'; // Critical for CORS
+        img.src = imageData;
+        img.onload = () => {
+          try {
+            doc.addImage(img, format || 'PNG', x, y, w, h, undefined, 'FAST');
+          } catch (e) {
+            console.error("Error drawing image object:", e);
+          }
+          resolve();
+        };
+        img.onerror = () => {
+          console.error("Failed to load image URL for PDF:", imageData);
+          resolve();
+        };
+      } else {
+        // It's already base64
+        doc.addImage(imageData, format || 'PNG', x, y, w, h, undefined, 'FAST');
+        resolve();
+      }
+    } catch (e) {
+      console.error("Critical error in addImageToDoc:", e);
+      resolve();
+    }
+  });
 };
 
 export const addStandardHeader = ({
@@ -175,13 +211,15 @@ export const addStandardHeader = ({
   const margin = 20;
 
   // Header images are usually full width or positioned at top
-  if (letterhead && typeof letterhead === 'string' && (letterhead.startsWith('data:image') || letterhead.startsWith('http'))) {
+  if (letterhead) {
+    // Note: this makes addStandardHeader technically async if we await it, 
+    // but we can just run it "fire and forget" if needed, OR better yet, we just draw what we can.
+    // For now, we will assume letterhead is already base64 because we await loadRemoteImage in the main functions.
     try {
-      const format = letterhead.startsWith('data:image') ? getImageFormat(letterhead) : undefined;
-      // Use 'FAST' compression and allow jsPDF to handle format detection
+      const format = (typeof letterhead === 'string' && letterhead.startsWith('data:image')) ? getImageFormat(letterhead) : undefined;
       doc.addImage(letterhead, format || 'PNG', 0, 0, 210, 297, undefined, 'FAST');
     } catch (e) {
-      console.error("Error adding header image:", e);
+      console.log("Soft error adding header image:", e);
     }
   }
   

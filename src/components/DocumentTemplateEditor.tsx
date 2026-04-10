@@ -109,7 +109,7 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({ isOpen,
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className={`grid grid-cols-1 ${form.applyTo === 'CALIBRATION_CERTIFICATE' ? 'md:grid-cols-2' : ''} gap-8`}>
           {/* Layout Image Upload (Padrão) */}
           <div className="space-y-3">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Layout Padrão (Imagem)</label>
@@ -143,38 +143,39 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({ isOpen,
             </div>
           </div>
 
-          {/* Layout Image Upload (RBC) */}
-          <div className="space-y-3">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Papel Timbrado Acreditado (RBC)</label>
-            <div className={`relative flex items-center justify-center p-8 border-2 border-dashed border-indigo-200 dark:border-indigo-700/50 rounded-[2.5rem] bg-indigo-50/50 dark:bg-indigo-900/10 transition-all ${isUploading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-50 dark:hover:bg-indigo-900/20 cursor-pointer'}`}>
-              <input 
-                type="file" 
-                accept="image/*" 
-                onChange={e => handleImageUpload(e, 'accreditedLetterheadBase64')} 
-                disabled={isUploading}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed" 
-              />
-              {form.accreditedLetterheadBase64 ? (
-                <div className="relative group/img text-center">
-                  <img src={form.accreditedLetterheadBase64} alt="Layout RBC" className="max-h-32 object-contain rounded-xl" />
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 flex items-center justify-center rounded-xl transition-all">
-                    <span className="text-white text-[10px] font-black uppercase tracking-widest">Alterar Papel Timbrado</span>
+          {form.applyTo === 'CALIBRATION_CERTIFICATE' && (
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Layout Acreditado RBC (Imagem)</label>
+              <div className={`relative flex items-center justify-center p-8 border-2 border-dashed border-indigo-200 dark:border-indigo-700/50 rounded-[2.5rem] bg-indigo-50/50 dark:bg-indigo-900/10 transition-all ${isUploading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-50 dark:hover:bg-indigo-900/20 cursor-pointer'}`}>
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={e => handleImageUpload(e, 'accreditedLetterheadBase64')} 
+                  disabled={isUploading}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed" 
+                />
+                {form.accreditedLetterheadBase64 ? (
+                  <div className="relative group/img text-center">
+                    <img src={form.accreditedLetterheadBase64} alt="Layout RBC" className="max-h-32 object-contain rounded-xl" />
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 flex items-center justify-center rounded-xl transition-all">
+                      <span className="text-white text-[10px] font-black uppercase tracking-widest">Alterar Layout RBC</span>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center text-indigo-400">
-                  {isUploading ? (
-                    <Loader2 className="w-10 h-10 mb-2 animate-spin" />
-                  ) : (
-                    <Plus className="w-10 h-10 mb-2 opacity-30" />
-                  )}
-                  <span className="text-[10px] font-black uppercase tracking-widest">
-                    {isUploading ? 'Enviando...' : 'Subir Papel Timbrado RBC'}
-                  </span>
-                </div>
-              )}
+                ) : (
+                  <div className="flex flex-col items-center text-indigo-400">
+                    {isUploading ? (
+                      <Loader2 className="w-10 h-10 mb-2 animate-spin" />
+                    ) : (
+                      <Plus className="w-10 h-10 mb-2 opacity-30" />
+                    )}
+                    <span className="text-[10px] font-black uppercase tracking-widest">
+                      {isUploading ? 'Enviando...' : 'Subir Layout RBC'}
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-700">
