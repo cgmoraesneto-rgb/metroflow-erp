@@ -252,7 +252,7 @@ export const addStandardHeader = ({
   return headerTitleY + 20;
 };
 
-export const addStandardFooter = (doc: jsPDF, isCertificate: boolean = false, customFooter?: string) => {
+export const addStandardFooter = (doc: jsPDF, isCertificate: boolean = false, customFooter?: string, extraLegend?: string) => {
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 20;
@@ -283,6 +283,12 @@ export const addStandardFooter = (doc: jsPDF, isCertificate: boolean = false, cu
     // Position text relative to bottom if no custom footer image, 
     // or overlay if it's just a background
     doc.text(disclaimer, pageWidth / 2, pageHeight - 15, { align: 'center' });
+
+    if (extraLegend) {
+      doc.setFont('helvetica', 'bold');
+      doc.text(extraLegend, pageWidth / 2, pageHeight - 18, { align: 'center' });
+      doc.setFont('helvetica', 'normal');
+    }
     
     if (isCertificate) {
        doc.text(`As incertezas expandidas de medição relatadas foram calculadas conforme o Guia para a Expressão da Incerteza de Medição (GUM).`, pageWidth / 2, pageHeight - 12, { align: 'center' });
@@ -1289,7 +1295,7 @@ export const generateServiceOrderPdf = async (
   }
 
   // --- PARTE 2: Protocolo de Campo (Manual) ---
-  if (currentY > pageHeight - 65) { doc.addPage(); currentY = drawCustomOSHeader(doc, 'ORDEM DE SERVIÇO') + 5; }
+  if (currentY > pageHeight - 65) { doc.addPage(); currentY = callHeader(doc, 'ORDEM DE SERVIÇO') + 5; }
 
   doc.setFontSize(9); doc.setFont('helvetica', 'bold');
   doc.setTextColor(...primaryBlue);
@@ -1330,7 +1336,7 @@ export const generateServiceOrderPdf = async (
 
   // --- PARTE 3: Relatório de Serviço Externo (Operacional) ---
   doc.addPage();
-  currentY = drawCustomOSHeader(doc, 'RELATÓRIO DE SERVIÇO EXTERNO');
+  currentY = callHeader(doc, 'RELATÓRIO DE SERVIÇO EXTERNO');
 
   doc.setFontSize(10); doc.setFont('helvetica', 'bold');
   doc.text(`CLIENTE: ${client?.razaoSocial || 'N/A'}`, margin, currentY);
@@ -1364,7 +1370,7 @@ export const generateServiceOrderPdf = async (
     });
   }
 
-  addStandardFooter(doc, false, template?.footerBase64);
+  addStandardFooter(doc, false, template?.footerBase64, "LEGENDA DE STATUS: 1. Equipamento realizado; 2. Não disponível; 3. Não encontrado; 4. Não operante; 5. Coletado.");
   
   if (preview) {
     return doc.output('bloburl');
