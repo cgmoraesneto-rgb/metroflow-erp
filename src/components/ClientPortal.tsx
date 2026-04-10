@@ -96,16 +96,28 @@ const ClientPortal: React.FC = () => {
         return `${r.certificateNumber} ${r.instrumentName} ${r.serialNumber}`.toLowerCase().includes(term);
     });
 
-    const handleDownloadPrimary = (certId: string) => {
+    const handleDownloadPrimary = async (certId: string) => {
         const cert = calibrationRecords.find(c => c.id === certId);
         if (!cert) return;
-        generateCertificatePdf(cert, loggedClient, procedures, standardInstruments, certificateMasks, employees, false, false, documentTemplates);
+        const promise = generateCertificatePdf(cert, loggedClient, procedures, standardInstruments, certificateMasks, employees, false, false, documentTemplates);
+        toast.promise(promise, {
+            loading: 'Gerando certificado...',
+            success: 'Certificado pronto!',
+            error: 'Erro ao gerar certificado.'
+        });
+        await promise;
     };
 
-    const handleDownloadStandard = (siId: string) => {
+    const handleDownloadStandard = async (siId: string) => {
         const si = standardInstruments.find(s => s.id === siId);
         if (si) {
-            generateStandardInstrumentPdf(si, documentTemplates);
+            const promise = generateStandardInstrumentPdf(si, documentTemplates);
+            toast.promise(promise, {
+                loading: 'Gerando ficha do padrão...',
+                success: 'Ficha baixada!',
+                error: 'Erro ao gerar ficha.'
+            });
+            await promise;
         }
     };
 
