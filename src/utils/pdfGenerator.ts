@@ -277,8 +277,8 @@ export const addStandardFooter = (doc: jsPDF, isCertificate: boolean = false, cu
     doc.setTextColor(150, 150, 150);
     
     const disclaimer = isCertificate 
-      ? "Os resultados apresentados neste documento referem-se exclusivamente ao instrumento calibrado nas condições especificadas."
-      : "Este documento é parte integrante do processo de atendimento da Wantec Metroflow Metrologia.";
+      ? "Os resultados apresentados referem-se exclusivamente ao instrumento calibrado nas condições especificadas."
+      : "";
     
     // Position text relative to bottom if no custom footer image, 
     // or overlay if it's just a background
@@ -863,8 +863,8 @@ export const generateQuotePdf = async (quote: Quote, client: Client | undefined,
     customLetterhead: letterhead
   });
 
-  // Footer on page 1
-  addStandardFooter(doc, false, footerImage);
+  // Footer will be added only at the end of the document to avoid overlaps
+  // addStandardFooter(doc, false, footerImage);
 
   // Intercept doc.addPage to automatically draw the background
   const originalAddPage = doc.addPage.bind(doc);
@@ -877,7 +877,7 @@ export const generateQuotePdf = async (quote: Quote, client: Client | undefined,
       hideMeta: true, 
       customLetterhead: letterhead 
     });
-    addStandardFooter(doc, false, footerImage);
+    // Removed duplicate footer call that causes numbering overlap
     return doc;
   };
 
