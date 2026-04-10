@@ -90,8 +90,7 @@ const LogisticsProtocolModal: React.FC<LogisticsProtocolModalProps> = ({
     try {
       const selectedItems = items.filter(i => i.selected);
       
-      if (previewOnly) {
-          const result = generateProtocolPdf(
+          const promise = generateProtocolPdf(
             os,
             client,
             quote,
@@ -103,15 +102,22 @@ const LogisticsProtocolModal: React.FC<LogisticsProtocolModalProps> = ({
             true
           );
           
+          toast.promise(promise, {
+            loading: 'Gerando prévia...',
+            success: 'Prévia aberta!',
+            error: 'Erro na prévia.'
+          });
+          
+          const result = await promise;
+          
           if (result) {
             const url = typeof result === 'string' ? result : (result as any).toString();
-            toast.success("Prévia gerada com sucesso!");
             window.open(url, '_blank');
           }
           return;
       }
 
-      generateProtocolPdf(
+      const promise = generateProtocolPdf(
         os,
         client,
         quote,
@@ -121,6 +127,14 @@ const LogisticsProtocolModal: React.FC<LogisticsProtocolModalProps> = ({
         { nome: '', cargo: '' },
         documentTemplates
       );
+
+      toast.promise(promise, {
+        loading: 'Gerando protocolo...',
+        success: 'Protocolo gerado!',
+        error: 'Erro ao gerar protocolo.'
+      });
+
+      await promise;
 
       // Workflow: Update OS status if it's a Retirada
       if (type === 'retirada' && os.statusServico === InstrumentStatus.PENDING) {

@@ -204,7 +204,15 @@ export default function ServiceOrdersSection({ clients, quotes, serviceOrders, c
                     </td>
                     <td className="rectilinear-td">
                       <div className="flex items-center justify-end gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => generateServiceOrderPdf(os, client, quote, documentTemplates)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all" title="Gerar PDF"><FileText className="w-4 h-4" /></button>
+                        <button onClick={async () => {
+                          const promise = generateServiceOrderPdf(os, client, quote, documentTemplates);
+                          toast.promise(promise, {
+                            loading: 'Gerando PDF da O.S...',
+                            success: 'O.S. gerada!',
+                            error: 'Erro ao gerar PDF.'
+                          });
+                          await promise;
+                        }} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all" title="Gerar PDF"><FileText className="w-4 h-4" /></button>
                         <button onClick={() => handleEditServiceOrder(os)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all" title="Ver Detalhes"><Eye className="w-4 h-4" /></button>
                         <button onClick={() => handleEditServiceOrder(os)} className="p-2 text-slate-400 hover:text-amber-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all" title="Editar"><Edit3 className="w-4 h-4" /></button>
                         <button onClick={() => onDeleteServiceOrder(os.id)} className="p-2 text-slate-400 hover:text-rose-500 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all" title="Excluir"><Trash2 className="w-4 h-4" /></button>

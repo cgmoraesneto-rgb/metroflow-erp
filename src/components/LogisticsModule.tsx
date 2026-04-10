@@ -100,7 +100,13 @@ export default function LogisticsModule({ serviceOrders = [], clients = [], quot
       // Find client and quote for the updated OS to generate PDF
       const client = clients.find(c => c.id === updatedOS.clienteId);
       const quote = quotes.find(q => q.id === updatedOS.orcamentoId);
-      generateServiceOrderPdf(updatedOS, client, quote, documentTemplates);
+      const promise = generateServiceOrderPdf(updatedOS, client, quote, documentTemplates);
+      toast.promise(promise, {
+        loading: 'Atualizando e gerando O.S...',
+        success: 'O.S. salva e gerada!',
+        error: 'Erro ao gerar PDF.'
+      });
+      await promise;
     }
   };
 
@@ -154,14 +160,21 @@ export default function LogisticsModule({ serviceOrders = [], clients = [], quot
     }
   };
 
-  const handleGenerateCautelaPdf = (custody: StandardCustody) => {
+  const handleGenerateCautelaPdf = async (custody: StandardCustody) => {
     const emp = employees.find(e => e.id === custody.responsavel);
     const resolvedItems = (custody.items || []).map(it => {
       const st = standardInstruments.find(s => s.id === it.standardInstrumentId);
       return { nome: st?.nome || it.standardInstrumentId, identificacao: st?.identificacao || '', quantidade: it.quantidade };
     });
     const employeeName = emp?.nome || custody.responsavel;
-    generateCautelaPdf(custody, resolvedItems, employeeName, documentTemplates);
+    
+    const promise = generateCautelaPdf(custody, resolvedItems, employeeName, documentTemplates);
+    toast.promise(promise, {
+      loading: 'Gerando Termo de Cautela...',
+      success: 'Termo gerado!',
+      error: 'Erro ao gerar PDF.'
+    });
+    await promise;
   };
 
   // --- Frota Logic ---
@@ -281,7 +294,15 @@ export default function LogisticsModule({ serviceOrders = [], clients = [], quot
                             <td className="rectilinear-td text-center pr-8">
                               <div className="flex items-center justify-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
                                 <button onClick={() => handleEditOS(os)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all" title="Gerenciar"><Activity className="w-4 h-4" /></button>
-                                <button onClick={() => generateServiceOrderPdf(os, client, quote, documentTemplates)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all" title="PDF O.S."><FileText className="w-4 h-4" /></button>
+                                <button onClick={async () => {
+                                  const promise = generateServiceOrderPdf(os, client, quote, documentTemplates);
+                                  toast.promise(promise, {
+                                    loading: 'Gerando PDF da O.S...',
+                                    success: 'O.S. gerada!',
+                                    error: 'Erro no PDF.'
+                                  });
+                                  await promise;
+                                }} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all" title="PDF O.S."><FileText className="w-4 h-4" /></button>
                                 <button onClick={() => handleOpenProtocol(os, 'retirada')} className="p-2 text-slate-400 hover:text-amber-600 hover:bg-white dark:hover:bg-amber-900/20 rounded-lg shadow-sm border border-transparent hover:border-amber-100 transition-all"><ArrowDownToLine className="w-4 h-4" /></button>
                                 <button onClick={() => handleOpenProtocol(os, 'entrega')} className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-white dark:hover:bg-emerald-900/20 rounded-lg shadow-sm border border-transparent hover:border-emerald-100 transition-all"><ArrowUpFromLine className="w-4 h-4" /></button>
                               </div>
@@ -317,7 +338,16 @@ export default function LogisticsModule({ serviceOrders = [], clients = [], quot
                         <div className="flex items-center justify-between border-t border-slate-50 dark:border-slate-800 pt-4">
                           <button onClick={() => handleEditOS(os)} className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Gerenciar</button>
                           <div className="flex gap-1">
-                            <button onClick={(e) => { e.stopPropagation(); generateServiceOrderPdf(os, client, quotes.find(q => q.id === os.orcamentoId), documentTemplates); }} className="p-1.5 text-slate-400 hover:text-indigo-600"><FileText className="w-4 h-4" /></button>
+                            <button onClick={async (e) => { 
+                             e.stopPropagation(); 
+                             const promise = generateServiceOrderPdf(os, client, quotes.find(q => q.id === os.orcamentoId), documentTemplates); 
+                             toast.promise(promise, {
+                                loading: 'Gerando PDF...',
+                                success: 'PDF gerado!',
+                                error: 'Erro no PDF.'
+                             });
+                             await promise;
+                           }} className="p-1.5 text-slate-400 hover:text-indigo-600"><FileText className="w-4 h-4" /></button>
                           </div>
                         </div>
                       </div>

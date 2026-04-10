@@ -137,10 +137,22 @@ interface HeaderOptions {
 }
 
 export const loadRemoteImage = async (url: string): Promise<string> => {
-  if (url.startsWith('http')) {
-    return await urlToBase64(url);
+  if (!url || !url.startsWith('http')) return url;
+  try {
+    const base64 = await urlToBase64(url);
+    if (base64 && base64.startsWith('data:image')) return base64;
+    return url;
+  } catch (error) {
+    console.error("Error loading remote image:", url, error);
+    return url;
   }
-  return url;
+};
+
+const getImageFormat = (dataUrl: string): any => {
+  if (dataUrl.startsWith('data:image/png')) return 'PNG';
+  if (dataUrl.startsWith('data:image/jpeg') || dataUrl.startsWith('data:image/jpg')) return 'JPEG';
+  if (dataUrl.startsWith('data:image/webp')) return 'WEBP';
+  return undefined; // Let jsPDF try to auto-detect
 };
 
 export const addStandardHeader = ({
@@ -165,7 +177,9 @@ export const addStandardHeader = ({
   // Header images are usually full width or positioned at top
   if (letterhead && typeof letterhead === 'string' && (letterhead.startsWith('data:image') || letterhead.startsWith('http'))) {
     try {
-      doc.addImage(letterhead, 'PNG', 0, 0, 210, 297, undefined, 'FAST');
+      const format = letterhead.startsWith('data:image') ? getImageFormat(letterhead) : undefined;
+      // Use 'FAST' compression and allow jsPDF to handle format detection
+      doc.addImage(letterhead, format || 'PNG', 0, 0, 210, 297, undefined, 'FAST');
     } catch (e) {
       console.error("Error adding header image:", e);
     }
@@ -211,8 +225,11 @@ export const addStandardFooter = (doc: jsPDF, isCertificate: boolean = false, cu
 
     if (customFooter) {
       try {
-        // Assume footer image is at the bottom, full width
-        doc.addImage(customFooter, 'PNG', 0, 0, 210, 297, undefined, 'FAST');
+        const format = customFooter.startsWith('data:image') ? getImageFormat(customFooter) : undefined;
+        // Optimization: only add footer image if it's not going to cover the whole page opaque-ly
+        // assuming footer is actually a background if it's full page.
+        // If it's a JPEG, it might cover the header. We'll use the same A4 size but ensure it's handled carefully.
+        doc.addImage(customFooter, format || 'PNG', 0, 0, 210, 297, undefined, 'FAST');
       } catch (e) {
         console.error("Error adding footer image:", e);
       }
@@ -276,7 +293,9 @@ export const generateCertificatePdf = async (
     ? `MEMÓRIA DE CÁLCULO D${isTest ? 'O' : 'A'} ${wordCalibration} N.º ${record.certificateNumber}`
     : `${(isTest || isMaintenance) ? 'RELATÓRIO' : 'CERTIFICADO'} DE ${wordCalibration} N.º ${record.certificateNumber}`.toUpperCase();
 
-  const template = documentTemplates.find(t => t.id === 'CALIBRATION_CERTIFICATE' || t.applyTo === 'CALIBRATION_CERTIFICATE');
+  const template = documentTemplates.find(t => t.id === 'CALIBRATION_CERTIFICATE') || 
+                   documentTemplates.find(t => t.applyTo === 'CALIBRATION_CERTIFICATE') ||
+                   documentTemplates.find(t => t.applyTo === 'ALL');
 
   let letterhead = template?.letterheadBase64;
   if (record.isAccredited && template?.accreditedLetterheadBase64) {
@@ -599,7 +618,12 @@ export const generateCertificatePdf = async (
   if (sigBase64?.startsWith('http')) sigBase64 = await loadRemoteImage(sigBase64);
 
   if (sigBase64 && (sigBase64.startsWith('data:image') || sigBase64.startsWith('http'))) {
-    try { doc.addImage(sigBase64, 'PNG', signatureX2, currentY - signatureHeight, signatureWidth, signatureHeight, undefined, 'FAST'); } catch (e) {}
+    try { 
+      const format = sigBase64.startsWith('data:image') ? getImageFormat(sigBase64) : undefined;
+      doc.addImage(sigBase64, format || 'PNG', signatureX2, currentY - signatureHeight, signatureWidth, signatureHeight, undefined, 'FAST'); 
+    } catch (e) {
+      console.error("Error adding signature image:", e);
+    }
   }
 
   doc.setDrawColor(0,0,0);
@@ -669,7 +693,9 @@ export const generateCertificatePdf = async (
             const maxW = contentWidth;
             const maxH = pageHeight - marginBottom - yTop - 10;
             // Assuming we just fit it approximately
-            doc.addImage(record.attachments[i], 'JPEG', marginX, yTop + 10, maxW, maxH, undefined, 'FAST');
+            const attachment = record.attachments[i];
+            const format = attachment.startsWith('data:image') ? getImageFormat(attachment) : undefined;
+            doc.addImage(attachment, format || 'JPEG', marginX, yTop + 10, maxW, maxH, undefined, 'FAST');
         } catch (e) {
             doc.setFont('helvetica', 'normal');
             doc.text('Erro ao carregar imagem em anexo.', marginX, yTop + 20);
@@ -761,7 +787,9 @@ export const generateClientReportPdf = async (
 };
 
 export const generateQuotePdf = async (quote: Quote, client: Client | undefined, documentTemplates: DocumentTemplate[] = [], returnBlobUrl: boolean = false): Promise<string | void> => {
-  const template = documentTemplates.find(t => t.applyTo === 'QUOTE') || documentTemplates.find(t => t.applyTo === 'ALL');
+  const template = documentTemplates.find(t => t.id === 'QUOTE') || 
+                   documentTemplates.find(t => t.applyTo === 'QUOTE') || 
+                   documentTemplates.find(t => t.applyTo === 'ALL');
   
   let letterhead = template?.letterheadBase64;
   if (letterhead?.startsWith('http')) letterhead = await loadRemoteImage(letterhead);
@@ -1117,44 +1145,37 @@ export const generateQuotePdf = async (quote: Quote, client: Client | undefined,
   }
 };
 
-export const generateServiceOrderPdf = (
+export const generateServiceOrderPdf = async (
   os: ServiceOrder, 
   client: Client | undefined, 
   quote: Quote | undefined, 
   documentTemplates: DocumentTemplate[] = [],
   preview: boolean = false
-) => {
+): Promise<string | void> => {
   const template = documentTemplates.find(t => t.id === 'OS' || t.applyTo === 'OS') || documentTemplates.find(t => t.applyTo === 'ALL');
+  
+  let letterhead = template?.letterheadBase64;
+  if (letterhead?.startsWith('http')) letterhead = await loadRemoteImage(letterhead);
+  
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 15;
   const primaryBlue: [number, number, number] = [0, 51, 102];
 
-  // Custom Header: Focus on the Title and O.S. ID
-  const drawCustomOSHeader = (document: jsPDF, title: string) => {
-    // Letterhead
-    if (template?.letterheadBase64) {
-      try {
-        document.addImage(template.letterheadBase64, 'PNG', 0, 0, 210, 297, undefined, 'FAST');
-      } catch (e) {}
-    } else {
-        try {
-            document.addImage(GENERAL_LETTERHEAD, 'PNG', 0, 0, 210, 297, undefined, 'FAST');
-        } catch (e) {}
-    }
-
-    document.setTextColor(...primaryBlue);
-    document.setFont('helvetica', 'bold');
-    document.setFontSize(14);
-    
-    let headerText = `${title} Nº ${os.id}`;
-    document.text(headerText.toUpperCase(), pageWidth / 2, 50, { align: 'center' });
-    return 60;
+  // Header Drawing
+  const callHeader = (document: jsPDF, title: string) => {
+    return addStandardHeader({
+      doc: document,
+      title: `${title} Nº ${os.id}`,
+      isCertificate: false,
+      hideMeta: true,
+      customLetterhead: letterhead
+    });
   };
 
   // --- PARTE 1: Ordem de Serviço (Administrativa) ---
-  let currentY = drawCustomOSHeader(doc, 'ORDEM DE SERVIÇO');
+  let currentY = callHeader(doc, 'ORDEM DE SERVIÇO');
 
   // Dados do Cliente e Referências (Estruturado conforme solicitado)
   autoTable(doc, {
@@ -1313,7 +1334,7 @@ export const generateServiceOrderPdf = (
   doc.save(`OS_Relatorio_Campo_${os.id}.pdf`);
 };
 
-export const generateProtocolPdf = (
+export const generateProtocolPdf = async (
   os: ServiceOrder, 
   client: Client | undefined, 
   quote: Quote | undefined, 
@@ -1323,31 +1344,29 @@ export const generateProtocolPdf = (
   clientResponsible: { nome: string; cargo: string },
   documentTemplates: DocumentTemplate[] = [],
   preview: boolean = false
-) => {
+): Promise<string | void> => {
   const template = documentTemplates.find(t => t.id === 'LOGISTICS_PROTOCOL' || t.applyTo === 'LOGISTICS_PROTOCOL') || documentTemplates.find(t => t.applyTo === 'ALL');
+  
+  let letterhead = template?.letterheadBase64;
+  if (letterhead?.startsWith('http')) letterhead = await loadRemoteImage(letterhead);
+  
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 15;
   const primaryBlue: [number, number, number] = [0, 51, 102];
 
-  // 1. Cabeçalho Unificado (Mesmo da O.S.)
-  const drawCustomHeader = (document: jsPDF, title: string) => {
-    if (template?.letterheadBase64) {
-      try { document.addImage(template.letterheadBase64, 'PNG', 0, 0, 210, 297, undefined, 'FAST'); } catch (e) {}
-    } else {
-      try { document.addImage(GENERAL_LETTERHEAD, 'PNG', 0, 0, 210, 297, undefined, 'FAST'); } catch (e) {}
-    }
-    document.setTextColor(...primaryBlue);
-    document.setFont('helvetica', 'bold');
-    document.setFontSize(14);
-    document.text(title.toUpperCase(), pageWidth / 2, 50, { align: 'center' });
-    return 60;
-  };
-
+  // Standardized Header
   const title = type === 'retirada' ? 'PROTOCOLO DE RETIRADA' : 'PROTOCOLO DE ENTREGA';
   const opLabel = type === 'retirada' ? 'COLETA' : 'ENTREGA';
-  let currentY = drawCustomHeader(doc, title);
+  
+  let currentY = addStandardHeader({
+    doc,
+    title,
+    isCertificate: false,
+    hideMeta: true,
+    customLetterhead: letterhead
+  });
 
   // 2. Dados da O.S. e Cliente (Layout O.S.)
   autoTable(doc, {
@@ -1445,8 +1464,15 @@ export const generateProtocolPdf = (
 };
 
 
-export const generateCautelaPdf = (custody: StandardCustody, resolvedItems: { nome: string; identificacao: string; quantidade: number }[], employeeName: string, documentTemplates: DocumentTemplate[] = []) => {
+export const generateCautelaPdf = async (custody: StandardCustody, resolvedItems: { nome: string; identificacao: string; quantidade: number }[], employeeName: string, documentTemplates: DocumentTemplate[] = []) => {
   const template = documentTemplates.find(t => t.id === 'CAUTELA' || t.applyTo === 'CAUTELA') || documentTemplates.find(t => t.applyTo === 'ALL');
+  
+  let letterhead = template?.letterheadBase64;
+  if (letterhead?.startsWith('http')) letterhead = await loadRemoteImage(letterhead);
+  
+  let footerImage = template?.footerBase64;
+  if (footerImage?.startsWith('http')) footerImage = await loadRemoteImage(footerImage);
+  
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -1460,7 +1486,7 @@ export const generateCautelaPdf = (custody: StandardCustody, resolvedItems: { no
     documentNumber: custody.id,
     date: custody.dataSaida,
     isCertificate: false,
-    customLetterhead: template?.letterheadBase64
+    customLetterhead: letterhead
   });
 
   doc.setFontSize(9); doc.setFont('helvetica', 'normal');
@@ -1546,12 +1572,19 @@ export const generateCautelaPdf = (custody: StandardCustody, resolvedItems: { no
   drawSig(margin + sigWidth + spacing, 'Responsável de Origem');
   drawSig(pageWidth - margin - sigWidth, 'Portaria / Recebedor Destino');
 
-  addStandardFooter(doc, false, template?.footerBase64);
+  addStandardFooter(doc, false, footerImage);
   doc.save(`Cautela_${custody.id}.pdf`);
 };
 
-export const generateStandardInstrumentPdf = (si: StandardInstrument, documentTemplates: DocumentTemplate[] = []) => {
-  const template = documentTemplates.find(t => t.id === 'INSTRUMENT_SHEET' || t.applyTo === 'INSTRUMENT_SHEET');
+export const generateStandardInstrumentPdf = async (si: StandardInstrument, documentTemplates: DocumentTemplate[] = []) => {
+  const template = documentTemplates.find(t => t.id === 'INSTRUMENT_SHEET' || t.applyTo === 'INSTRUMENT_SHEET') || documentTemplates.find(t => t.applyTo === 'ALL');
+  
+  let letterhead = template?.letterheadBase64;
+  if (letterhead?.startsWith('http')) letterhead = await loadRemoteImage(letterhead);
+  
+  let footerImage = template?.footerBase64;
+  if (footerImage?.startsWith('http')) footerImage = await loadRemoteImage(footerImage);
+
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 20;
@@ -1561,7 +1594,7 @@ export const generateStandardInstrumentPdf = (si: StandardInstrument, documentTe
     title: 'FICHA DE EQUIPAMENTO PADRÃO',
     documentNumber: si.identificacao,
     isCertificate: false,
-    customLetterhead: template?.letterheadBase64
+    customLetterhead: letterhead
   });
 
   doc.setFontSize(12); doc.setFont('helvetica', 'normal');
@@ -1586,6 +1619,6 @@ export const generateStandardInstrumentPdf = (si: StandardInstrument, documentTe
   addLine('Periodicidade', si.periodicidade);
   addLine('Validade', si.dataValidadeCalibracao ? formatDate(si.dataValidadeCalibracao) : 'N/A');
 
-  addStandardFooter(doc, false, template?.footerBase64);
+  addStandardFooter(doc, false, footerImage);
   doc.save(`Ficha_Padrao_${si.identificacao}.pdf`);
 };
