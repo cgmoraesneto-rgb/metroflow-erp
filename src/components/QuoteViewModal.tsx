@@ -11,6 +11,7 @@ import { useData } from '../contexts/DataContext';
 import { usePdfGenerator } from '../hooks/usePdfGenerator';
 import { pdfjs, Document, Page } from 'react-pdf';
 import { toast } from 'sonner';
+import { generateNextOsId } from '../utils/migration';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
@@ -30,7 +31,7 @@ interface QuoteViewModalProps {
 }
 
 const QuoteViewModal: React.FC<QuoteViewModalProps> = ({ quote, client, onClose, onApprove }) => {
-  const { documentTemplates } = useData();
+  const { documentTemplates, serviceOrders } = useData();
   const [confirmApprove, setConfirmApprove] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
@@ -44,9 +45,9 @@ const QuoteViewModal: React.FC<QuoteViewModalProps> = ({ quote, client, onClose,
   };
 
   const handleApprove = () => {
-    // 4. O.S. Validation: ...obrigatoriamente preencher o campo dataEntrada com a data atual...
+    const newOsId = generateNextOsId(serviceOrders);
     const newServiceOrder: ServiceOrder = {
-      id: `WS${Date.now().toString().slice(-6)}`, // generate proper formatting
+      id: newOsId,
       orcamentoId: quote.id,
       clienteId: quote.clienteId,
       dataEmissao: new Date().toISOString(), 

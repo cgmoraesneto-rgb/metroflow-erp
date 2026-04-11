@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { Employee, Bank, UnitOfMeasure, PaymentMethod, Module, Vehicle, DocumentTemplate } from '../types';
 import DocumentTemplateEditor from './DocumentTemplateEditor';
 import AuditLogModule from './AuditLogModule';
-import { Users, Landmark, Ruler, Plus, Edit2, Trash2, XCircle, FileText, CreditCard, ShieldCheck, Mail, Phone, Briefcase, Hash, Globe, ChevronRight, Car, ActivitySquare } from 'lucide-react';
+import { Users, Landmark, Ruler, Plus, Edit2, Trash2, XCircle, FileText, CreditCard, ShieldCheck, Mail, Phone, Briefcase, Hash, Globe, ChevronRight, Car, ActivitySquare, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useData } from '../contexts/DataContext';
+import { useAuth } from '../contexts/AuthContext';
 import { storage } from '../firebaseConfig';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from 'sonner';
+import { migrateERPData } from '../utils/migration';
 
 interface GeneralRegistersModuleProps {
   employees: Employee[];
@@ -44,7 +46,14 @@ export default function GeneralRegistersModule({
   documentTemplates = [],
   onSaveDocumentTemplate
 }: GeneralRegistersModuleProps) {
-  const { saveItem, deleteItem, vehicles } = useData();
+  const { saveItem, deleteItem, vehicles, quotes, serviceOrders, calibrationRecords, financialControls } = useData();
+  const { employee } = useAuth();
+  const isDeveloper = employee?.cargo?.toLowerCase().includes('developer') || 
+                      employee?.username === 'developer' || 
+                      (employee as any)?.isDeveloper === true;
+  const [isMigrating, setIsMigrating] = useState(false);
+  const [migrationDone, setMigrationDone] = useState(false);
+  const [migrationConfirm, setMigrationConfirm] = useState(false);
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('employees');
   const [templateEditorOpen, setTemplateEditorOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<DocumentTemplate | null>(null);
@@ -59,6 +68,37 @@ export default function GeneralRegistersModule({
     await saveItem('vehicles', vehicle);
     setVehicleForm({ placa: '', modelo: '' });
     setEditingVehicleId(null);
+  };
+
+  const handleRunMigration = async () => {
+    setIsMigrating(true);
+    try {
+      const result = migrateERPData(quotes, serviceOrders, calibrationRecords, financialControls);
+      
+      // Save all migrated records (upsert by new ID)
+      await Promise.all(result.quotes.map(q => saveItem('quotes', q)));
+      await Promise.all(result.serviceOrders.map(os => saveItem('service_orders', os)));
+      await Promise.all(result.calibrationRecords.map(r => saveItem('calibration_records', r)));
+      await Promise.all(result.financialControls.map(f => saveItem('financial_controls', f as any)));
+
+      // Delete old records that changed ID
+      const oldQuoteIds = Object.entries(result.quoteMapping)
+        .filter(([oldId, newId]) => oldId !== newId).map(([oldId]) => oldId);
+      const oldOsIds = Object.entries(result.osMapping)
+        .filter(([oldId, newId]) => oldId !== newId).map(([oldId]) => oldId);
+
+      await Promise.all(oldQuoteIds.map(id => deleteItem('quotes', id)));
+      await Promise.all(oldOsIds.map(id => deleteItem('service_orders', id)));
+
+      toast.success(`Migração concluída! ${result.quotes.length} orçamentos e ${result.serviceOrders.length} O.S. atualizados.`);
+      setMigrationDone(true);
+      setMigrationConfirm(false);
+    } catch (error: any) {
+      console.error('Migration error:', error);
+      toast.error(`Erro na migração: ${error.message}`);
+    } finally {
+      setIsMigrating(false);
+    }
   };
 
   // Employee State
@@ -446,6 +486,53 @@ export default function GeneralRegistersModule({
                     ))}
                   </tbody>
                 </table>
+              </div>
+
+              {/* ── MIGRATION PANEL ── */}
+              <div className="mt-12 p-8 rounded-[2.5rem] border border-amber-200 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-900/10">
+                <div className="flex items-start gap-5">
+                  <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-800/30 flex items-center justify-center text-amber-600 shrink-0">
+                    <RefreshCw className="w-6 h-6" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-black text-amber-900 dark:text-amber-300 uppercase tracking-widest text-sm mb-1">Migração de Numeração de Documentos</h4>
+                    <p className="text-xs text-amber-700 dark:text-amber-400 font-medium mb-4">
+                      Esta operação irá renumerar todos os Orçamentos e Ordens de Serviço existentes conforme o novo padrão
+                      (OCW041026+, OS 26280+), preservando todos os vínculos entre documentos. <strong>Execute apenas uma vez.</strong>
+                    </p>
+
+                    {migrationDone ? (
+                      <div className="flex items-center gap-3 px-5 py-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl border border-emerald-200 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-400">
+                        <span className="text-sm font-black uppercase tracking-wider">✓ Migração concluída com sucesso!</span>
+                      </div>
+                    ) : !migrationConfirm ? (
+                      <button
+                        onClick={() => setMigrationConfirm(true)}
+                        className="flex items-center gap-2 px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-amber-200 dark:shadow-none"
+                      >
+                        <RefreshCw className="w-4 h-4" />
+                        Iniciar Migração de Numeração
+                      </button>
+                    ) : (
+                      <div className="flex items-center gap-4">
+                        <p className="text-xs font-black text-amber-800 dark:text-amber-300 uppercase tracking-widest">Você tem certeza? Esta ação é irreversível.</p>
+                        <button
+                          onClick={() => setMigrationConfirm(false)}
+                          className="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition-all"
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          onClick={handleRunMigration}
+                          disabled={isMigrating}
+                          className="flex items-center gap-2 px-6 py-2 bg-rose-600 hover:bg-rose-700 disabled:opacity-60 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all active:scale-95"
+                        >
+                          {isMigrating ? <><RefreshCw className="w-4 h-4 animate-spin" /> Migrando...</> : 'Confirmar e Executar'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           )}

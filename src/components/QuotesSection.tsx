@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDate, formatCurrency, formatNumber } from '../utils/formatters';
 import { generateQuotePdf } from '../utils/pdfGenerator';
+import { generateNextQuoteId } from '../utils/migration';
 
 const handleDownloadPdf = async (quote: Quote, client: Client | undefined, documentTemplates: DocumentTemplate[]) => {
   try {
@@ -66,18 +67,7 @@ export default function QuotesSection({
     if (clients.length === 0) { toast.error('Por favor, cadastre um cliente primeiro.'); return; }
     if (priceTables.length === 0) { toast.error('Por favor, cadastre uma tabela de preços primeiro.'); return; }
 
-    let maxSeq = 0;
-    quotes.forEach(q => {
-      // Adjusted regex to match IDs with or without revision suffixes (e.g., OCW000126 or OCW000126/R1)
-      const match = q.id.match(/^OCW(\d{4})26/);
-      if (match && match[1]) {
-        const seq = parseInt(match[1], 10);
-        if (seq > maxSeq) maxSeq = seq;
-      }
-    });
-
-    const newSeq = (maxSeq + 1).toString().padStart(4, '0');
-    const newQuoteId = `OCW${newSeq}26`;
+    const newQuoteId = generateNextQuoteId(quotes);
     const emissionDate = new Date();
     const validityDate = new Date();
     validityDate.setDate(emissionDate.getDate() + 30);
