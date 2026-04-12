@@ -1,4 +1,4 @@
-import { Quote, ServiceOrder, CalibrationRecord, FinancialControl } from '../types';
+import { Quote, ServiceOrder, CalibrationRecord, FinancialControl, QuoteStatus } from '../types';
 
 /**
  * EXACT REMAPPING TABLES
@@ -22,35 +22,30 @@ const OS_EXACT_MAP: Record<string, string> = {
 
 /**
  * Remaps a quote ID from the old format to the new format.
- * OCW000126 -> extracts seq 1, adds 409 -> 410 -> OCW041026
- * OCW000226 -> seq 2 + 409 = 411 -> OCW041126
  */
 export const remapQuoteId = (oldId: string): string => {
-  // Match format OCW0001 26 or OCW000126
   const match = oldId.match(/^OCW(\d{4})26/);
   if (match) {
     const seq = parseInt(match[1], 10);
+    // If it's already a high number (>= 410), it might already be migrated or new
+    if (seq >= 410) return oldId;
     const newSeq = seq + QUOTE_SEQUENCE_OFFSET;
     return `OCW${newSeq.toString().padStart(4, '0')}26`;
   }
-  // Already in new format or unknown format – return as-is
   return oldId;
 };
 
 /**
  * Remaps an OS ID from old WS format to new numeric format.
- * Uses the exact manual map for known IDs.
  */
 export const remapOsId = (oldId: string): string => {
   if (OS_EXACT_MAP[oldId]) return OS_EXACT_MAP[oldId];
-  // If already in new format (numeric 26XXX), return as-is
   if (/^\d+$/.test(oldId)) return oldId;
   return oldId;
 };
 
 /**
  * Main migration function.
- * Returns migrated copies of all data arrays with updated IDs and cross-references.
  */
 export const migrateERPData = (
   quotes: Quote[],
@@ -58,7 +53,6 @@ export const migrateERPData = (
   calibrationRecords: CalibrationRecord[],
   financialControls: FinancialControl[]
 ) => {
-  // Build mapping tables FIRST so cross-references can be updated
   const quoteMapping: Record<string, string> = {};
   quotes.forEach(q => {
     quoteMapping[q.id] = remapQuoteId(q.id);
@@ -69,26 +63,36 @@ export const migrateERPData = (
     osMapping[os.id] = remapOsId(os.id);
   });
 
-  // 1. Migrate Quotes
-  const migratedQuotes: Quote[] = quotes.map(q => ({
-    ...q,
-    id: quoteMapping[q.id] ?? q.id,
-  }));
+  // IDENTIFY QUOTES THAT HAVE OS (to mark as APPROVED)
+  const linkedQuoteIds = new Set(serviceOrders.map(os => os.orcamentoId));
 
-  // 2. Migrate Service Orders – also update the linked quote reference
+  // 1. Migrate Quotes
+  const migratedQuotes: Quote[] = quotes.map(q => {
+    const newId = quoteMapping[q.id] ?? q.id;
+    const hasOS = linkedQuoteIds.has(q.id);
+    
+    return {
+      ...q,
+      id: newId,
+      // Auto-approve if OS exists or if it's one of the specific IDs requested
+      status: hasOS ? QuoteStatus.APPROVED : q.status
+    };
+  });
+
+  // 2. Migrate Service Orders
   const migratedOS: ServiceOrder[] = serviceOrders.map(os => ({
     ...os,
     id: osMapping[os.id] ?? os.id,
     orcamentoId: quoteMapping[os.orcamentoId] ?? os.orcamentoId,
   }));
 
-  // 3. Migrate Calibration Records – update linked OS reference
+  // 3. Migrate Calibration Records
   const migratedRecords: CalibrationRecord[] = calibrationRecords.map(r => ({
     ...r,
     serviceOrderId: osMapping[r.serviceOrderId] ?? r.serviceOrderId,
   }));
 
-  // 4. Migrate Financial Controls – update linked OS reference
+  // 4. Migrate Financial Controls
   const migratedFinancial: FinancialControl[] = financialControls.map(f => ({
     ...f,
     serviceOrderId: (osMapping as any)[f.serviceOrderId] ?? (f as any).serviceOrderId,
@@ -99,7 +103,6 @@ export const migrateERPData = (
     serviceOrders: migratedOS,
     calibrationRecords: migratedRecords,
     financialControls: migratedFinancial,
-    // Return mappings so caller can delete old records
     quoteMapping,
     osMapping,
   };

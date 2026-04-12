@@ -119,7 +119,12 @@ export default function LogisticsModule({ serviceOrders = [], clients = [], quot
     const term = searchTerm.toLowerCase();
     return (os.id || "").toLowerCase().includes(term) || (os.orcamentoId || "").toLowerCase().includes(term) || client?.razaoSocial?.toLowerCase().includes(term);
   });
-  const sortedOS = [...filteredOS].sort((a, b) => (b.id || "").localeCompare(a.id || ""));
+  const sortedOS = [...filteredOS].sort((a, b) => {
+    // Attempt to extract numbers from the IDs for a true numerical sort
+    const numA = parseInt(a.id.replace(/\D/g, ''), 10) || 0;
+    const numB = parseInt(b.id.replace(/\D/g, ''), 10) || 0;
+    return numA - numB; // Ordem crescente (da menor para a maior)
+  });
 
   // --- Cautelas Logic ---
   const newEmptyCustody = (): StandardCustody => ({
