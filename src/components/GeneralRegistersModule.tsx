@@ -2,14 +2,17 @@ import React, { useState } from 'react';
 import { Employee, Bank, UnitOfMeasure, PaymentMethod, Module, Vehicle, DocumentTemplate } from '../types';
 import DocumentTemplateEditor from './DocumentTemplateEditor';
 import AuditLogModule from './AuditLogModule';
-import { Users, Landmark, Ruler, Plus, Edit2, Trash2, XCircle, FileText, CreditCard, ShieldCheck, Mail, Phone, Briefcase, Hash, Globe, ChevronRight, Car, ActivitySquare, RefreshCw } from 'lucide-react';
+import { Users, Landmark, Ruler, Plus, Edit2, Trash2, XCircle, FileText, CreditCard, ShieldCheck, Mail, Phone, Briefcase, Hash, Globe, ChevronRight, Car, ActivitySquare, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import { storage } from '../firebaseConfig';
+import { db } from '../firebaseConfig';
+import { doc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from 'sonner';
 import { migrateERPData } from '../utils/migration';
+import { QuoteStatus } from '../types';
 
 interface GeneralRegistersModuleProps {
   employees: Employee[];
@@ -114,6 +117,38 @@ export default function GeneralRegistersModule({
       toast.error(`Erro na migração: ${error.message}`);
     } finally {
       setIsMigrating(false);
+    }
+  };
+
+  // DIRECT FIRESTORE FIX: Bypasses all schemas and context layers
+  const [isFixingStatus, setIsFixingStatus] = useState(false);
+  const handleFixQuoteStatus = async () => {
+    setIsFixingStatus(true);
+    try {
+      // Build set of quoteIds that have linked OS
+      const linkedQuoteIds = new Set(serviceOrders.map(os => os.orcamentoId));
+      const quotesNeedingFix = quotes.filter(q =>
+        linkedQuoteIds.has(q.id) && q.status !== QuoteStatus.APPROVED
+      );
+
+      if (quotesNeedingFix.length === 0) {
+        toast.info('Todos os orçamentos vinculados já estão como Aprovados.');
+        return;
+      }
+
+      toast.info(`Corrigindo status de ${quotesNeedingFix.length} orçamento(s)...`);
+
+      for (const q of quotesNeedingFix) {
+        const docRef = doc(db, 'quotes', q.id);
+        await updateDoc(docRef, { status: QuoteStatus.APPROVED });
+      }
+
+      toast.success(`✓ ${quotesNeedingFix.length} orçamento(s) atualizados para APROVADO!`);
+    } catch (error: any) {
+      console.error('Status fix error:', error);
+      toast.error(`Erro: ${error.message}`);
+    } finally {
+      setIsFixingStatus(false);
     }
   };
 
@@ -547,6 +582,31 @@ export default function GeneralRegistersModule({
                         </button>
                       </div>
                     )}
+                  </div>
+                </div>
+              </div>
+
+              {/* ── FIX QUOTE STATUS PANEL ── */}
+              <div className="mt-6 p-8 rounded-[2.5rem] border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-900/10">
+                <div className="flex items-start gap-5">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-800/30 flex items-center justify-center text-emerald-600 shrink-0">
+                    <CheckCircle2 className="w-6 h-6" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-black text-emerald-900 dark:text-emerald-300 uppercase tracking-widest text-sm mb-1">Corrigir Status dos Orçamentos</h4>
+                    <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium mb-4">
+                      Detecta todos os orçamentos com uma O.S. vinculada e força o status para <strong>APROVADO</strong> diretamente no banco de dados. Pode ser executado quantas vezes quiser — sem risco.
+                    </p>
+                    <button
+                      onClick={handleFixQuoteStatus}
+                      disabled={isFixingStatus}
+                      className="flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-emerald-200 dark:shadow-none"
+                    >
+                      {isFixingStatus
+                        ? <><RefreshCw className="w-4 h-4 animate-spin" /> Corrigindo...</>
+                        : <><CheckCircle2 className="w-4 h-4" /> Corrigir Status Agora</>
+                      }
+                    </button>
                   </div>
                 </div>
               </div>
