@@ -75,22 +75,38 @@ export default function GeneralRegistersModule({
     try {
       const result = migrateERPData(quotes, serviceOrders, calibrationRecords, financialControls);
       
-      // Save all migrated records (upsert by new ID)
-      await Promise.all(result.quotes.map(q => saveItem('quotes', q)));
-      await Promise.all(result.serviceOrders.map(os => saveItem('service_orders', os)));
-      await Promise.all(result.calibrationRecords.map(r => saveItem('calibration_records', r)));
-      await Promise.all(result.financialControls.map(f => saveItem('financial_controls', f as any)));
+      toast.info('Iniciando atualização dos registros...');
 
-      // Delete old records that changed ID
+      // Save Quotes one by one to ensure stability and status update
+      for (const q of result.quotes) {
+        await saveItem('quotes', q);
+      }
+
+      // Save Service Orders
+      for (const os of result.serviceOrders) {
+        await saveItem('service_orders', os);
+      }
+
+      // Save Calibration Records
+      for (const r of result.calibrationRecords) {
+        await saveItem('calibration_records', r);
+      }
+
+      // Save Financial Controls
+      for (const f of result.financialControls) {
+        await saveItem('financial_controls', f as any);
+      }
+
+      // Clean up old records
       const oldQuoteIds = Object.entries(result.quoteMapping)
         .filter(([oldId, newId]) => oldId !== newId).map(([oldId]) => oldId);
       const oldOsIds = Object.entries(result.osMapping)
         .filter(([oldId, newId]) => oldId !== newId).map(([oldId]) => oldId);
 
-      await Promise.all(oldQuoteIds.map(id => deleteItem('quotes', id)));
-      await Promise.all(oldOsIds.map(id => deleteItem('service_orders', id)));
+      for (const id of oldQuoteIds) await deleteItem('quotes', id);
+      for (const id of oldOsIds) await deleteItem('service_orders', id);
 
-      toast.success(`Migração concluída! ${result.quotes.length} orçamentos e ${result.serviceOrders.length} O.S. atualizados.`);
+      toast.success(`Migração e Sincronização de Status concluída!`);
       setMigrationDone(true);
       setMigrationConfirm(false);
     } catch (error: any) {

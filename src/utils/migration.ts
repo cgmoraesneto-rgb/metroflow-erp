@@ -64,17 +64,21 @@ export const migrateERPData = (
   });
 
   // IDENTIFY QUOTES THAT HAVE OS (to mark as APPROVED)
-  const linkedQuoteIds = new Set(serviceOrders.map(os => os.orcamentoId));
+  // We check all possible mappings to be sure
+  const linkedQuoteIds = new Set<string>();
+  serviceOrders.forEach(os => {
+    linkedQuoteIds.add(os.orcamentoId);
+    if (quoteMapping[os.orcamentoId]) linkedQuoteIds.add(quoteMapping[os.orcamentoId]);
+  });
 
   // 1. Migrate Quotes
   const migratedQuotes: Quote[] = quotes.map(q => {
     const newId = quoteMapping[q.id] ?? q.id;
-    const hasOS = linkedQuoteIds.has(q.id);
+    const hasOS = linkedQuoteIds.has(q.id) || linkedQuoteIds.has(newId);
     
     return {
       ...q,
       id: newId,
-      // Auto-approve if OS exists or if it's one of the specific IDs requested
       status: hasOS ? QuoteStatus.APPROVED : q.status
     };
   });
