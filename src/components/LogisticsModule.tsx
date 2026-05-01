@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { ServiceOrder, Client, Quote, InstrumentStatus, StandardCustody, FleetLog, CustodyItem, DocumentTemplate, CertificateStatus } from '../types';
-import { Truck, ClipboardList, LayoutGrid, List, FileText, Download, ArrowDownToLine, ArrowUpFromLine, Search, Pencil, Calendar, CheckCircle2, X, Activity, Key, FileCheck, LogOut, CarFront, Plus, Trash2, Settings, ChevronDown } from 'lucide-react';
+import { ClipboardList, LayoutGrid, List, FileText, Download, ArrowDownToLine, ArrowUpFromLine, Pencil, Calendar, CheckCircle2, X, Activity, Key, FileCheck, CarFront, Plus, Trash2 } from 'lucide-react';
 import { formatDate } from '../utils/formatters';
 import { motion, AnimatePresence } from 'framer-motion';
-import { jsPDF } from 'jspdf';
 import EmployeeSelect from './EmployeeSelect';
 import { useData } from '../contexts/DataContext';
 import { toast } from 'sonner';
-import { GENERAL_LETTERHEAD } from '../utils/letterheads';
 import { generateServiceOrderPdf, generateCautelaPdf } from '../utils/pdfGenerator';
 import LogisticsProtocolModal from './LogisticsProtocolModal';
 
