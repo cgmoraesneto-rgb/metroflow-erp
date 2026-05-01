@@ -91,10 +91,10 @@ export default function LogisticsModule({
   const handleSaveOS = async () => {
     if (editingOS) {
       let newStatus = InstrumentStatus.PENDING;
-      if (editForm.dataSaida) {
-        newStatus = InstrumentStatus.DELIVERED;
-      } else if (editForm.calibracaoConcluida && editForm.certificadosEnviados) {
+      if (editForm.calibracaoConcluida && editForm.certificadosEnviados && editForm.dataSaida) {
         newStatus = InstrumentStatus.COMPLETED;
+      } else if (editForm.dataSaida) {
+        newStatus = InstrumentStatus.DELIVERED;
       } else if (editForm.calibracaoConcluida) {
         newStatus = InstrumentStatus.CALIBRATED;
       } else if (editForm.dataEntrada) {
