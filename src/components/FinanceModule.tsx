@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FinancialControl, PaymentStatus, Quote, ServiceOrder, Client, PaymentMethod, InstrumentStatus, Bank } from '../types';
+import { FinancialControl, FinancialExpense, ExpenseCategory, PaymentStatus, Quote, ServiceOrder, Client, PaymentMethod, InstrumentStatus, Bank } from '../types';
 import InvoiceModal from './InvoiceModal';
 import ExpenseModal from './ExpenseModal';
 import { Plus, Edit2, Trash2, CreditCard, Receipt, CircleDollarSign, Calendar, Download, ChevronRight, ArrowUpRight, CheckCircle, Clock, DollarSign, Search, Building2, Smartphone, X, Filter, Tag } from 'lucide-react';
