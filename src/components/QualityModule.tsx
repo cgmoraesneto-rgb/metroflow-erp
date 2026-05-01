@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { ServiceOrder, StandardInstrument, CalibrationRecord, Client, CertificateStatus, Procedure, CertificateMask } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, Wrench, CheckCircle, History } from 'lucide-react';
+import { BookOpen, Wrench, CheckCircle, History, FileText } from 'lucide-react';
 import QualityApprovalModule from './QualityApprovalModule';
 import ProceduresModule from './ProceduresModule';
 import StandardInstrumentsModule from './StandardInstrumentsModule';
 import IssuedCertificatesModule from './IssuedCertificatesModule';
+import CertificateMasksModule from './CertificateMasksModule';
 
 interface QualityModuleProps {
   standardInstruments: StandardInstrument[];
@@ -21,11 +22,13 @@ interface QualityModuleProps {
   onDeleteStandardInstrument: (id: string) => void;
   onSaveProcedure: (proc: any) => void;
   onDeleteProcedure: (id: string) => void;
+  onSaveCertificateMask: (mask: any) => void;
+  onDeleteCertificateMask: (id: string) => void;
   documentTemplates?: any[];
   searchQuery?: string;
 }
 
-type SubTab = 'procedures' | 'standards' | 'issued' | 'approvals';
+type SubTab = 'masks' | 'procedures' | 'standards' | 'issued' | 'approvals';
 
 export default function QualityModule({
   standardInstruments,
@@ -41,12 +44,15 @@ export default function QualityModule({
   onDeleteStandardInstrument,
   onSaveProcedure,
   onDeleteProcedure,
+  onSaveCertificateMask,
+  onDeleteCertificateMask,
   documentTemplates = [],
   searchQuery
 }: QualityModuleProps) {
-  const [activeSubTab, setActiveSubTab] = useState<SubTab>('procedures');
+  const [activeSubTab, setActiveSubTab] = useState<SubTab>('masks');
 
   const TAB_CONFIG = [
+    { id: 'masks', label: 'Máscaras de Certificados', icon: FileText, color: 'blue' },
     { id: 'procedures', label: 'Procedimentos', icon: BookOpen, color: 'emerald' },
     { id: 'standards', label: 'Instrumentos Padrão', icon: Wrench, color: 'amber' },
     { id: 'issued', label: 'Certificados Emitidos', icon: History, color: 'blue' },
@@ -86,6 +92,15 @@ export default function QualityModule({
           exit={{ opacity: 0, scale: 0.98 }}
           transition={{ duration: 0.3 }}
         >
+          {activeSubTab === 'masks' && (
+            <CertificateMasksModule
+              masks={certificateMasks}
+              onSave={onSaveCertificateMask}
+              onDelete={onDeleteCertificateMask}
+              procedures={procedures}
+              standardInstruments={standardInstruments}
+            />
+          )}
           {activeSubTab === 'issued' && (
             <IssuedCertificatesModule
               calibrationRecords={calibrationRecords}

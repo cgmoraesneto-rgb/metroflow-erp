@@ -310,6 +310,8 @@ function QualityWrapper() {
       procedures={procedures}
       documentTemplates={documentTemplates}
       employees={employees}
+      onSaveCertificateMask={(mask) => saveItem('certificate_masks', mask)}
+      onDeleteCertificateMask={(id) => deleteItem('certificate_masks', id)}
       onUpdateCertificateStatus={async (recordId, status, justification, signatarioId) => {
         const record = calibrationRecords.find(r => r.id === recordId);
         if (record) {

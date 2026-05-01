@@ -25,12 +25,11 @@ interface TechnicalModuleProps {
   employees?: any[];
 }
 
-import CertificateMasksModule from './CertificateMasksModule';
 import CalibrationRecordModule from './CalibrationRecordModule';
 import CalibrationHistoryModule from './CalibrationHistoryModule';
 import { toast } from 'sonner';
 
-type SubTab = 'masks' | 'records' | 'history';
+type SubTab = 'records' | 'history';
 
 export default function TechnicalModule({
   searchQuery = '',
@@ -52,10 +51,9 @@ export default function TechnicalModule({
   documentTemplates = [],
   employees = []
 }: TechnicalModuleProps) {
-  const [activeSubTab, setActiveSubTab] = useState<SubTab>('masks');
+  const [activeSubTab, setActiveSubTab] = useState<SubTab>('records');
 
   const TAB_CONFIG = [
-    { id: 'masks', label: 'Máscaras de Certificados', icon: FileText, color: 'blue' },
     { id: 'records', label: 'Registro de Calibração', icon: ClipboardList, color: 'emerald' },
     { id: 'history', label: 'Histórico', icon: Clock, color: 'amber' },
   ];
@@ -118,15 +116,7 @@ export default function TechnicalModule({
           exit={{ opacity: 0, scale: 0.98 }}
           transition={{ duration: 0.3 }}
         >
-          {activeSubTab === 'masks' && (
-            <CertificateMasksModule
-              masks={certificateMasks}
-              onSave={onSaveCertificateMask}
-              onDelete={onDeleteCertificateMask}
-              procedures={procedures}
-              standardInstruments={standardInstruments}
-            />
-          )}
+        >
           {activeSubTab === 'records' &&
             <CalibrationRecordModule
               searchQuery={searchQuery}
