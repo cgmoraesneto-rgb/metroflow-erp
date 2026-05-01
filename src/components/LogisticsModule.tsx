@@ -581,12 +581,20 @@ export default function LogisticsModule({
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 gap-4">
-                  {/* Recebimento */}
-                  <div className="space-y-3">
-                    <div className={`w-full flex items-center justify-between p-5 rounded-[2rem] border-2 transition-all group ${editForm.dataEntrada ? 'bg-sky-600 border-sky-600 text-white shadow-lg shadow-sky-500/20' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 text-slate-500 hover:border-sky-200'}`}>
-                      <div 
-                        className="flex items-center gap-4 cursor-pointer flex-1" 
+                <div className="space-y-4">
+                  {/* 1. Recebimento */}
+                  <div className={`p-6 rounded-[2.5rem] border-2 transition-all duration-300 ${editForm.dataEntrada ? 'bg-sky-50 dark:bg-sky-900/10 border-sky-200 dark:border-sky-800/50 shadow-sm' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800'}`}>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${editForm.dataEntrada ? 'bg-white dark:bg-slate-900 shadow-sm' : 'bg-slate-50 dark:bg-slate-800'}`}>
+                          <ClipboardList className={`w-6 h-6 ${editForm.dataEntrada ? 'text-sky-600' : 'text-slate-400'}`} />
+                        </div>
+                        <div className="text-left">
+                          <p className={`text-sm font-black uppercase tracking-tight ${editForm.dataEntrada ? 'text-slate-900 dark:text-white' : 'text-slate-500'}`}>1. Recebimento</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{editForm.dataEntrada ? 'Instrumento Recebido' : 'Aguardando Chegada'}</p>
+                        </div>
+                      </div>
+                      <button 
                         onClick={() => {
                           const hasDate = !!editForm.dataEntrada;
                           setEditForm(p => ({ 
@@ -594,36 +602,37 @@ export default function LogisticsModule({
                             dataEntrada: hasDate ? '' : new Date().toISOString().split('T')[0]
                           }));
                         }}
+                        className={`w-12 h-6 rounded-full transition-all relative ${editForm.dataEntrada ? 'bg-sky-500' : 'bg-slate-200 dark:bg-slate-700'}`}
                       >
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${editForm.dataEntrada ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-800 group-hover:bg-sky-50'}`}>
-                          <ClipboardList className={`w-5 h-5 ${editForm.dataEntrada ? 'text-white' : ''}`} />
-                        </div>
-                        <div className="text-left flex-1">
-                          <p className="text-sm font-black uppercase tracking-tight">Recebimento</p>
-                          {editForm.dataEntrada ? (
-                            <div className="flex items-center gap-1 mt-0.5" onClick={(e) => e.stopPropagation()}>
-                              <span className="text-[10px] font-bold text-sky-100 uppercase tracking-widest">Recebido em</span>
-                              <input 
-                                type="date" 
-                                value={editForm.dataEntrada} 
-                                onChange={e => setEditForm(p => ({ ...p, dataEntrada: e.target.value }))} 
-                                className="bg-white/10 text-[10px] font-bold text-white outline-none cursor-pointer hover:bg-white/20 px-2 py-0.5 rounded-lg transition-colors border border-white/10"
-                              />
-                            </div>
-                          ) : (
-                            <p className="text-[10px] font-bold text-slate-400">Aguardando Instrumento</p>
-                          )}
-                        </div>
-                      </div>
-                      {editForm.dataEntrada && <CheckCircle2 className="w-6 h-6 ml-4 opacity-80" />}
+                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm ${editForm.dataEntrada ? 'left-7' : 'left-1'}`} />
+                      </button>
                     </div>
+                    {editForm.dataEntrada && (
+                      <div className="mt-4 pt-4 border-t border-sky-200/50 dark:border-sky-800/30 animate-in fade-in slide-in-from-top-2">
+                        <label className="text-[9px] font-black text-sky-600/60 dark:text-sky-400 uppercase tracking-[0.2em] ml-1 mb-2 block">Data de Entrada</label>
+                        <input 
+                          type="date" 
+                          value={editForm.dataEntrada} 
+                          onChange={e => setEditForm(p => ({ ...p, dataEntrada: e.target.value }))} 
+                          className="w-full px-6 py-4 bg-white dark:bg-slate-800 border-2 border-sky-100 dark:border-sky-900/50 focus:border-sky-500 rounded-2xl font-black text-sm outline-none transition-all shadow-inner"
+                        />
+                      </div>
+                    )}
                   </div>
 
-                  {/* Calibração */}
-                  <div className="space-y-3">
-                    <div className={`w-full flex items-center justify-between p-5 rounded-[2rem] border-2 transition-all group ${editForm.calibracaoConcluida ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 text-slate-500 hover:border-indigo-200'}`}>
-                      <div 
-                        className="flex items-center gap-4 cursor-pointer flex-1" 
+                  {/* 2. Calibração */}
+                  <div className={`p-6 rounded-[2.5rem] border-2 transition-all duration-300 ${editForm.calibracaoConcluida ? 'bg-indigo-50 dark:bg-indigo-900/10 border-indigo-200 dark:border-indigo-800/50 shadow-sm' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800'}`}>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${editForm.calibracaoConcluida ? 'bg-white dark:bg-slate-900 shadow-sm' : 'bg-slate-50 dark:bg-slate-800'}`}>
+                          <Activity className={`w-6 h-6 ${editForm.calibracaoConcluida ? 'text-indigo-600' : 'text-slate-400'}`} />
+                        </div>
+                        <div className="text-left">
+                          <p className={`text-sm font-black uppercase tracking-tight ${editForm.calibracaoConcluida ? 'text-slate-900 dark:text-white' : 'text-slate-500'}`}>2. Calibração</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{editForm.calibracaoConcluida ? 'Calibração Concluída' : 'Aguardando Técnico'}</p>
+                        </div>
+                      </div>
+                      <button 
                         onClick={() => {
                           const nextVal = !editForm.calibracaoConcluida;
                           setEditForm(p => ({ 
@@ -632,36 +641,37 @@ export default function LogisticsModule({
                             dataCalibracaoFim: (nextVal && !p.dataCalibracaoFim) ? new Date().toISOString().split('T')[0] : p.dataCalibracaoFim
                           }));
                         }}
+                        className={`w-12 h-6 rounded-full transition-all relative ${editForm.calibracaoConcluida ? 'bg-indigo-500' : 'bg-slate-200 dark:bg-slate-700'}`}
                       >
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${editForm.calibracaoConcluida ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-800 group-hover:bg-indigo-50'}`}>
-                          <Activity className={`w-5 h-5 ${editForm.calibracaoConcluida ? 'text-white' : ''}`} />
-                        </div>
-                        <div className="text-left flex-1">
-                          <p className="text-sm font-black uppercase tracking-tight">Calibração</p>
-                          {editForm.calibracaoConcluida ? (
-                            <div className="flex items-center gap-1 mt-0.5" onClick={(e) => e.stopPropagation()}>
-                              <span className="text-[10px] font-bold text-indigo-100 uppercase tracking-widest">Calibrado em</span>
-                              <input 
-                                type="date" 
-                                value={editForm.dataCalibracaoFim} 
-                                onChange={e => setEditForm(p => ({ ...p, dataCalibracaoFim: e.target.value }))} 
-                                className="bg-white/10 text-[10px] font-bold text-white outline-none cursor-pointer hover:bg-white/20 px-2 py-0.5 rounded-lg transition-colors border border-white/10"
-                              />
-                            </div>
-                          ) : (
-                            <p className="text-[10px] font-bold text-slate-400">Aguardando Técnico</p>
-                          )}
-                        </div>
-                      </div>
-                      {editForm.calibracaoConcluida && <CheckCircle2 className="w-6 h-6 ml-4 opacity-80" />}
+                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm ${editForm.calibracaoConcluida ? 'left-7' : 'left-1'}`} />
+                      </button>
                     </div>
+                    {editForm.calibracaoConcluida && (
+                      <div className="mt-4 pt-4 border-t border-indigo-200/50 dark:border-indigo-800/30 animate-in fade-in slide-in-from-top-2">
+                        <label className="text-[9px] font-black text-indigo-600/60 dark:text-indigo-400 uppercase tracking-[0.2em] ml-1 mb-2 block">Data da Calibração</label>
+                        <input 
+                          type="date" 
+                          value={editForm.dataCalibracaoFim} 
+                          onChange={e => setEditForm(p => ({ ...p, dataCalibracaoFim: e.target.value }))} 
+                          className="w-full px-6 py-4 bg-white dark:bg-slate-800 border-2 border-indigo-100 dark:border-indigo-900/50 focus:border-indigo-500 rounded-2xl font-black text-sm outline-none transition-all shadow-inner"
+                        />
+                      </div>
+                    )}
                   </div>
 
-                  {/* Certificados */}
-                  <div className="space-y-3">
-                    <div className={`w-full flex items-center justify-between p-5 rounded-[2rem] border-2 transition-all group ${editForm.certificadosEnviados ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 text-slate-500 hover:border-emerald-200'}`}>
-                      <div 
-                        className="flex items-center gap-4 cursor-pointer flex-1"
+                  {/* 3. Certificados */}
+                  <div className={`p-6 rounded-[2.5rem] border-2 transition-all duration-300 ${editForm.certificadosEnviados ? 'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/50 shadow-sm' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800'}`}>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${editForm.certificadosEnviados ? 'bg-white dark:bg-slate-900 shadow-sm' : 'bg-slate-50 dark:bg-slate-800'}`}>
+                          <FileText className={`w-6 h-6 ${editForm.certificadosEnviados ? 'text-emerald-600' : 'text-slate-400'}`} />
+                        </div>
+                        <div className="text-left">
+                          <p className={`text-sm font-black uppercase tracking-tight ${editForm.certificadosEnviados ? 'text-slate-900 dark:text-white' : 'text-slate-500'}`}>3. Certificados</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{editForm.certificadosEnviados ? 'Enviados ao Cliente' : 'Pendente Revisão'}</p>
+                        </div>
+                      </div>
+                      <button 
                         onClick={() => {
                           const nextVal = !editForm.certificadosEnviados;
                           setEditForm(p => ({ 
@@ -670,36 +680,37 @@ export default function LogisticsModule({
                             dataEnvioCertificado: (nextVal && !p.dataEnvioCertificado) ? new Date().toISOString().split('T')[0] : p.dataEnvioCertificado
                           }));
                         }}
+                        className={`w-12 h-6 rounded-full transition-all relative ${editForm.certificadosEnviados ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`}
                       >
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${editForm.certificadosEnviados ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-800 group-hover:bg-emerald-50'}`}>
-                          <FileText className={`w-5 h-5 ${editForm.certificadosEnviados ? 'text-white' : ''}`} />
-                        </div>
-                        <div className="text-left flex-1">
-                          <p className="text-sm font-black uppercase tracking-tight">Certificados</p>
-                          {editForm.certificadosEnviados ? (
-                            <div className="flex items-center gap-1 mt-0.5" onClick={(e) => e.stopPropagation()}>
-                              <span className="text-[10px] font-bold text-emerald-100 uppercase tracking-widest">Enviado em</span>
-                              <input 
-                                type="date" 
-                                value={editForm.dataEnvioCertificado} 
-                                onChange={e => setEditForm(p => ({ ...p, dataEnvioCertificado: e.target.value }))} 
-                                className="bg-white/10 text-[10px] font-bold text-white outline-none cursor-pointer hover:bg-white/20 px-2 py-0.5 rounded-lg transition-colors border border-white/10"
-                              />
-                            </div>
-                          ) : (
-                            <p className="text-[10px] font-bold text-slate-400">Pendente Revisão</p>
-                          )}
-                        </div>
-                      </div>
-                      {editForm.certificadosEnviados && <CheckCircle2 className="w-6 h-6 ml-4 opacity-80" />}
+                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm ${editForm.certificadosEnviados ? 'left-7' : 'left-1'}`} />
+                      </button>
                     </div>
+                    {editForm.certificadosEnviados && (
+                      <div className="mt-4 pt-4 border-t border-emerald-200/50 dark:border-emerald-800/30 animate-in fade-in slide-in-from-top-2">
+                        <label className="text-[9px] font-black text-emerald-600/60 dark:text-emerald-400 uppercase tracking-[0.2em] ml-1 mb-2 block">Data de Envio</label>
+                        <input 
+                          type="date" 
+                          value={editForm.dataEnvioCertificado} 
+                          onChange={e => setEditForm(p => ({ ...p, dataEnvioCertificado: e.target.value }))} 
+                          className="w-full px-6 py-4 bg-white dark:bg-slate-800 border-2 border-emerald-100 dark:border-emerald-900/50 focus:border-emerald-500 rounded-2xl font-black text-sm outline-none transition-all shadow-inner"
+                        />
+                      </div>
+                    )}
                   </div>
 
-                  {/* Entrega */}
-                  <div className="space-y-3">
-                    <div className={`w-full flex items-center justify-between p-5 rounded-[2rem] border-2 transition-all group ${editForm.dataSaida ? 'bg-purple-600 border-purple-600 text-white shadow-lg shadow-purple-500/20' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 text-slate-500 hover:border-purple-200'}`}>
-                      <div 
-                        className="flex items-center gap-4 cursor-pointer flex-1" 
+                  {/* 4. Entrega */}
+                  <div className={`p-6 rounded-[2.5rem] border-2 transition-all duration-300 ${editForm.dataSaida ? 'bg-purple-50 dark:bg-purple-900/10 border-purple-200 dark:border-purple-800/50 shadow-sm' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800'}`}>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${editForm.dataSaida ? 'bg-white dark:bg-slate-900 shadow-sm' : 'bg-slate-50 dark:bg-slate-800'}`}>
+                          <CarFront className={`w-6 h-6 ${editForm.dataSaida ? 'text-purple-600' : 'text-slate-400'}`} />
+                        </div>
+                        <div className="text-left">
+                          <p className={`text-sm font-black uppercase tracking-tight ${editForm.dataSaida ? 'text-slate-900 dark:text-white' : 'text-slate-500'}`}>4. Entrega</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{editForm.dataSaida ? 'Equipamento Retirado' : 'Aguardando Saída'}</p>
+                        </div>
+                      </div>
+                      <button 
                         onClick={() => {
                           const hasDate = !!editForm.dataSaida;
                           setEditForm(p => ({ 
@@ -707,29 +718,22 @@ export default function LogisticsModule({
                             dataSaida: hasDate ? '' : new Date().toISOString().split('T')[0]
                           }));
                         }}
+                        className={`w-12 h-6 rounded-full transition-all relative ${editForm.dataSaida ? 'bg-purple-500' : 'bg-slate-200 dark:bg-slate-700'}`}
                       >
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${editForm.dataSaida ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-800 group-hover:bg-purple-50'}`}>
-                          <CarFront className={`w-5 h-5 ${editForm.dataSaida ? 'text-white' : ''}`} />
-                        </div>
-                        <div className="text-left flex-1">
-                          <p className="text-sm font-black uppercase tracking-tight">Entrega</p>
-                          {editForm.dataSaida ? (
-                            <div className="flex items-center gap-1 mt-0.5" onClick={(e) => e.stopPropagation()}>
-                              <span className="text-[10px] font-bold text-purple-100 uppercase tracking-widest">Entregue em</span>
-                              <input 
-                                type="date" 
-                                value={editForm.dataSaida} 
-                                onChange={e => setEditForm(p => ({ ...p, dataSaida: e.target.value }))} 
-                                className="bg-white/10 text-[10px] font-bold text-white outline-none cursor-pointer hover:bg-white/20 px-2 py-0.5 rounded-lg transition-colors border border-white/10"
-                              />
-                            </div>
-                          ) : (
-                            <p className="text-[10px] font-bold text-slate-400">Aguardando Retirada</p>
-                          )}
-                        </div>
-                      </div>
-                      {editForm.dataSaida && <CheckCircle2 className="w-6 h-6 ml-4 opacity-80" />}
+                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm ${editForm.dataSaida ? 'left-7' : 'left-1'}`} />
+                      </button>
                     </div>
+                    {editForm.dataSaida && (
+                      <div className="mt-4 pt-4 border-t border-purple-200/50 dark:border-purple-800/30 animate-in fade-in slide-in-from-top-2">
+                        <label className="text-[9px] font-black text-purple-600/60 dark:text-purple-400 uppercase tracking-[0.2em] ml-1 mb-2 block">Data de Saída</label>
+                        <input 
+                          type="date" 
+                          value={editForm.dataSaida} 
+                          onChange={e => setEditForm(p => ({ ...p, dataSaida: e.target.value }))} 
+                          className="w-full px-6 py-4 bg-white dark:bg-slate-800 border-2 border-purple-100 dark:border-purple-900/50 focus:border-purple-500 rounded-2xl font-black text-sm outline-none transition-all shadow-inner"
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
                 
