@@ -17,6 +17,7 @@ interface LogisticsModuleProps {
   quotes: Quote[];
   documentTemplates?: DocumentTemplate[];
   onSaveServiceOrder: (so: ServiceOrder) => void;
+  searchQuery?: string;
 }
 
 type ViewMode = 'grid' | 'list';
@@ -31,13 +32,22 @@ const statusConfig: Record<string, { color: string; label: string }> = {
 };
 
 
-export default function LogisticsModule({ serviceOrders = [], clients = [], quotes = [], documentTemplates = [], onSaveServiceOrder }: LogisticsModuleProps) {
+export default function LogisticsModule({ 
+  serviceOrders = [], 
+  clients = [], 
+  quotes = [], 
+  documentTemplates = [], 
+  onSaveServiceOrder,
+  searchQuery: searchQueryProp
+}: LogisticsModuleProps) {
   const context = useData();
   const { standardCustodies = [], fleetLogs = [], standardInstruments = [], employees = [], vehicles = [], saveItem, deleteItem } = context || {};
 
   const [activeTab, setActiveTab] = useState<TabMode>('os');
   const [viewMode, setViewMode] = useState<ViewMode>(() => (localStorage.getItem('logisticsViewMode') as ViewMode) || 'list');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | InstrumentStatus>('all');
+  const { searchQuery: searchQueryContext } = useData();
+  const searchQuery = searchQueryProp !== undefined ? searchQueryProp : searchQueryContext;
 
   // OS Edit State
   const [editingOS, setEditingOS] = useState<ServiceOrder | null>(null);
@@ -46,6 +56,8 @@ export default function LogisticsModule({ serviceOrders = [], clients = [], quot
     dataSaida: '',
     calibracaoConcluida: false,
     certificadosEnviados: false,
+    dataCalibracaoFim: '',
+    dataEnvioCertificado: '',
   });
 
   // Protocol Modal State
@@ -73,6 +85,8 @@ export default function LogisticsModule({ serviceOrders = [], clients = [], quot
       dataSaida: os.dataSaida || '',
       calibracaoConcluida: os.calibracaoConcluida || false,
       certificadosEnviados: os.certificadosEnviados || false,
+      dataCalibracaoFim: os.dataCalibracaoFim || '',
+      dataEnvioCertificado: os.dataEnvioCertificado || '',
     });
   };
 
@@ -92,21 +106,13 @@ export default function LogisticsModule({ serviceOrders = [], clients = [], quot
         dataSaida: editForm.dataSaida,
         calibracaoConcluida: editForm.calibracaoConcluida,
         certificadosEnviados: editForm.certificadosEnviados,
+        dataCalibracaoFim: editForm.dataCalibracaoFim,
+        dataEnvioCertificado: editForm.dataEnvioCertificado,
         statusServico: newStatus,
       };
       onSaveServiceOrder(updatedOS);
       toast.success('O.S. atualizada com sucesso!');
       setEditingOS(null);
-      // Find client and quote for the updated OS to generate PDF
-      const client = clients.find(c => c.id === updatedOS.clienteId);
-      const quote = quotes.find(q => q.id === updatedOS.orcamentoId);
-      const promise = generateServiceOrderPdf(updatedOS, client, quote, documentTemplates);
-      toast.promise(promise, {
-        loading: 'Atualizando e gerando O.S...',
-        success: 'O.S. salva e gerada!',
-        error: 'Erro ao gerar PDF.'
-      });
-      await promise;
     }
   };
 
@@ -115,9 +121,30 @@ export default function LogisticsModule({ serviceOrders = [], clients = [], quot
   };
 
   const filteredOS = (serviceOrders || []).filter(os => {
+    const matchesStatus = statusFilter === 'all' || os.statusServico === statusFilter;
+    if (!matchesStatus) return false;
+
+    if (!searchQuery) return true;
     const client = (clients || []).find(c => c.id === os.clienteId);
-    const term = searchTerm.toLowerCase();
-    return (os.id || "").toLowerCase().includes(term) || (os.orcamentoId || "").toLowerCase().includes(term) || client?.razaoSocial?.toLowerCase().includes(term);
+    const term = searchQuery.toLowerCase().trim();
+    const digits = term.replace(/\D/g, '');
+    
+    // Textual
+    const matchesText = (os.id || "").toLowerCase().includes(term) || 
+                       (os.orcamentoId || "").toLowerCase().includes(term) || 
+                       client?.razaoSocial?.toLowerCase().includes(term) ||
+                       client?.cnpj?.toLowerCase().includes(term);
+    
+    if (matchesText) return true;
+
+    // Numeric
+    if (digits && digits.length >= 3) {
+        const idDigits = (os.id || "").replace(/\D/g, '');
+        const cnpjDigits = (client?.cnpj || "").replace(/\D/g, '');
+        if (idDigits.includes(digits) || cnpjDigits.includes(digits)) return true;
+    }
+
+    return false;
   });
   const sortedOS = [...filteredOS].sort((a, b) => {
     // Attempt to extract numbers from the IDs for a true numerical sort
@@ -130,7 +157,10 @@ export default function LogisticsModule({ serviceOrders = [], clients = [], quot
   const newEmptyCustody = (): StandardCustody => ({
     id: `CAUT-${Date.now().toString().slice(-6)}`,
     items: [{ standardInstrumentId: '', quantidade: 1 }],
+    origem: 'Laboratório Central',
+    responsavelOrigem: '',
     destino: '',
+    responsavelDestino: '',
     dataSaida: new Date().toISOString().split('T')[0],
     dataRetorno: '',
     responsavel: ''
@@ -166,14 +196,20 @@ export default function LogisticsModule({ serviceOrders = [], clients = [], quot
   };
 
   const handleGenerateCautelaPdf = async (custody: StandardCustody) => {
-    const emp = employees.find(e => e.id === custody.responsavel);
+    const empOrigem = employees.find(e => e.id === custody.responsavelOrigem);
+    
+    // Resolve responsavelDestino (could be ID or name)
+    const empDestino = employees.find(e => e.id === custody.responsavelDestino);
+    
     const resolvedItems = (custody.items || []).map(it => {
       const st = standardInstruments.find(s => s.id === it.standardInstrumentId);
       return { nome: st?.nome || it.standardInstrumentId, identificacao: st?.identificacao || '', quantidade: it.quantidade };
     });
-    const employeeName = emp?.nome || custody.responsavel;
     
-    const promise = generateCautelaPdf(custody, resolvedItems, employeeName, documentTemplates);
+    const respOrigemName = empOrigem?.nome || custody.responsavelOrigem;
+    const respDestinoName = empDestino?.nome || custody.responsavelDestino;
+    
+    const promise = generateCautelaPdf(custody, resolvedItems, respOrigemName, respDestinoName, documentTemplates);
     toast.promise(promise, {
       loading: 'Gerando Termo de Cautela...',
       success: 'Termo gerado!',
@@ -206,13 +242,13 @@ export default function LogisticsModule({ serviceOrders = [], clients = [], quot
 
   return (
     <div className="w-full max-w-full min-w-0 overflow-hidden space-y-10">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 pb-10 border-b border-slate-100 dark:border-slate-800">
         <div>
-          <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight uppercase leading-tight">Módulo de Logística</h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium italic">Gestão operacional de transportes, cautelas e controle de frota.</p>
+          <span className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.3em] mb-2 block">Gestão Operacional</span>
+          <h2 className="text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Logística</h2>
         </div>
 
-        <div className="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl gap-1 overflow-x-auto custom-scrollbar no-scrollbar-on-mobile whitespace-nowrap w-full md:w-auto">
+        <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl gap-1">
           {[
             { id: 'os', label: 'Ordens de Serviço', icon: ClipboardList },
             { id: 'standards', label: 'Cautelas (Padrões)', icon: Key },
@@ -224,7 +260,7 @@ export default function LogisticsModule({ serviceOrders = [], clients = [], quot
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as TabMode)}
-                className={`flex-shrink-0 flex items-center px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all duration-300 ${
+                className={`flex items-center px-6 py-2.5 rounded-xl font-black text-xs transition-all duration-300 ${
                   isActive
                     ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm'
                     : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
@@ -247,13 +283,48 @@ export default function LogisticsModule({ serviceOrders = [], clients = [], quot
               <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-8 mb-12">
                 <div className="flex-1">
                   <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Ordens de Serviço</h2>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm font-medium italic">Gestão de fluxo de entrada e saída de instrumentos.</p>
+                  <div className="flex items-center gap-4 mt-2">
+                    <p className="text-slate-500 dark:text-slate-400 text-sm font-medium italic">Gestão de fluxo de entrada e saída de instrumentos.</p>
+                    <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-800 ml-4">
+                      <button 
+                        onClick={() => setStatusFilter('all')}
+                        className={`px-3 py-1 text-[9px] font-black uppercase rounded-md transition-all ${statusFilter === 'all' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                      >
+                        Todas
+                      </button>
+                      <button 
+                        onClick={() => setStatusFilter(InstrumentStatus.PENDING)}
+                        className={`px-3 py-1 text-[9px] font-black uppercase rounded-md transition-all ${statusFilter === InstrumentStatus.PENDING ? 'bg-white dark:bg-amber-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                      >
+                        Pendentes
+                      </button>
+                      <button 
+                        onClick={() => setStatusFilter(InstrumentStatus.IN_PROGRESS)}
+                        className={`px-3 py-1 text-[9px] font-black uppercase rounded-md transition-all ${statusFilter === InstrumentStatus.IN_PROGRESS ? 'bg-white dark:bg-amber-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                      >
+                        Em Andamento
+                      </button>
+                      <button 
+                        onClick={() => setStatusFilter(InstrumentStatus.CALIBRATED)}
+                        className={`px-3 py-1 text-[9px] font-black uppercase rounded-md transition-all ${statusFilter === InstrumentStatus.CALIBRATED ? 'bg-white dark:bg-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                      >
+                        Calibrado
+                      </button>
+                      <button 
+                        onClick={() => setStatusFilter(InstrumentStatus.DELIVERED)}
+                        className={`px-3 py-1 text-[9px] font-black uppercase rounded-md transition-all ${statusFilter === InstrumentStatus.DELIVERED ? 'bg-white dark:bg-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                      >
+                        Entregue
+                      </button>
+                    </div>
+                  </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="relative group flex-1 md:flex-none">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder="Buscar O.S., orçamento ou cliente..." className="w-full pl-12 pr-5 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-800 rounded-[1.5rem] text-sm font-bold outline-none xl:w-96 shadow-sm focus:ring-4 focus:ring-indigo-500/10 transition-all" />
-                  </div>
+                  {searchQuery && (
+                    <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-[10px] font-black uppercase tracking-widest animate-pulse border border-indigo-100">
+                      {filteredOS.length} resultado(s)
+                    </span>
+                  )}
                   <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
                     <button onClick={() => setViewMode('list')} className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}><List className="w-5 h-5" /></button>
                     <button onClick={() => setViewMode('grid')} className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}><LayoutGrid className="w-5 h-5" /></button>
@@ -516,7 +587,18 @@ export default function LogisticsModule({ serviceOrders = [], clients = [], quot
                 </div>
 
                 <div className="grid grid-cols-1 gap-4">
-                    <button onClick={() => setEditForm(p => ({ ...p, calibracaoConcluida: !p.calibracaoConcluida }))} className={`flex items-center gap-4 p-5 rounded-[2rem] border-2 transition-all group ${editForm.calibracaoConcluida ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 text-slate-500 hover:border-indigo-200'}`}>
+                  <div className="space-y-3">
+                    <button 
+                      onClick={() => {
+                        const nextVal = !editForm.calibracaoConcluida;
+                        setEditForm(p => ({ 
+                          ...p, 
+                          calibracaoConcluida: nextVal,
+                          dataCalibracaoFim: (nextVal && !p.dataCalibracaoFim) ? new Date().toISOString().split('T')[0] : p.dataCalibracaoFim
+                        }));
+                      }} 
+                      className={`w-full flex items-center gap-4 p-5 rounded-[2rem] border-2 transition-all group ${editForm.calibracaoConcluida ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 text-slate-500 hover:border-indigo-200'}`}
+                    >
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${editForm.calibracaoConcluida ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-800 group-hover:bg-indigo-50'}`}>
                             <Activity className={`w-5 h-5 ${editForm.calibracaoConcluida ? 'text-white' : ''}`} />
                         </div>
@@ -526,8 +608,31 @@ export default function LogisticsModule({ serviceOrders = [], clients = [], quot
                         </div>
                         {editForm.calibracaoConcluida && <CheckCircle2 className="w-6 h-6 ml-auto" />}
                     </button>
+                    {editForm.calibracaoConcluida && (
+                      <div className="px-6 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Data da Calibração</label>
+                        <input 
+                          type="date" 
+                          value={editForm.dataCalibracaoFim} 
+                          onChange={e => setEditForm(p => ({ ...p, dataCalibracaoFim: e.target.value }))} 
+                          className="w-full px-4 py-3 bg-indigo-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-400 rounded-2xl font-bold text-xs outline-none transition-all"
+                        />
+                      </div>
+                    )}
+                  </div>
 
-                    <button onClick={() => setEditForm(p => ({ ...p, certificadosEnviados: !p.certificadosEnviados }))} className={`flex items-center gap-4 p-5 rounded-[2rem] border-2 transition-all group ${editForm.certificadosEnviados ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 text-slate-500 hover:border-emerald-200'}`}>
+                  <div className="space-y-3">
+                    <button 
+                      onClick={() => {
+                        const nextVal = !editForm.certificadosEnviados;
+                        setEditForm(p => ({ 
+                          ...p, 
+                          certificadosEnviados: nextVal,
+                          dataEnvioCertificado: (nextVal && !p.dataEnvioCertificado) ? new Date().toISOString().split('T')[0] : p.dataEnvioCertificado
+                        }));
+                      }} 
+                      className={`w-full flex items-center gap-4 p-5 rounded-[2rem] border-2 transition-all group ${editForm.certificadosEnviados ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 text-slate-500 hover:border-emerald-200'}`}
+                    >
                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${editForm.certificadosEnviados ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-800 group-hover:bg-emerald-50'}`}>
                             <FileText className={`w-5 h-5 ${editForm.certificadosEnviados ? 'text-white' : ''}`} />
                         </div>
@@ -537,6 +642,18 @@ export default function LogisticsModule({ serviceOrders = [], clients = [], quot
                         </div>
                         {editForm.certificadosEnviados && <CheckCircle2 className="w-6 h-6 ml-auto" />}
                     </button>
+                    {editForm.certificadosEnviados && (
+                      <div className="px-6 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Data de Envio</label>
+                        <input 
+                          type="date" 
+                          value={editForm.dataEnvioCertificado} 
+                          onChange={e => setEditForm(p => ({ ...p, dataEnvioCertificado: e.target.value }))} 
+                          className="w-full px-4 py-3 bg-emerald-50 dark:bg-slate-800 border-2 border-transparent focus:border-emerald-400 rounded-2xl font-bold text-xs outline-none transition-all"
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -565,10 +682,38 @@ export default function LogisticsModule({ serviceOrders = [], clients = [], quot
               <button onClick={() => setEditingCustody(null)} className="p-3 text-slate-400 hover:text-slate-600 rounded-2xl transition-all"><X className="w-6 h-6" /></button>
             </div>
             <form onSubmit={handleSaveCustody} className="space-y-8 overflow-y-auto custom-scrollbar pr-2 -mr-2 pb-2">
-                <div className="space-y-3">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Destino / Finalidade da Saída</label>
-                  <textarea required value={editingCustody.destino} onChange={e => setEditingCustody(p => ({...p!, destino: e.target.value}))} rows={2} placeholder="Descreva o local de trabalho ou cliente de destino..." className="w-full px-6 py-5 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-500 rounded-[2.5rem] font-bold text-sm outline-none transition-all shadow-inner resize-none" />
-               </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Origem</label>
+                    <input required value={editingCustody.origem} onChange={e => setEditingCustody(p => ({...p!, origem: e.target.value}))} className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-500 rounded-[2rem] font-bold text-sm outline-none transition-all shadow-inner" />
+                  </div>
+                  <div className="space-y-3">
+                    <EmployeeSelect label="Responsável Origem" value={editingCustody.responsavelOrigem} onChange={val => setEditingCustody(p => ({...p!, responsavelOrigem: val}))} />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Destino</label>
+                    <input required value={editingCustody.destino} onChange={e => setEditingCustody(p => ({...p!, destino: e.target.value}))} placeholder="Local ou Cliente..." className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-500 rounded-[2rem] font-bold text-sm outline-none transition-all shadow-inner" />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Responsável Destino</label>
+                    <input 
+                      list="employee-list"
+                      required 
+                      value={editingCustody.responsavelDestino} 
+                      onChange={e => setEditingCustody(p => ({...p!, responsavelDestino: e.target.value}))} 
+                      placeholder="Selecione ou digite o nome..."
+                      className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-500 rounded-[2rem] font-bold text-sm outline-none transition-all shadow-inner"
+                    />
+                    <datalist id="employee-list">
+                      {employees.map(e => (
+                        <option key={e.id} value={e.nome} />
+                      ))}
+                    </datalist>
+                  </div>
+                </div>
 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between px-2">
@@ -591,7 +736,7 @@ export default function LogisticsModule({ serviceOrders = [], clients = [], quot
                   </div>
                 </div>
 
-                <EmployeeSelect label="Responsável pela Retirada" value={editingCustody.responsavel} onChange={val => setEditingCustody(p => ({...p!, responsavel: val}))} />
+                <EmployeeSelect label="Responsável pela Saída (Transportador)" value={editingCustody.responsavel} onChange={val => setEditingCustody(p => ({...p!, responsavel: val}))} />
 
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
@@ -650,11 +795,11 @@ export default function LogisticsModule({ serviceOrders = [], clients = [], quot
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-5">Partida</label>
-                    <input type="date" required value={editingFleet.dataSaida} onChange={e => setEditForm(prev => ({...prev, dataSaida: e.target.value}))} className="w-full p-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-emerald-500 rounded-[2rem] font-black text-sm outline-none shadow-sm transition-all" />
+                    <input type="date" required value={editingFleet.dataSaida} onChange={e => setEditingFleet(p => ({...p!, dataSaida: e.target.value}))} className="w-full p-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-emerald-500 rounded-[2rem] font-black text-sm outline-none shadow-sm transition-all" />
                   </div>
                   <div className="space-y-1">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-5">Chegada</label>
-                    <input type="date" value={editingFleet.dataRetorno || ''} onChange={e => setEditForm(prev => ({...prev, dataRetorno: e.target.value}))} className="w-full p-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-emerald-500 rounded-[2rem] font-black text-sm outline-none shadow-sm transition-all" />
+                    <input type="date" value={editingFleet.dataRetorno || ''} onChange={e => setEditingFleet(p => ({...p!, dataRetorno: e.target.value}))} className="w-full p-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-emerald-500 rounded-[2rem] font-black text-sm outline-none shadow-sm transition-all" />
                   </div>
                 </div>
                 <button type="submit" className="w-full py-6 bg-slate-900 dark:bg-emerald-600 text-white rounded-[2.5rem] font-black text-xs uppercase tracking-[0.2em] shadow-2xl hover:bg-black dark:hover:bg-emerald-500 transition-all active:scale-95">Salvar Registro de Viagem</button>
