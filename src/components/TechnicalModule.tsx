@@ -116,7 +116,6 @@ export default function TechnicalModule({
           exit={{ opacity: 0, scale: 0.98 }}
           transition={{ duration: 0.3 }}
         >
-        >
           {activeSubTab === 'records' &&
             <CalibrationRecordModule
               searchQuery={searchQuery}
