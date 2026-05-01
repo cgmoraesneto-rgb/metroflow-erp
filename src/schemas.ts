@@ -79,6 +79,8 @@ export const ServiceOrderSchema = z.object({
   statusCertificado: z.nativeEnum(CertificateStatus).optional().default(CertificateStatus.PENDING),
   calibracaoConcluida: z.boolean().optional().default(false),
   certificadosEnviados: z.boolean().optional().default(false),
+  dataCalibracaoFim: z.string().optional().default(''),
+  dataEnvioCertificado: z.string().optional().default(''),
   observacoes: z.string().optional().default(''),
 });
 
