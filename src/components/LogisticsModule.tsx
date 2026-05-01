@@ -50,7 +50,9 @@ export default function LogisticsModule({
   // OS Edit State
   const [editingOS, setEditingOS] = useState<ServiceOrder | null>(null);
   const [editForm, setEditForm] = useState({
+    entradaConfirmada: false,
     dataEntrada: '',
+    saidaConfirmada: false,
     dataSaida: '',
     calibracaoConcluida: false,
     certificadosEnviados: false,
@@ -79,7 +81,9 @@ export default function LogisticsModule({
   const handleEditOS = (os: ServiceOrder) => {
     setEditingOS(os);
     setEditForm({
+      entradaConfirmada: !!os.dataEntrada,
       dataEntrada: os.dataEntrada || '',
+      saidaConfirmada: !!os.dataSaida,
       dataSaida: os.dataSaida || '',
       calibracaoConcluida: os.calibracaoConcluida || false,
       certificadosEnviados: os.certificadosEnviados || false,
@@ -91,19 +95,19 @@ export default function LogisticsModule({
   const handleSaveOS = async () => {
     if (editingOS) {
       let newStatus = InstrumentStatus.PENDING;
-      if (editForm.calibracaoConcluida && editForm.certificadosEnviados && editForm.dataSaida) {
+      if (editForm.calibracaoConcluida && editForm.certificadosEnviados && editForm.saidaConfirmada && editForm.dataSaida) {
         newStatus = InstrumentStatus.COMPLETED;
-      } else if (editForm.dataSaida) {
+      } else if (editForm.saidaConfirmada && editForm.dataSaida) {
         newStatus = InstrumentStatus.DELIVERED;
       } else if (editForm.calibracaoConcluida) {
         newStatus = InstrumentStatus.CALIBRATED;
-      } else if (editForm.dataEntrada) {
+      } else if (editForm.entradaConfirmada && editForm.dataEntrada) {
         newStatus = InstrumentStatus.IN_PROGRESS;
       }
       const updatedOS: ServiceOrder = {
         ...editingOS!,
-        dataEntrada: editForm.dataEntrada,
-        dataSaida: editForm.dataSaida,
+        dataEntrada: editForm.entradaConfirmada ? editForm.dataEntrada : '',
+        dataSaida: editForm.saidaConfirmada ? editForm.dataSaida : '',
         calibracaoConcluida: editForm.calibracaoConcluida,
         certificadosEnviados: editForm.certificadosEnviados,
         dataCalibracaoFim: editForm.dataCalibracaoFim || undefined,
@@ -583,31 +587,32 @@ export default function LogisticsModule({
                 
                 <div className="space-y-4">
                   {/* 1. Recebimento */}
-                  <div className={`p-6 rounded-[2.5rem] border-2 transition-all duration-300 ${editForm.dataEntrada ? 'bg-sky-50 dark:bg-sky-900/10 border-sky-200 dark:border-sky-800/50 shadow-sm' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800'}`}>
+                  <div className={`p-6 rounded-[2.5rem] border-2 transition-all duration-300 ${editForm.entradaConfirmada ? 'bg-sky-50 dark:bg-sky-900/10 border-sky-200 dark:border-sky-800/50 shadow-sm' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800'}`}>
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-4">
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${editForm.dataEntrada ? 'bg-white dark:bg-slate-900 shadow-sm' : 'bg-slate-50 dark:bg-slate-800'}`}>
-                          <ClipboardList className={`w-6 h-6 ${editForm.dataEntrada ? 'text-sky-600' : 'text-slate-400'}`} />
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${editForm.entradaConfirmada ? 'bg-white dark:bg-slate-900 shadow-sm' : 'bg-slate-50 dark:bg-slate-800'}`}>
+                          <ClipboardList className={`w-6 h-6 ${editForm.entradaConfirmada ? 'text-sky-600' : 'text-slate-400'}`} />
                         </div>
                         <div className="text-left">
-                          <p className={`text-sm font-black uppercase tracking-tight ${editForm.dataEntrada ? 'text-slate-900 dark:text-white' : 'text-slate-500'}`}>1. Recebimento</p>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{editForm.dataEntrada ? 'Instrumento Recebido' : 'Aguardando Chegada'}</p>
+                          <p className={`text-sm font-black uppercase tracking-tight ${editForm.entradaConfirmada ? 'text-slate-900 dark:text-white' : 'text-slate-500'}`}>1. Recebimento</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{editForm.entradaConfirmada ? 'Instrumento Recebido' : 'Aguardando Chegada'}</p>
                         </div>
                       </div>
                       <button 
                         onClick={() => {
-                          const hasDate = !!editForm.dataEntrada;
+                          const nextVal = !editForm.entradaConfirmada;
                           setEditForm(p => ({ 
                             ...p, 
-                            dataEntrada: hasDate ? '' : new Date().toISOString().split('T')[0]
+                            entradaConfirmada: nextVal,
+                            dataEntrada: (nextVal && !p.dataEntrada) ? new Date().toISOString().split('T')[0] : p.dataEntrada
                           }));
                         }}
-                        className={`w-12 h-6 rounded-full transition-all relative ${editForm.dataEntrada ? 'bg-sky-500' : 'bg-slate-200 dark:bg-slate-700'}`}
+                        className={`w-12 h-6 rounded-full transition-all relative ${editForm.entradaConfirmada ? 'bg-sky-500' : 'bg-slate-200 dark:bg-slate-700'}`}
                       >
-                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm ${editForm.dataEntrada ? 'left-7' : 'left-1'}`} />
+                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm ${editForm.entradaConfirmada ? 'left-7' : 'left-1'}`} />
                       </button>
                     </div>
-                    {editForm.dataEntrada && (
+                    {editForm.entradaConfirmada && (
                       <div className="mt-4 pt-4 border-t border-sky-200/50 dark:border-sky-800/30 animate-in fade-in slide-in-from-top-2">
                         <label className="text-[9px] font-black text-sky-600/60 dark:text-sky-400 uppercase tracking-[0.2em] ml-1 mb-2 block">Data de Entrada</label>
                         <input 
@@ -699,31 +704,32 @@ export default function LogisticsModule({
                   </div>
 
                   {/* 4. Entrega */}
-                  <div className={`p-6 rounded-[2.5rem] border-2 transition-all duration-300 ${editForm.dataSaida ? 'bg-purple-50 dark:bg-purple-900/10 border-purple-200 dark:border-purple-800/50 shadow-sm' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800'}`}>
+                  <div className={`p-6 rounded-[2.5rem] border-2 transition-all duration-300 ${editForm.saidaConfirmada ? 'bg-purple-50 dark:bg-purple-900/10 border-purple-200 dark:border-purple-800/50 shadow-sm' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800'}`}>
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-4">
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${editForm.dataSaida ? 'bg-white dark:bg-slate-900 shadow-sm' : 'bg-slate-50 dark:bg-slate-800'}`}>
-                          <CarFront className={`w-6 h-6 ${editForm.dataSaida ? 'text-purple-600' : 'text-slate-400'}`} />
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${editForm.saidaConfirmada ? 'bg-white dark:bg-slate-900 shadow-sm' : 'bg-slate-50 dark:bg-slate-800'}`}>
+                          <CarFront className={`w-6 h-6 ${editForm.saidaConfirmada ? 'text-purple-600' : 'text-slate-400'}`} />
                         </div>
                         <div className="text-left">
-                          <p className={`text-sm font-black uppercase tracking-tight ${editForm.dataSaida ? 'text-slate-900 dark:text-white' : 'text-slate-500'}`}>4. Entrega</p>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{editForm.dataSaida ? 'Equipamento Retirado' : 'Aguardando Saída'}</p>
+                          <p className={`text-sm font-black uppercase tracking-tight ${editForm.saidaConfirmada ? 'text-slate-900 dark:text-white' : 'text-slate-500'}`}>4. Entrega</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{editForm.saidaConfirmada ? 'Equipamento Retirado' : 'Aguardando Saída'}</p>
                         </div>
                       </div>
                       <button 
                         onClick={() => {
-                          const hasDate = !!editForm.dataSaida;
+                          const nextVal = !editForm.saidaConfirmada;
                           setEditForm(p => ({ 
                             ...p, 
-                            dataSaida: hasDate ? '' : new Date().toISOString().split('T')[0]
+                            saidaConfirmada: nextVal,
+                            dataSaida: (nextVal && !p.dataSaida) ? new Date().toISOString().split('T')[0] : p.dataSaida
                           }));
                         }}
-                        className={`w-12 h-6 rounded-full transition-all relative ${editForm.dataSaida ? 'bg-purple-500' : 'bg-slate-200 dark:bg-slate-700'}`}
+                        className={`w-12 h-6 rounded-full transition-all relative ${editForm.saidaConfirmada ? 'bg-purple-500' : 'bg-slate-200 dark:bg-slate-700'}`}
                       >
-                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm ${editForm.dataSaida ? 'left-7' : 'left-1'}`} />
+                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm ${editForm.saidaConfirmada ? 'left-7' : 'left-1'}`} />
                       </button>
                     </div>
-                    {editForm.dataSaida && (
+                    {editForm.saidaConfirmada && (
                       <div className="mt-4 pt-4 border-t border-purple-200/50 dark:border-purple-800/30 animate-in fade-in slide-in-from-top-2">
                         <label className="text-[9px] font-black text-purple-600/60 dark:text-purple-400 uppercase tracking-[0.2em] ml-1 mb-2 block">Data de Saída</label>
                         <input 
