@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ServiceOrder, Client, Quote, InstrumentStatus, StandardCustody, FleetLog, CustodyItem, DocumentTemplate, CertificateStatus } from '../types';
-import { ClipboardList, LayoutGrid, List, FileText, Download, ArrowDownToLine, ArrowUpFromLine, Pencil, Calendar, CheckCircle2, X, Activity, Key, FileCheck, CarFront, Plus, Trash2 } from 'lucide-react';
+import { ClipboardList, LayoutGrid, List, FileText, Download, ArrowDownToLine, ArrowUpFromLine, Pencil, CheckCircle2, X, Activity, Key, FileCheck, CarFront, Plus, Trash2 } from 'lucide-react';
 import { formatDate } from '../utils/formatters';
 import { motion, AnimatePresence } from 'framer-motion';
 import EmployeeSelect from './EmployeeSelect';
@@ -98,14 +98,14 @@ export default function LogisticsModule({
       } else if (editForm.dataEntrada) {
         newStatus = InstrumentStatus.IN_PROGRESS;
       }
-      const updatedOS = {
-        ...editingOS,
+      const updatedOS: ServiceOrder = {
+        ...editingOS!,
         dataEntrada: editForm.dataEntrada,
         dataSaida: editForm.dataSaida,
         calibracaoConcluida: editForm.calibracaoConcluida,
         certificadosEnviados: editForm.certificadosEnviados,
-        dataCalibracaoFim: editForm.dataCalibracaoFim,
-        dataEnvioCertificado: editForm.dataEnvioCertificado,
+        dataCalibracaoFim: editForm.dataCalibracaoFim || undefined,
+        dataEnvioCertificado: editForm.dataEnvioCertificado || undefined,
         statusServico: newStatus,
       };
       onSaveServiceOrder(updatedOS);
