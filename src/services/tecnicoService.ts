@@ -1,7 +1,7 @@
 // src/services/tecnicoService.ts
 import { apiClient } from './apiClient';
 import { ServiceOrderSchema, StandardInstrumentSchema, IdSchema } from '../schemas';
-import { ServiceOrder, StandardInstrument, CalibrationRecord, Procedure } from '../types';
+import { ServiceOrder, StandardInstrument, CalibrationRecord, CalibrationResult, Procedure } from '../types';
 
 export const tecnicoService = {
   // --- Ordens de Serviço ---
@@ -31,6 +31,15 @@ export const tecnicoService = {
 
   async saveCalibrationRecord(record: Partial<CalibrationRecord>): Promise<CalibrationRecord> {
     return apiClient.post<CalibrationRecord>('/api/mock/calibration_records', record);
+  },
+  
+  // --- Resultados de Calibração ---
+  async getCalibrationResults(): Promise<CalibrationResult[]> {
+    return apiClient.fetch<CalibrationResult>('/api/mock/calibration_results');
+  },
+
+  async saveCalibrationResult(result: Partial<CalibrationResult>): Promise<CalibrationResult> {
+    return apiClient.post<CalibrationResult>('/api/mock/calibration_results', result);
   },
   // --- Procedimentos ---
   async getProcedures(): Promise<Procedure[]> {

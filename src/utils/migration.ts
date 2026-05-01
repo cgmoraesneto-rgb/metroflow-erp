@@ -121,7 +121,8 @@ export const generateNextQuoteId = (existingQuotes: Quote[]): string => {
   let maxSeq = MIN_SEQ - 1;
 
   existingQuotes.forEach(q => {
-    const match = q.id.match(/^OCW(\d{4})26/);
+    // Check for both OCW and OCM prefixes to avoid collisions during transition
+    const match = q.id.match(/^OC[WM](\d{4})26/);
     if (match) {
       const seq = parseInt(match[1], 10);
       if (seq > maxSeq) maxSeq = seq;

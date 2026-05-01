@@ -1,1 +1,286 @@
-[]
+[
+  {
+    "id": "AUDIT-1776778387464-529",
+    "userId": "admin-1",
+    "userName": "C.G. Moraes Neto",
+    "action": "CREATE",
+    "entityId": "001",
+    "entityType": "clients",
+    "timestamp": "2026-04-21T13:33:07.464Z",
+    "newState": "{\"id\":\"001\",\"razaoSocial\":\"Novo Cliente 001\",\"cnpj\":\"00.000.000/0000-00\",\"status\":\"NÃO ATUALIZADO\",\"funcionarioCadastro\":\"C.G. Moraes Neto\"}"
+  },
+  {
+    "id": "AUDIT-1776778412123-922",
+    "userId": "admin-1",
+    "userName": "C.G. Moraes Neto",
+    "action": "UPDATE",
+    "entityId": "001",
+    "entityType": "clients",
+    "timestamp": "2026-04-21T13:33:32.123Z",
+    "previousState": "{\"id\":\"001\",\"razaoSocial\":\"Novo Cliente 001\",\"cnpj\":\"00.000.000/0000-00\",\"status\":\"NÃO ATUALIZADO\",\"funcionarioCadastro\":\"C.G. Moraes Neto\"}",
+    "newState": "{\"id\":\"001\",\"razaoSocial\":\"Novo Cliente 001\",\"cnpj\":\"00.000.000/0000-00\",\"status\":\"NÃO ATUALIZADO\",\"funcionarioCadastro\":\"C.G. Moraes Neto\"}"
+  },
+  {
+    "id": "AUDIT-1776778416189-919",
+    "userId": "admin-1",
+    "userName": "C.G. Moraes Neto",
+    "action": "UPDATE",
+    "entityId": "001",
+    "entityType": "clients",
+    "timestamp": "2026-04-21T13:33:36.189Z",
+    "previousState": "{\"id\":\"001\",\"razaoSocial\":\"Novo Cliente 001\",\"cnpj\":\"00.000.000/0000-00\",\"status\":\"NÃO ATUALIZADO\",\"funcionarioCadastro\":\"C.G. Moraes Neto\"}",
+    "newState": "{\"id\":\"001\",\"razaoSocial\":\"Novo Cliente 001\",\"cnpj\":\"00.000.000/0000-00\",\"status\":\"NÃO ATUALIZADO\",\"funcionarioCadastro\":\"C.G. Moraes Neto\"}"
+  },
+  {
+    "id": "AUDIT-1776778426756-273",
+    "userId": "admin-1",
+    "userName": "C.G. Moraes Neto",
+    "action": "CREATE",
+    "entityId": "001",
+    "entityType": "clients",
+    "timestamp": "2026-04-21T13:33:46.756Z",
+    "newState": "{\"id\":\"001\",\"razaoSocial\":\"Novo Cliente 001\",\"cnpj\":\"00.000.000/0000-00\",\"status\":\"NÃO ATUALIZADO\",\"funcionarioCadastro\":\"C.G. Moraes Neto\"}"
+  },
+  {
+    "id": "AUDIT-1776778427781-321",
+    "userId": "admin-1",
+    "userName": "C.G. Moraes Neto",
+    "action": "UPDATE",
+    "entityId": "001",
+    "entityType": "clients",
+    "timestamp": "2026-04-21T13:33:47.781Z",
+    "previousState": "{\"id\":\"001\",\"razaoSocial\":\"Novo Cliente 001\",\"cnpj\":\"00.000.000/0000-00\",\"status\":\"NÃO ATUALIZADO\",\"funcionarioCadastro\":\"C.G. Moraes Neto\"}",
+    "newState": "{\"id\":\"001\",\"razaoSocial\":\"Novo Cliente 001\",\"cnpj\":\"00.000.000/0000-00\",\"status\":\"NÃO ATUALIZADO\",\"funcionarioCadastro\":\"C.G. Moraes Neto\"}"
+  },
+  {
+    "id": "AUDIT-1776778428814-413",
+    "userId": "admin-1",
+    "userName": "C.G. Moraes Neto",
+    "action": "UPDATE",
+    "entityId": "001",
+    "entityType": "clients",
+    "timestamp": "2026-04-21T13:33:48.814Z",
+    "previousState": "{\"id\":\"001\",\"razaoSocial\":\"Novo Cliente 001\",\"cnpj\":\"00.000.000/0000-00\",\"status\":\"NÃO ATUALIZADO\",\"funcionarioCadastro\":\"C.G. Moraes Neto\"}",
+    "newState": "{\"id\":\"001\",\"razaoSocial\":\"Novo Cliente 001\",\"cnpj\":\"00.000.000/0000-00\",\"status\":\"NÃO ATUALIZADO\",\"funcionarioCadastro\":\"C.G. Moraes Neto\"}"
+  },
+  {
+    "id": "AUDIT-1776778443149-968",
+    "userId": "admin-1",
+    "userName": "C.G. Moraes Neto",
+    "action": "UPDATE",
+    "entityId": "001",
+    "entityType": "clients",
+    "timestamp": "2026-04-21T13:34:03.149Z",
+    "previousState": "{\"id\":\"001\",\"razaoSocial\":\"Novo Cliente 001\",\"cnpj\":\"00.000.000/0000-00\",\"status\":\"NÃO ATUALIZADO\",\"funcionarioCadastro\":\"C.G. Moraes Neto\"}",
+    "newState": "{\"id\":\"001\",\"razaoSocial\":\"WANTEC - TECNOLOGIA EM INSTRUMENTOS DE MEDICAO E CALIBRACAO LTDA\",\"cnpj\":\"10015449000187\",\"enderecoPrincipal\":\"RUA RAUL BOOP, 37, COMPENSA, MANAUS - AM\",\"enderecoColeta\":\"\",\"solicitanteNome\":\"\",\"solicitanteEmail\":\"\",\"solicitanteContato\":\"9292135116\",\"emailFinanceiro\":\"\",\"emailCertificados\":\"\",\"retencaoImpostoFonte\":false,\"status\":\"NÃO ATUALIZADO\",\"restricaoPagamento\":false,\"funcionarioCadastro\":\"C.G. Moraes Neto\",\"senha\":\"\",\"inscricaoMunicipal\":\"\",\"inscricaoEstadual\":\"\"}"
+  },
+  {
+    "id": "AUDIT-1776778445081-715",
+    "userId": "admin-1",
+    "userName": "C.G. Moraes Neto",
+    "action": "UPDATE",
+    "entityId": "001",
+    "entityType": "clients",
+    "timestamp": "2026-04-21T13:34:05.081Z",
+    "previousState": "{\"id\":\"001\",\"razaoSocial\":\"WANTEC - TECNOLOGIA EM INSTRUMENTOS DE MEDICAO E CALIBRACAO LTDA\",\"cnpj\":\"10015449000187\",\"status\":\"NÃO ATUALIZADO\",\"funcionarioCadastro\":\"C.G. Moraes Neto\",\"enderecoPrincipal\":\"RUA RAUL BOOP, 37, COMPENSA, MANAUS - AM\",\"enderecoColeta\":\"\",\"solicitanteNome\":\"\",\"solicitanteEmail\":\"\",\"solicitanteContato\":\"9292135116\",\"emailFinanceiro\":\"\",\"emailCertificados\":\"\",\"retencaoImpostoFonte\":false,\"restricaoPagamento\":false,\"senha\":\"\",\"inscricaoMunicipal\":\"\",\"inscricaoEstadual\":\"\"}",
+    "newState": "{\"id\":\"001\",\"razaoSocial\":\"Novo Cliente 001\",\"cnpj\":\"00.000.000/0000-00\",\"status\":\"NÃO ATUALIZADO\",\"funcionarioCadastro\":\"C.G. Moraes Neto\"}"
+  },
+  {
+    "id": "AUDIT-1776778446679-611",
+    "userId": "admin-1",
+    "userName": "C.G. Moraes Neto",
+    "action": "UPDATE",
+    "entityId": "001",
+    "entityType": "clients",
+    "timestamp": "2026-04-21T13:34:06.679Z",
+    "previousState": "{\"id\":\"001\",\"razaoSocial\":\"Novo Cliente 001\",\"cnpj\":\"00.000.000/0000-00\",\"status\":\"NÃO ATUALIZADO\",\"funcionarioCadastro\":\"C.G. Moraes Neto\",\"enderecoPrincipal\":\"RUA RAUL BOOP, 37, COMPENSA, MANAUS - AM\",\"enderecoColeta\":\"\",\"solicitanteNome\":\"\",\"solicitanteEmail\":\"\",\"solicitanteContato\":\"9292135116\",\"emailFinanceiro\":\"\",\"emailCertificados\":\"\",\"retencaoImpostoFonte\":false,\"restricaoPagamento\":false,\"senha\":\"\",\"inscricaoMunicipal\":\"\",\"inscricaoEstadual\":\"\"}",
+    "newState": "{\"id\":\"001\",\"razaoSocial\":\"Novo Cliente 001\",\"cnpj\":\"00.000.000/0000-00\",\"status\":\"NÃO ATUALIZADO\",\"funcionarioCadastro\":\"C.G. Moraes Neto\"}"
+  },
+  {
+    "id": "AUDIT-1776778493305-813",
+    "userId": "admin-1",
+    "userName": "C.G. Moraes Neto",
+    "action": "CREATE",
+    "entityType": "standard_instruments",
+    "timestamp": "2026-04-21T13:34:53.305Z",
+    "newState": "{\"nome\":\"LRM\",\"identificacao\":\"LRM\",\"certificadoCalibracao\":\"LRM\",\"certificadoPdf\":\"\",\"dataCalibracao\":\"2025-12-12\",\"dataValidadeCalibracao\":\"2026-12-12\",\"orgaoCalibrador\":\"LRM\",\"periodicidade\":\"12\",\"resolucao\":\"0,001\",\"unidadeMedida\":\"mm\",\"statusMovimentacao\":\"Disponível\",\"uncertainty\":0,\"kFactor\":2}"
+  },
+  {
+    "id": "AUDIT-1776778571804-799",
+    "userId": "admin-1",
+    "userName": "C.G. Moraes Neto",
+    "action": "CREATE",
+    "entityId": "PT-1776778571762",
+    "entityType": "price_tables",
+    "timestamp": "2026-04-21T13:36:11.804Z",
+    "newState": "{\"id\":\"PT-1776778571762\",\"nome\":\"2026\",\"items\":[]}"
+  },
+  {
+    "id": "AUDIT-1776778613823-913",
+    "userId": "admin-1",
+    "userName": "C.G. Moraes Neto",
+    "action": "UPDATE",
+    "entityId": "PT-1776778571762",
+    "entityType": "price_tables",
+    "timestamp": "2026-04-21T13:36:53.823Z",
+    "previousState": "{\"id\":\"PT-1776778571762\",\"nome\":\"2026\",\"items\":[]}",
+    "newState": "{\"id\":\"PT-1776778571762\",\"nome\":\"2026\",\"items\":[{\"nomeInstrumento\":\"Paquimetro\",\"valorRastreavel\":100,\"valorAcreditado\":0,\"manutencao\":0,\"ensaio\":0,\"teste\":0,\"qualificacao\":0,\"logistica\":0,\"id\":\"PTI-1776778611431\"}]}"
+  },
+  {
+    "id": "AUDIT-1776778653268-884",
+    "userId": "admin-1",
+    "userName": "C.G. Moraes Neto",
+    "action": "CREATE",
+    "entityId": "1776778653213",
+    "entityType": "payment_methods",
+    "timestamp": "2026-04-21T13:37:33.268Z",
+    "newState": "{\"description\":\"10 dias\",\"id\":\"1776778653213\"}"
+  },
+  {
+    "id": "AUDIT-1776778677171-631",
+    "userId": "admin-1",
+    "userName": "C.G. Moraes Neto",
+    "action": "CREATE",
+    "entityId": "OCW041026",
+    "entityType": "quotes",
+    "timestamp": "2026-04-21T13:37:57.171Z",
+    "newState": "{\"id\":\"OCW041026\",\"clienteId\":\"001\",\"dataEmissao\":\"2026-04-21\",\"validade\":\"2026-05-21\",\"comissaoVendedor\":false,\"tabelaPrecos\":\"2026\",\"formaPagamento\":\"10 dias\",\"items\":[{\"descricao\":\"Paquimetro\",\"quantidade\":1,\"tipoServico\":\"Rastreável\",\"local\":\"Laboratório\",\"valorUnitario\":100,\"desconto\":0,\"valorUnitarioFinal\":100,\"valorTotal\":100,\"item\":1}],\"clienteCnpj\":\"00.000.000/0000-00\",\"clienteEndereco\":\"RUA RAUL BOOP, 37, COMPENSA, MANAUS - AM\",\"clienteSolicitanteNome\":\"\",\"clienteSolicitanteEmail\":\"\",\"clienteSolicitanteContato\":\"9292135116\",\"clienteEmailFinanceiro\":\"\",\"clienteRetencaoImpostoFonte\":false,\"status\":\"Pendente\",\"revision\":0,\"criadoPor\":\"C.G. Moraes Neto\",\"criadoEm\":\"21/04/2026, 09:37:44\"}"
+  },
+  {
+    "id": "AUDIT-1776778761222-586",
+    "userId": "admin-1",
+    "userName": "C.G. Moraes Neto",
+    "action": "CREATE",
+    "entityId": "mask-1776778687276",
+    "entityType": "certificate_masks",
+    "timestamp": "2026-04-21T13:39:21.222Z",
+    "newState": "{\"type\":\"CALIBRATION_CERTIFICATE\",\"id\":\"mask-1776778687276\",\"title\":\"Teste\",\"description\":\"Paquimetro\",\"procedureId\":\"\",\"standardInstrumentIds\":[],\"version\":1,\"createdAt\":\"2026-04-21T13:38:07.276Z\",\"updatedAt\":\"2026-04-21T13:39:21.160Z\",\"measurementGroups\":[{\"name\":\"Tabela de Resultados 1\",\"blockId\":\"T1\",\"columnDefinitions\":[{\"id\":\"TAG_1\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\"},{\"id\":\"TAG_2\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\",\"displayFormat\":\"percent\"},{\"id\":\"TAG_3\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"CALCULATED\",\"formula\":\"[TAG_2]+[TAG_3]\",\"decimalPlaces\":1,\"displayFormat\":\"percent\"},{\"id\":\"TAG_4\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\"}],\"isDynamic\":true}],\"uncertaintyBudget\":[]}"
+  },
+  {
+    "id": "AUDIT-1776778783054-381",
+    "userId": "admin-1",
+    "userName": "C.G. Moraes Neto",
+    "action": "UPDATE",
+    "entityId": "OCW041026",
+    "entityType": "quotes",
+    "timestamp": "2026-04-21T13:39:43.054Z",
+    "previousState": "{\"id\":\"OCW041026\",\"clienteId\":\"001\",\"dataEmissao\":\"2026-04-21\",\"validade\":\"2026-05-21\",\"comissaoVendedor\":false,\"tabelaPrecos\":\"2026\",\"formaPagamento\":\"10 dias\",\"items\":[{\"descricao\":\"Paquimetro\",\"quantidade\":1,\"tipoServico\":\"Rastreável\",\"local\":\"Laboratório\",\"valorUnitario\":100,\"desconto\":0,\"valorUnitarioFinal\":100,\"valorTotal\":100,\"item\":1}],\"clienteCnpj\":\"00.000.000/0000-00\",\"clienteEndereco\":\"RUA RAUL BOOP, 37, COMPENSA, MANAUS - AM\",\"clienteSolicitanteNome\":\"\",\"clienteSolicitanteEmail\":\"\",\"clienteSolicitanteContato\":\"9292135116\",\"clienteEmailFinanceiro\":\"\",\"clienteRetencaoImpostoFonte\":false,\"status\":\"Pendente\",\"revision\":0,\"criadoPor\":\"C.G. Moraes Neto\",\"criadoEm\":\"21/04/2026, 09:37:44\"}",
+    "newState": "{\"id\":\"OCW041026\",\"clienteId\":\"001\",\"dataEmissao\":\"2026-04-21\",\"validade\":\"2026-05-21\",\"comissaoVendedor\":false,\"tabelaPrecos\":\"2026\",\"formaPagamento\":\"10 dias\",\"items\":[{\"descricao\":\"Paquimetro\",\"quantidade\":1,\"tipoServico\":\"Rastreável\",\"local\":\"Laboratório\",\"valorUnitario\":100,\"desconto\":0,\"valorUnitarioFinal\":100,\"valorTotal\":100,\"item\":1}],\"clienteCnpj\":\"00.000.000/0000-00\",\"clienteEndereco\":\"RUA RAUL BOOP, 37, COMPENSA, MANAUS - AM\",\"clienteSolicitanteNome\":\"\",\"clienteSolicitanteEmail\":\"\",\"clienteSolicitanteContato\":\"9292135116\",\"clienteEmailFinanceiro\":\"\",\"clienteRetencaoImpostoFonte\":false,\"status\":\"Aprovado\",\"revision\":0,\"criadoPor\":\"C.G. Moraes Neto\",\"criadoEm\":\"21/04/2026, 09:37:44\"}"
+  },
+  {
+    "id": "AUDIT-1776779768615-850",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "CREATE",
+    "entityId": "002",
+    "entityType": "clients",
+    "timestamp": "2026-04-21T13:56:08.615Z",
+    "newState": "{\"id\":\"002\",\"razaoSocial\":\"Novo Cliente 002\",\"cnpj\":\"00.000.000/0000-00\",\"status\":\"NÃO ATUALIZADO\",\"funcionarioCadastro\":\"Desenvolvedor MetroFlow\"}"
+  },
+  {
+    "id": "AUDIT-1776779777944-849",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "UPDATE",
+    "entityId": "002",
+    "entityType": "clients",
+    "timestamp": "2026-04-21T13:56:17.944Z",
+    "previousState": "{\"id\":\"002\",\"razaoSocial\":\"Novo Cliente 002\",\"cnpj\":\"00.000.000/0000-00\",\"status\":\"NÃO ATUALIZADO\",\"funcionarioCadastro\":\"Desenvolvedor MetroFlow\"}",
+    "newState": "{\"id\":\"002\",\"razaoSocial\":\"WANTEC - TECNOLOGIA EM INSTRUMENTOS DE MEDICAO E CALIBRACAO LTDA\",\"cnpj\":\"10015449000187\",\"enderecoPrincipal\":\"RUA RAUL BOOP, 37, COMPENSA, MANAUS - AM\",\"enderecoColeta\":\"\",\"solicitanteNome\":\"\",\"solicitanteEmail\":\"\",\"solicitanteContato\":\"9292135116\",\"emailFinanceiro\":\"\",\"emailCertificados\":\"\",\"retencaoImpostoFonte\":false,\"status\":\"NÃO ATUALIZADO\",\"restricaoPagamento\":false,\"funcionarioCadastro\":\"Desenvolvedor MetroFlow\",\"senha\":\"\",\"inscricaoMunicipal\":\"\",\"inscricaoEstadual\":\"\"}"
+  },
+  {
+    "id": "AUDIT-1776779779037-798",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "UPDATE",
+    "entityId": "002",
+    "entityType": "clients",
+    "timestamp": "2026-04-21T13:56:19.037Z",
+    "previousState": "{\"id\":\"002\",\"razaoSocial\":\"WANTEC - TECNOLOGIA EM INSTRUMENTOS DE MEDICAO E CALIBRACAO LTDA\",\"cnpj\":\"10015449000187\",\"status\":\"NÃO ATUALIZADO\",\"funcionarioCadastro\":\"Desenvolvedor MetroFlow\",\"enderecoPrincipal\":\"RUA RAUL BOOP, 37, COMPENSA, MANAUS - AM\",\"enderecoColeta\":\"\",\"solicitanteNome\":\"\",\"solicitanteEmail\":\"\",\"solicitanteContato\":\"9292135116\",\"emailFinanceiro\":\"\",\"emailCertificados\":\"\",\"retencaoImpostoFonte\":false,\"restricaoPagamento\":false,\"senha\":\"\",\"inscricaoMunicipal\":\"\",\"inscricaoEstadual\":\"\"}",
+    "newState": "{\"id\":\"002\",\"razaoSocial\":\"Novo Cliente 002\",\"cnpj\":\"00.000.000/0000-00\",\"status\":\"NÃO ATUALIZADO\",\"funcionarioCadastro\":\"Desenvolvedor MetroFlow\"}"
+  },
+  {
+    "id": "AUDIT-1776779787694-238",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "CREATE",
+    "entityId": "1776779787631",
+    "entityType": "payment_methods",
+    "timestamp": "2026-04-21T13:56:27.694Z",
+    "newState": "{\"description\":\"10\",\"id\":\"1776779787631\"}"
+  },
+  {
+    "id": "AUDIT-1776779794499-879",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "CREATE",
+    "entityId": "PT-1776779794448",
+    "entityType": "price_tables",
+    "timestamp": "2026-04-21T13:56:34.499Z",
+    "newState": "{\"id\":\"PT-1776779794448\",\"nome\":\"2026\",\"items\":[]}"
+  },
+  {
+    "id": "AUDIT-1776779802635-393",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "UPDATE",
+    "entityId": "PT-1776779794448",
+    "entityType": "price_tables",
+    "timestamp": "2026-04-21T13:56:42.635Z",
+    "previousState": "{\"id\":\"PT-1776779794448\",\"nome\":\"2026\",\"items\":[]}",
+    "newState": "{\"id\":\"PT-1776779794448\",\"nome\":\"2026\",\"items\":[{\"nomeInstrumento\":\"Paq\",\"valorRastreavel\":100,\"valorAcreditado\":0,\"manutencao\":0,\"ensaio\":0,\"teste\":0,\"qualificacao\":0,\"logistica\":0,\"id\":\"PTI-1776779801391\"}]}"
+  },
+  {
+    "id": "AUDIT-1776779823661-644",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "CREATE",
+    "entityId": "OCW041026",
+    "entityType": "quotes",
+    "timestamp": "2026-04-21T13:57:03.661Z",
+    "newState": "{\"id\":\"OCW041026\",\"clienteId\":\"002\",\"dataEmissao\":\"2026-04-21\",\"validade\":\"2026-05-21\",\"comissaoVendedor\":false,\"tabelaPrecos\":\"2026\",\"formaPagamento\":\"10\",\"items\":[{\"descricao\":\"Paq\",\"quantidade\":1,\"tipoServico\":\"Rastreável\",\"local\":\"Laboratório\",\"valorUnitario\":100,\"desconto\":0,\"valorUnitarioFinal\":100,\"valorTotal\":100,\"item\":1}],\"clienteCnpj\":\"00.000.000/0000-00\",\"clienteEndereco\":\"RUA RAUL BOOP, 37, COMPENSA, MANAUS - AM\",\"clienteSolicitanteNome\":\"\",\"clienteSolicitanteEmail\":\"\",\"clienteSolicitanteContato\":\"9292135116\",\"clienteEmailFinanceiro\":\"\",\"clienteRetencaoImpostoFonte\":false,\"status\":\"Pendente\",\"revision\":0,\"criadoPor\":\"Desenvolvedor MetroFlow\",\"criadoEm\":\"21/04/2026, 09:56:47\"}"
+  },
+  {
+    "id": "AUDIT-1776779831326-982",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "UPDATE",
+    "entityId": "OCW041026",
+    "entityType": "quotes",
+    "timestamp": "2026-04-21T13:57:11.326Z",
+    "previousState": "{\"id\":\"OCW041026\",\"clienteId\":\"002\",\"dataEmissao\":\"2026-04-21\",\"validade\":\"2026-05-21\",\"comissaoVendedor\":false,\"tabelaPrecos\":\"2026\",\"formaPagamento\":\"10\",\"items\":[{\"descricao\":\"Paq\",\"quantidade\":1,\"tipoServico\":\"Rastreável\",\"local\":\"Laboratório\",\"valorUnitario\":100,\"desconto\":0,\"valorUnitarioFinal\":100,\"valorTotal\":100,\"item\":1}],\"clienteCnpj\":\"00.000.000/0000-00\",\"clienteEndereco\":\"RUA RAUL BOOP, 37, COMPENSA, MANAUS - AM\",\"clienteSolicitanteNome\":\"\",\"clienteSolicitanteEmail\":\"\",\"clienteSolicitanteContato\":\"9292135116\",\"clienteEmailFinanceiro\":\"\",\"clienteRetencaoImpostoFonte\":false,\"status\":\"Pendente\",\"revision\":0,\"criadoPor\":\"Desenvolvedor MetroFlow\",\"criadoEm\":\"21/04/2026, 09:56:47\"}",
+    "newState": "{\"id\":\"OCW041026\",\"clienteId\":\"002\",\"dataEmissao\":\"2026-04-21\",\"validade\":\"2026-05-21\",\"comissaoVendedor\":false,\"tabelaPrecos\":\"2026\",\"formaPagamento\":\"10\",\"items\":[{\"descricao\":\"Paq\",\"quantidade\":1,\"tipoServico\":\"Rastreável\",\"local\":\"Laboratório\",\"valorUnitario\":100,\"desconto\":0,\"valorUnitarioFinal\":100,\"valorTotal\":100,\"item\":1}],\"clienteCnpj\":\"00.000.000/0000-00\",\"clienteEndereco\":\"RUA RAUL BOOP, 37, COMPENSA, MANAUS - AM\",\"clienteSolicitanteNome\":\"\",\"clienteSolicitanteEmail\":\"\",\"clienteSolicitanteContato\":\"9292135116\",\"clienteEmailFinanceiro\":\"\",\"clienteRetencaoImpostoFonte\":false,\"status\":\"Aprovado\",\"revision\":0,\"criadoPor\":\"Desenvolvedor MetroFlow\",\"criadoEm\":\"21/04/2026, 09:56:47\"}"
+  },
+  {
+    "id": "AUDIT-1776781131757-732",
+    "userId": "admin-1",
+    "userName": "C.G. Moraes Neto",
+    "action": "CREATE",
+    "entityId": "CAL-1776781131293",
+    "entityType": "calibration_records",
+    "timestamp": "2026-04-21T14:18:51.758Z",
+    "newState": "{\"id\":\"CAL-1776781131293\",\"serviceOrderId\":\"OS-2026-001\",\"quoteItemIndex\":0,\"unitIndex\":0,\"instrumentName\":\"Micrômetro Externo 0-25mm\",\"certificateNumber\":\"CERT-2026-3374\",\"calibrationDate\":\"2026-04-21\",\"nextCalibrationDate\":\"2026-04-21\",\"technicianName\":\"admin-1\",\"manufacturer\":\"\",\"model\":\"\",\"serialNumber\":\"\",\"identification\":\"\",\"periodicity\":\"12 meses\",\"calibrationLocation\":\"Laboratório\",\"resolution\":0,\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"unidadeMedida\":\"\",\"temperature\":20,\"humidity\":50,\"envStandardInstrumentId\":\"\",\"environmentalStandardId\":\"\",\"certificateMaskId\":\"\",\"procedureId\":\"\",\"standardInstrumentIds\":[],\"observations\":\"\",\"attachments\":[],\"groups\":[],\"status\":\"Em confecção\",\"isDraft\":true,\"headerValidated\":true,\"headerSaved\":true,\"isAccredited\":false,\"kFactorJustification\":\"Padrão (k=2 para 95.45%)\"}"
+  },
+  {
+    "id": "AUDIT-1776781168178-426",
+    "userId": "admin-1",
+    "userName": "C.G. Moraes Neto",
+    "action": "UPDATE",
+    "entityId": "CAL-1776781131293",
+    "entityType": "calibration_records",
+    "timestamp": "2026-04-21T14:19:28.178Z",
+    "previousState": "{\"id\":\"CAL-1776781131293\",\"serviceOrderId\":\"OS-2026-001\",\"quoteItemIndex\":0,\"unitIndex\":0,\"instrumentName\":\"Micrômetro Externo 0-25mm\",\"certificateNumber\":\"CERT-2026-3374\",\"calibrationDate\":\"2026-04-21\",\"nextCalibrationDate\":\"2026-04-21\",\"technicianName\":\"admin-1\",\"manufacturer\":\"\",\"model\":\"\",\"serialNumber\":\"\",\"identification\":\"\",\"periodicity\":\"12 meses\",\"calibrationLocation\":\"Laboratório\",\"resolution\":0,\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"unidadeMedida\":\"\",\"temperature\":20,\"humidity\":50,\"envStandardInstrumentId\":\"\",\"environmentalStandardId\":\"\",\"certificateMaskId\":\"\",\"procedureId\":\"\",\"standardInstrumentIds\":[],\"observations\":\"\",\"attachments\":[],\"groups\":[],\"status\":\"Em confecção\",\"isDraft\":true,\"headerValidated\":true,\"headerSaved\":true,\"isAccredited\":false,\"kFactorJustification\":\"Padrão (k=2 para 95.45%)\"}",
+    "newState": "{\"id\":\"CAL-1776781131293\",\"serviceOrderId\":\"OS-2026-001\",\"quoteItemIndex\":0,\"unitIndex\":0,\"instrumentName\":\"Micrômetro Externo 0-25mm\",\"certificateNumber\":\"CERT-2026-3374\",\"calibrationDate\":\"2026-04-21\",\"nextCalibrationDate\":\"2026-04-21\",\"technicianName\":\"admin-1\",\"manufacturer\":\"\",\"model\":\"\",\"serialNumber\":\"\",\"identification\":\"\",\"periodicity\":\"12 meses\",\"calibrationLocation\":\"Laboratório\",\"resolution\":0,\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"unidadeMedida\":\"\",\"temperature\":20,\"humidity\":50,\"envStandardInstrumentId\":\"\",\"environmentalStandardId\":\"\",\"certificateMaskId\":\"mask-1776778687276\",\"procedureId\":\"\",\"standardInstrumentIds\":[],\"observations\":\"\",\"attachments\":[],\"groups\":[{\"name\":\"Tabela de Resultados 1\",\"blockId\":\"T1\",\"columnDefinitions\":[{\"id\":\"TAG_1\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\"},{\"id\":\"TAG_2\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\",\"displayFormat\":\"percent\"},{\"id\":\"TAG_3\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"CALCULATED\",\"formula\":\"[TAG_2]+[TAG_3]\",\"decimalPlaces\":1,\"displayFormat\":\"percent\"},{\"id\":\"TAG_4\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\"}],\"isDynamic\":true,\"rows\":[{\"_pointIdx\":\"0\",\"TAG_1\":\"10\",\"TAG_2\":\"10\",\"TAG_3\":\"\",\"TAG_4\":\"10\"}],\"groupName\":\"Tabela de Resultados 1\",\"columns\":[\"TAG_1\",\"TAG_2\",\"TAG_3\",\"TAG_4\"]}],\"status\":\"Em Análise\",\"isDraft\":false,\"headerValidated\":true,\"headerSaved\":true,\"isAccredited\":false,\"kFactorJustification\":\"Padrão (k=2 para 95.45%)\",\"calculatedPoints\":{\"T1_row0\":{\"_pointIdx\":\"0\",\"TAG_1\":\"10\",\"TAG_2\":\"10\",\"TAG_3\":10,\"TAG_4\":\"10\",\"trace\":{\"TAG_3\":{\"formula\":\"[TAG_2]+[TAG_3]\",\"output\":10}}}}}"
+  },
+  {
+    "id": "AUDIT-1776781329146-602",
+    "userId": "admin-1",
+    "userName": "C.G. Moraes Neto",
+    "action": "UPDATE",
+    "entityId": "CAL-1776781131293",
+    "entityType": "calibration_records",
+    "timestamp": "2026-04-21T14:22:09.146Z",
+    "previousState": "{\"id\":\"CAL-1776781131293\",\"serviceOrderId\":\"OS-2026-001\",\"quoteItemIndex\":0,\"unitIndex\":0,\"instrumentName\":\"Micrômetro Externo 0-25mm\",\"certificateNumber\":\"CERT-2026-3374\",\"calibrationDate\":\"2026-04-21\",\"nextCalibrationDate\":\"2026-04-21\",\"technicianName\":\"admin-1\",\"manufacturer\":\"\",\"model\":\"\",\"serialNumber\":\"\",\"identification\":\"\",\"periodicity\":\"12 meses\",\"calibrationLocation\":\"Laboratório\",\"resolution\":0,\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"unidadeMedida\":\"\",\"temperature\":20,\"humidity\":50,\"envStandardInstrumentId\":\"\",\"environmentalStandardId\":\"\",\"certificateMaskId\":\"mask-1776778687276\",\"procedureId\":\"\",\"standardInstrumentIds\":[],\"observations\":\"\",\"attachments\":[],\"groups\":[{\"name\":\"Tabela de Resultados 1\",\"blockId\":\"T1\",\"columnDefinitions\":[{\"id\":\"TAG_1\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\"},{\"id\":\"TAG_2\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\",\"displayFormat\":\"percent\"},{\"id\":\"TAG_3\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"CALCULATED\",\"formula\":\"[TAG_2]+[TAG_3]\",\"decimalPlaces\":1,\"displayFormat\":\"percent\"},{\"id\":\"TAG_4\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\"}],\"isDynamic\":true,\"rows\":[{\"_pointIdx\":\"0\",\"TAG_1\":\"10\",\"TAG_2\":\"10\",\"TAG_3\":\"\",\"TAG_4\":\"10\"}],\"groupName\":\"Tabela de Resultados 1\",\"columns\":[\"TAG_1\",\"TAG_2\",\"TAG_3\",\"TAG_4\"]}],\"status\":\"Em Análise\",\"isDraft\":false,\"headerValidated\":true,\"headerSaved\":true,\"isAccredited\":false,\"kFactorJustification\":\"Padrão (k=2 para 95.45%)\",\"calculatedPoints\":{\"T1_row0\":{\"_pointIdx\":\"0\",\"TAG_1\":\"10\",\"TAG_2\":\"10\",\"TAG_3\":10,\"TAG_4\":\"10\",\"trace\":{\"TAG_3\":{\"formula\":\"[TAG_2]+[TAG_3]\",\"output\":10}}}}}",
+    "newState": "{\"id\":\"CAL-1776781131293\",\"serviceOrderId\":\"OS-2026-001\",\"quoteItemIndex\":0,\"unitIndex\":0,\"instrumentName\":\"Micrômetro Externo 0-25mm\",\"certificateNumber\":\"CERT-2026-3374\",\"calibrationDate\":\"2026-04-21\",\"nextCalibrationDate\":\"2026-04-21\",\"technicianName\":\"admin-1\",\"manufacturer\":\"\",\"model\":\"\",\"serialNumber\":\"\",\"identification\":\"\",\"periodicity\":\"12 meses\",\"calibrationLocation\":\"Laboratório\",\"resolution\":0,\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"unidadeMedida\":\"\",\"temperature\":20,\"humidity\":50,\"envStandardInstrumentId\":\"\",\"environmentalStandardId\":\"\",\"certificateMaskId\":\"mask-1776778687276\",\"procedureId\":\"\",\"standardInstrumentIds\":[],\"observations\":\"\",\"attachments\":[],\"groups\":[{\"name\":\"Tabela de Resultados 1\",\"blockId\":\"T1\",\"columnDefinitions\":[{\"id\":\"TAG_1\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\"},{\"id\":\"TAG_2\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\",\"displayFormat\":\"percent\"},{\"id\":\"TAG_3\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"CALCULATED\",\"formula\":\"[TAG_2]+[TAG_3]\",\"decimalPlaces\":1,\"displayFormat\":\"percent\"},{\"id\":\"TAG_4\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\"}],\"isDynamic\":true,\"rows\":[{\"_pointIdx\":\"0\",\"TAG_1\":\"10\",\"TAG_2\":\"10\",\"TAG_3\":\"\",\"TAG_4\":\"10\"}],\"groupName\":\"Tabela de Resultados 1\",\"columns\":[\"TAG_1\",\"TAG_2\",\"TAG_3\",\"TAG_4\"]}],\"status\":\"Devolvido para correção\",\"isDraft\":false,\"headerValidated\":true,\"headerSaved\":true,\"isAccredited\":false,\"kFactorJustification\":\"Padrão (k=2 para 95.45%)\",\"calculatedPoints\":{\"T1_row0\":{\"_pointIdx\":\"0\",\"TAG_1\":\"10\",\"TAG_2\":\"10\",\"TAG_3\":10,\"TAG_4\":\"10\",\"trace\":{\"TAG_3\":{\"formula\":\"[TAG_2]+[TAG_3]\",\"output\":10}}}}}"
+  }
+]

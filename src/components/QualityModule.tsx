@@ -22,6 +22,7 @@ interface QualityModuleProps {
   onSaveProcedure: (proc: any) => void;
   onDeleteProcedure: (id: string) => void;
   documentTemplates?: any[];
+  searchQuery?: string;
 }
 
 type SubTab = 'procedures' | 'standards' | 'issued' | 'approvals';
@@ -40,7 +41,8 @@ export default function QualityModule({
   onDeleteStandardInstrument,
   onSaveProcedure,
   onDeleteProcedure,
-  documentTemplates = []
+  documentTemplates = [],
+  searchQuery
 }: QualityModuleProps) {
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('procedures');
 
@@ -53,18 +55,18 @@ export default function QualityModule({
 
   return (
     <div className="space-y-10">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 pb-10 border-b border-slate-100 dark:border-slate-800">
         <div>
-          <h2 className="text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tight">Módulo da Qualidade</h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium italic">Gestão de procedimentos, padrões e aprovação de resultados.</p>
+          <span className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.3em] mb-2 block">Garantia da Qualidade</span>
+          <h2 className="text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Qualidade</h2>
         </div>
 
-        <div className="flex flex-wrap lg:flex-nowrap bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl gap-1">
+        <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl gap-1">
           {TAB_CONFIG.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveSubTab(tab.id as SubTab)}
-              className={`flex items-center px-4 py-2.5 rounded-xl font-black text-xs transition-all duration-300 ${activeSubTab === tab.id
+              className={`flex items-center px-6 py-2.5 rounded-xl font-black text-xs transition-all duration-300 ${activeSubTab === tab.id
                 ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm'
                 : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                 }`}
@@ -91,6 +93,7 @@ export default function QualityModule({
               serviceOrders={serviceOrders}
               documentTemplates={documentTemplates}
               onUpdateCertificateStatus={onUpdateCertificateStatus}
+              searchQuery={searchQuery}
             />
           )}
           {activeSubTab === 'approvals' && (
@@ -104,6 +107,7 @@ export default function QualityModule({
               employees={employees}
               documentTemplates={documentTemplates}
               onUpdateCertificateStatus={onUpdateCertificateStatus}
+              searchQuery={searchQuery}
             />
           )}
           {activeSubTab === 'procedures' && (
@@ -111,6 +115,7 @@ export default function QualityModule({
               procedures={procedures}
               onSaveProcedure={onSaveProcedure}
               onDeleteProcedure={onDeleteProcedure}
+              searchQuery={searchQuery}
             />
           )}
           {activeSubTab === 'standards' && (
@@ -120,6 +125,7 @@ export default function QualityModule({
               documentTemplates={documentTemplates}
               onSaveStandardInstrument={onSaveStandardInstrument}
               onDeleteStandardInstrument={onDeleteStandardInstrument}
+              searchQuery={searchQuery}
             />
           )}
         </motion.div>

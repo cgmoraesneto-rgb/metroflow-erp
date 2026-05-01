@@ -22,7 +22,7 @@ export function viteMockPlugin(): Plugin {
 
                 const collection = urlParts[2];
                 const id = urlParts[3];
-                const mockDbDir = path.resolve(__dirname, 'mock-db');
+                const mockDbDir = path.resolve(__dirname, process.env.MOCK_DB_DIR || 'mock-db');
                 const dbPath = path.join(mockDbDir, `${collection}.json`);
 
                 // Initialize file if not exists

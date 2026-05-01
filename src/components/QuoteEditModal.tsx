@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
-import { X, Save, Plus, Trash2, Search, ArrowRight, Upload, Paperclip } from 'lucide-react';
+import { X, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { jsPDF } from 'jspdf';
 import { Quote, QuoteItem, Client, ClientStatus, QuoteStatus, PriceTable, PaymentMethod, DocumentTemplate } from '../types';
@@ -48,6 +49,7 @@ export default function QuoteEditModal({
   priceTables,
   paymentMethods,
 }: QuoteEditModalProps) {
+  const { employee } = useAuth();
   const [formData, setFormData] = useState<Quote | null>({ ...defaultQuote, ...(quote || {}) });
   const [newItem, setNewItem] = useState<Omit<QuoteItem, 'item'>>({
     descricao: '',
@@ -78,24 +80,29 @@ export default function QuoteEditModal({
       const itemFromTable = selectedPriceTable.items.find(item => item.nomeInstrumento === selectedInstrument);
       if (itemFromTable) {
         let valorUnitario = 0;
+        const logistica = itemFromTable.logistica || 0;
+        
         switch (selectedServiceType) {
           case 'Rastreável':
-            valorUnitario = itemFromTable.valorRastreavel;
+            valorUnitario = itemFromTable.valorRastreavel + logistica;
             break;
           case 'Acreditado':
-            valorUnitario = itemFromTable.valorAcreditado;
+            valorUnitario = itemFromTable.valorAcreditado + logistica;
             break;
           case 'Manutenção':
-            valorUnitario = itemFromTable.manutencao;
+            valorUnitario = itemFromTable.manutencao + logistica;
             break;
           case 'Ensaio':
-            valorUnitario = itemFromTable.ensaio;
+            valorUnitario = itemFromTable.ensaio + logistica;
             break;
           case 'Teste':
-            valorUnitario = itemFromTable.teste;
+            valorUnitario = itemFromTable.teste + logistica;
             break;
           case 'Qualificação':
-            valorUnitario = itemFromTable.qualificacao;
+            valorUnitario = itemFromTable.qualificacao + logistica;
+            break;
+          case 'Logística':
+            valorUnitario = logistica;
             break;
           default:
             valorUnitario = 0;
@@ -236,7 +243,11 @@ export default function QuoteEditModal({
     e.preventDefault();
     if (formData) {
       try {
-        await onSave(formData);
+        const dataToSave = { ...formData };
+        if ((!dataToSave.criadoPor || dataToSave.criadoPor === 'Sistema') && employee?.nome) {
+          dataToSave.criadoPor = employee.nome;
+        }
+        await onSave(dataToSave);
         onClose();
       } catch (error) {
         console.error("Erro ao salvar orçamento:", error);
@@ -250,7 +261,11 @@ export default function QuoteEditModal({
   const handleGeneratePdf = async () => {
     if (formData) {
       try {
-        await generateQuotePdf(formData, clients.find(c => c.id === formData.clienteId), documentTemplates);
+        const dataToPrint = { ...formData };
+        if ((!dataToPrint.criadoPor || dataToPrint.criadoPor === 'Sistema') && employee?.nome) {
+          dataToPrint.criadoPor = employee.nome;
+        }
+        await generateQuotePdf(dataToPrint, clients.find(c => c.id === formData.clienteId), documentTemplates);
       } catch (err) {
         console.error("PDF generation error:", err);
         toast.error("Erro ao gerar PDF.");
@@ -504,7 +519,7 @@ export default function QuoteEditModal({
                     <tr key={index} className="rectilinear-tr">
                       <td className="rectilinear-td text-center font-black text-slate-400">{item.item}</td>
                       <td className="rectilinear-td text-center font-bold text-slate-700">
-                        {item.descricao} <span className="text-[10px] text-slate-400">({item.quantidade}x {item.tipoServico})</span>
+                        {item.descricao} <span className="text-[10px] text-slate-400">({item.quantidade}x {item.tipoServico}) — {item.local}</span>
                       </td>
                       <td className="rectilinear-td text-center font-black text-indigo-600">
                         {item.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
@@ -538,7 +553,7 @@ export default function QuoteEditModal({
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                   >
                     <option value="" disabled>Selecione um Instrumento</option>
-                    {selectedPriceTable?.items.map((item) => (
+                    {[...(selectedPriceTable?.items || [])].sort((a, b) => a.nomeInstrumento.localeCompare(b.nomeInstrumento, undefined, { numeric: true, sensitivity: 'base' })).map((item) => (
                       <option key={item.id} value={item.nomeInstrumento}>{item.nomeInstrumento}</option>
                     ))}
                   </select>
@@ -559,6 +574,7 @@ export default function QuoteEditModal({
                     <option value="Ensaio">Ensaio</option>
                     <option value="Teste">Teste</option>
                     <option value="Qualificação">Qualificação</option>
+                    <option value="Logística">Logística</option>
                   </select>
                 </div>
                 <div>

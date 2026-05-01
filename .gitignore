@@ -36,3 +36,6 @@ pubsub-debug.log*
 
 # Vite
 .vite/
+
+# Mock Databases
+mock-db-demo/

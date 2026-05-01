@@ -18,17 +18,21 @@ import {
   Eye,
   FileUp,
   FileCheck,
-  FileText
+  FileText,
+  FileDown
 } from 'lucide-react';
-import { formatDate } from '../utils/formatters';
-import StandardInstrumentForm, { StandardInstrumentFormData } from './StandardInstrumentForm';
+import { toast } from 'sonner';
+import { formatDate, formatStandardValidity } from '../utils/formatters';
+import { generateStandardInstrumentPdf } from '../utils/pdfGenerator';
+import StandardInstrumentForm from './StandardInstrumentForm';
 
 interface StandardInstrumentsModuleProps {
   standardInstruments: StandardInstrument[];
-  onSaveStandardInstrument: (si: any) => void;
+  onSaveStandardInstrument: (instrument: Omit<StandardInstrument, 'id'> | StandardInstrument) => void;
   onDeleteStandardInstrument: (id: string) => void;
   procedures?: any[];
   documentTemplates?: any[];
+  searchQuery?: string;
 }
 
 export default function StandardInstrumentsModule({ 
@@ -36,10 +40,13 @@ export default function StandardInstrumentsModule({
   onSaveStandardInstrument, 
   onDeleteStandardInstrument,
   procedures = [],
-  documentTemplates = [] 
+  documentTemplates = [],
+  searchQuery
 }: StandardInstrumentsModuleProps) {
   const [editingInstrument, setEditingInstrument] = useState<StandardInstrument | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [localSearchTerm, setLocalSearchTerm] = useState('');
+
+  const effectiveSearch = searchQuery !== undefined ? searchQuery : localSearchTerm;
   
   // View mode management
   const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
@@ -50,9 +57,23 @@ export default function StandardInstrumentsModule({
     localStorage.setItem('standard_instruments_view_mode', viewMode);
   }, [viewMode]);
 
-  const handleSave = async (data: StandardInstrumentFormData) => {
+  const handleSave = async (data: StandardInstrument) => {
     onSaveStandardInstrument(data);
     setEditingInstrument(null);
+  };
+
+  const handleDownloadStandard = async (inst: StandardInstrument) => {
+    try {
+      const promise = generateStandardInstrumentPdf(inst, documentTemplates);
+      toast.promise(promise, {
+        loading: 'Gerando Ficha Padrão PDF...',
+        success: 'Ficha baixada com sucesso!',
+        error: 'Erro ao gerar ficha.'
+      });
+      await promise;
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const handleEdit = (inst: StandardInstrument) => {
@@ -73,9 +94,9 @@ export default function StandardInstrumentsModule({
   };
 
   const filteredInstruments = standardInstruments.filter(inst => 
-    inst.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    inst.identificacao?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    inst.certificadoCalibracao?.toLowerCase().includes(searchTerm.toLowerCase())
+    inst.nome.toLowerCase().includes(effectiveSearch.toLowerCase()) ||
+    inst.identificacao?.toLowerCase().includes(effectiveSearch.toLowerCase()) ||
+    inst.certificadoCalibracao?.toLowerCase().includes(effectiveSearch.toLowerCase())
   );
 
   return (
@@ -90,8 +111,8 @@ export default function StandardInstrumentsModule({
       {/* FORM SECTION */}
       <StandardInstrumentForm 
         key={editingInstrument ? editingInstrument.id : 'new'} 
-        initialData={editingInstrument} 
-        onSave={handleSave} 
+        initialData={editingInstrument || {}} 
+        onSubmit={handleSave} 
         onCancel={() => setEditingInstrument(null)} 
       />
 
@@ -102,8 +123,9 @@ export default function StandardInstrumentsModule({
                 type="text" 
                 placeholder="Filtrar instrumentos..." 
                 className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-sm transition-all dark:text-white"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                value={effectiveSearch}
+                onChange={(e) => searchQuery !== undefined ? null : setLocalSearchTerm(e.target.value)}
+                readOnly={searchQuery !== undefined}
             />
         </div>
         <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest hidden md:block">
@@ -154,18 +176,26 @@ export default function StandardInstrumentsModule({
                         <td className="rectilinear-td font-mono text-xs font-bold tabular-nums">
                             <div className="flex items-center gap-1.5">
                                 <Clock className={`w-3 h-3 ${diffDays < 0 ? 'text-rose-500' : diffDays < 30 ? 'text-amber-500' : 'text-slate-400'}`} />
-                                <span className={diffDays < 0 ? 'text-rose-600 font-black' : 'text-slate-600 dark:text-slate-400'}>{formatDate(inst.dataValidadeCalibracao)}</span>
+                                <span className={diffDays < 0 ? 'text-rose-600 font-black' : 'text-slate-600 dark:text-slate-400'}>{formatStandardValidity(inst.dataValidadeCalibracao)}</span>
                             </div>
                         </td>
                         <td className="rectilinear-td">
                             <div className="flex items-center justify-end gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
-                                <button onClick={() => handleEdit(inst)} className="p-2 text-indigo-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all">
+                                <button onClick={() => handleEdit(inst)} className="p-2 text-indigo-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all" title="Ver Detalhes">
                                     <Eye className="w-4 h-4" />
                                 </button>
+                                <button onClick={() => handleDownloadStandard(inst)} className="p-2 text-emerald-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all" title="Gerar Ficha Padrão (PDF)">
+                                    <FileDown className="w-4 h-4" />
+                                </button>
                                 {inst.certificadoPdf && (
-                                    <button onClick={() => handleClearAttachment(inst)} className="p-2 text-amber-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all">
-                                        <FileText className="w-4 h-4" />
-                                    </button>
+                                    <>
+                                      <button onClick={() => window.open(inst.certificadoPdf, '_blank')} className="p-2 text-indigo-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all text-[10px] font-black uppercase flex items-center gap-1" title="Ver PDF">
+                                          <ExternalLink className="w-4 h-4" /> PDF
+                                      </button>
+                                      <button onClick={() => handleClearAttachment(inst)} className="p-2 text-amber-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all" title="Remover PDF">
+                                          <X className="w-4 h-4" />
+                                      </button>
+                                    </>
                                 )}
                                 <button onClick={() => handleDelete(inst.id)} className="p-2 text-rose-500 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all">
                                     <Trash2 className="w-4 h-4" />

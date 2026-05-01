@@ -80,7 +80,7 @@ export const firebaseClient = {
       const finalItem = { ...sanitizedBody, id: docId };
 
       const docRef = doc(db, collectionName, docId).withConverter(genericConverter<T>());
-      await setDoc(docRef, finalItem);
+      await setDoc(docRef, finalItem, { merge: true });
 
       if (schema) {
         const result = schema.safeParse(finalItem);

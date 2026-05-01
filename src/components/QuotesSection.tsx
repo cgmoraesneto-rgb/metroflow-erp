@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Quote, Client, PriceTable, PaymentMethod, QuoteStatus, ServiceOrder, DocumentTemplate } from '../types';
 import QuoteEditModal from './QuoteEditModal';
 import QuoteViewModal from './QuoteViewModal';
-import { Eye, Pencil, Trash2, Plus, LayoutGrid, List, CheckCircle, FileText } from 'lucide-react';
+import { Eye, Pencil, Trash2, Plus, LayoutGrid, List, CheckCircle, FileText, History } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDate, formatCurrency, formatNumber } from '../utils/formatters';
@@ -35,6 +35,7 @@ interface QuotesSectionProps {
   onSaveQuote: (quote: Quote) => void;
   onDeleteQuote: (quoteId: string) => void;
   onApproveQuote?: (quote: Quote, newServiceOrder: ServiceOrder) => void;
+  searchQuery?: string;
 }
 
 type ViewMode = 'grid' | 'list';
@@ -47,6 +48,7 @@ export default function QuotesSection({
   onSaveQuote,
   onDeleteQuote,
   onApproveQuote,
+  searchQuery
 }: QuotesSectionProps) {
   const { documentTemplates } = useData();
   const { employee } = useAuth();
@@ -98,6 +100,28 @@ export default function QuotesSection({
   };
 
 
+  const handleCreateRevision = (original: Quote) => {
+    // Find all revisions of this quote to determine the next revision number
+    const baseId = original.parentQuoteId || original.id;
+    const nextRev = (original.revision || 0) + 1;
+    
+    const revisedQuote: Quote = {
+      ...original,
+      id: `${baseId}-REV${nextRev}`,
+      parentQuoteId: baseId,
+      revision: nextRev,
+      status: QuoteStatus.PENDING, // Revision starts as pending
+      dataEmissao: new Date().toISOString().split('T')[0],
+      criadoEm: new Date().toLocaleString('pt-BR'),
+      criadoPor: employee?.nome || 'Sistema',
+    };
+    
+    onSaveQuote(revisedQuote);
+    setEditingQuote(revisedQuote);
+    setIsQuoteModalOpen(true);
+    toast.success(`Criando revisão ${nextRev} do orçamento ${baseId}`);
+  };
+
   const handleApproveQuote = (quote: Quote, newSO: ServiceOrder) => {
     onApproveQuote?.(quote, newSO);
     setViewingQuote(null);
@@ -111,12 +135,53 @@ export default function QuotesSection({
     return <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 uppercase tracking-wider">Pendente</span>;
   };
 
+  const [statusFilter, setStatusFilter] = useState<'all' | QuoteStatus>('all');
+
+  const filteredQuotes = (quotes || []).filter(quote => {
+    // Search query filter
+    const term = searchQuery?.toLowerCase().trim() || "";
+    const digits = term.replace(/\D/g, '');
+
+    const matchesSearch = !searchQuery || 
+                         (quote.id || "").toLowerCase().includes(term) ||
+                         getClientName(quote.clienteId).toLowerCase().includes(term) ||
+                         (quote.clienteCnpj || "").toLowerCase().includes(term) ||
+                         (digits.length >= 3 && (quote.id || "").replace(/\D/g, '').includes(digits));
+
+    // Status filter
+    const matchesStatus = statusFilter === 'all' || quote.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Orçamentos Emitidos</h3>
-          <p className="text-sm text-slate-500 font-medium italic mt-1">Gestão de propostas comerciais e aprovações.</p>
+        <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <button
+            onClick={() => setStatusFilter('all')}
+            className={`px-4 py-2 text-[10px] font-black uppercase rounded-xl transition-all ${statusFilter === 'all' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+          >
+            Todos
+          </button>
+          <button
+            onClick={() => setStatusFilter(QuoteStatus.PENDING)}
+            className={`px-4 py-2 text-[10px] font-black uppercase rounded-xl transition-all ${statusFilter === QuoteStatus.PENDING ? 'bg-white text-amber-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+          >
+            Pendentes
+          </button>
+          <button
+            onClick={() => setStatusFilter(QuoteStatus.APPROVED)}
+            className={`px-4 py-2 text-[10px] font-black uppercase rounded-xl transition-all ${statusFilter === QuoteStatus.APPROVED ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+          >
+            Aprovados
+          </button>
+          <button
+            onClick={() => setStatusFilter(QuoteStatus.REJECTED)}
+            className={`px-4 py-2 text-[10px] font-black uppercase rounded-xl transition-all ${statusFilter === QuoteStatus.REJECTED ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+          >
+            Reprovados
+          </button>
         </div>
         
         <div className="flex items-center gap-4">
@@ -143,7 +208,7 @@ export default function QuotesSection({
         </div>
       </div>
 
-      {quotes.length > 0 ? (
+      {filteredQuotes.length > 0 ? (
         viewMode === 'list' ? (
           <div className="rectilinear-container custom-scrollbar shadow-sm">
             <table className="rectilinear-table">
@@ -160,7 +225,7 @@ export default function QuotesSection({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
-                {quotes.map(quote => {
+                {filteredQuotes.map(quote => {
                   const total = quote.items.reduce((s, i) => s + (i.valorTotal || 0), 0);
                   const isApproved = quote.status === QuoteStatus.APPROVED;
                   return (
@@ -168,7 +233,7 @@ export default function QuotesSection({
                       <td className="rectilinear-td col-md text-center pl-8 font-black text-slate-900 dark:text-white uppercase">
                         {quote.id}
                         {quote.revision && quote.revision > 0 ? (
-                          <span className="ml-1 text-[9px] bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-400">R{quote.revision}</span>
+                          <span className="ml-1 text-[9px] bg-indigo-50 dark:bg-indigo-900/30 px-1.5 py-0.5 rounded text-indigo-600 font-black uppercase">Rev {quote.revision}</span>
                         ) : null}
                       </td>
                       <td className="rectilinear-td text-left text-sm font-bold text-slate-700 dark:text-slate-300 truncate" title={getClientName(quote.clienteId)}>
@@ -196,8 +261,10 @@ export default function QuotesSection({
                       <td className="rectilinear-td text-center pr-8">
                         <div className="flex items-center justify-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
                           <button onClick={() => setViewingQuote(quote)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all" title="Visualizar"><Eye className="w-4 h-4" /></button>
-                          {!isApproved && (
+                          {!isApproved ? (
                             <button onClick={() => { setEditingQuote(quote); setIsQuoteModalOpen(true); }} className="p-2 text-slate-400 hover:text-amber-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all" title="Editar"><Pencil className="w-4 h-4" /></button>
+                          ) : (
+                            <button onClick={() => handleCreateRevision(quote)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all" title="Criar Revisão"><History className="w-4 h-4" /></button>
                           )}
                           <button onClick={() => handleDownloadPdf(quote, clients.find(c => c.id === quote.clienteId), documentTemplates)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all" title="Gerar PDF"><FileText className="w-4 h-4" /></button>
                           {!isApproved && (
@@ -213,7 +280,7 @@ export default function QuotesSection({
           </div>
         ) : (
           <div className="rectilinear-grid">
-            {quotes.map(quote => {
+            {filteredQuotes.map(quote => {
               const total = quote.items.reduce((s, i) => s + (i.valorTotal || 0), 0);
               const isApproved = quote.status === QuoteStatus.APPROVED;
               return (
@@ -221,7 +288,10 @@ export default function QuotesSection({
                   <div>
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">{quote.id}</span>
+                        <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">
+                          {quote.id}
+                          {quote.revision && quote.revision > 0 ? ` REV ${quote.revision}` : ''}
+                        </span>
                         {quote.comissaoVendedor && (
                           <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" title="Comissão Habilitada"></span>
                         )}
@@ -243,8 +313,10 @@ export default function QuotesSection({
                   
                   <div className="flex items-center justify-between gap-2 border-t border-slate-50 dark:border-slate-800 pt-4">
                     <button onClick={() => setViewingQuote(quote)} className="flex-1 py-2 text-slate-400 hover:text-indigo-600 font-black text-[10px] uppercase tracking-widest transition-all">Ver Detalhes</button>
-                    {!isApproved && (
-                      <button onClick={() => { setEditingQuote(quote); setIsQuoteModalOpen(true); }} className="p-2 text-slate-400 hover:text-amber-600"><Pencil className="w-4 h-4" /></button>
+                    {!isApproved ? (
+                      <button onClick={() => { setEditingQuote(quote); setIsQuoteModalOpen(true); }} className="p-2 text-slate-400 hover:text-amber-600" title="Editar"><Pencil className="w-4 h-4" /></button>
+                    ) : (
+                      <button onClick={() => handleCreateRevision(quote)} className="p-2 text-slate-400 hover:text-indigo-600" title="Criar Revisão"><History className="w-4 h-4" /></button>
                     )}
                     <button onClick={() => handleDownloadPdf(quote, clients.find(c => c.id === quote.clienteId), documentTemplates)} className="p-2 text-slate-400 hover:text-blue-600"><FileText className="w-4 h-4" /></button>
                   </div>
@@ -256,7 +328,7 @@ export default function QuotesSection({
       ) : (
         <div className="text-center py-24 bg-slate-50 dark:bg-slate-900/30 rounded-[3rem] border border-dashed border-slate-200 dark:border-slate-800">
           <FileText className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-          <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">Nenhum orçamento emitido</h3>
+          <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">Nenhum orçamento encontrado</h3>
           <p className="text-slate-500 text-sm">Clique em "Nova Proposta" para criar o seu primeiro orçamento.</p>
         </div>
       )}

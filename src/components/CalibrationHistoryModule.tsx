@@ -8,6 +8,7 @@ import {
     StandardInstrument, 
     CertificateMask 
 } from '../types';
+import { useData } from '../contexts/DataContext';
 import { 
     Search, 
     TrendingUp, 
@@ -42,6 +43,7 @@ interface CalibrationHistoryModuleProps {
     onUpdateCertificateStatus?: (recordId: string, status: CertificateStatus, justification?: string) => void;
     documentTemplates?: any[];
     employees?: any[];
+    searchQuery?: string;
 }
 
 function Sparkline({ values, color = '#6366f1', height = 36 }: { values: number[]; color?: string; height?: number }) {
@@ -82,9 +84,11 @@ export default function CalibrationHistoryModule({
     onRevisionRequest,
     onUpdateCertificateStatus,
     documentTemplates = [],
-    employees = []
+    employees = [],
+    searchQuery: searchQueryProp
 }: CalibrationHistoryModuleProps) {
-    const [searchTerm, setSearchTerm] = useState('');
+    const { searchQuery: searchQueryContext } = useData();
+    const searchQuery = searchQueryProp !== undefined ? searchQueryProp : searchQueryContext;
     const [expandedInstrument, setExpandedInstrument] = useState<string | null>(null);
     const [viewMode, setViewMode] = useState<'instrument' | 'list'>('instrument');
     const { pdfState, generate: generatePdf } = usePdfGenerator();
@@ -102,10 +106,10 @@ export default function CalibrationHistoryModule({
         map.forEach(g => g.records.sort((a, b) => new Date(a.calibrationDate).getTime() - new Date(b.calibrationDate).getTime()));
         
         return Array.from(map.entries())
-            .filter(([name]) => name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                (map.get(name)?.client?.razaoSocial || '').toLowerCase().includes(searchTerm.toLowerCase()))
+            .filter(([name]) => name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                (map.get(name)?.client?.razaoSocial || '').toLowerCase().includes(searchQuery.toLowerCase()))
             .sort((a, b) => b[1].records.length - a[1].records.length);
-    }, [calibrationRecords, serviceOrders, clients, searchTerm]);
+    }, [calibrationRecords, serviceOrders, clients, searchQuery]);
 
     const handleDownloadPdf = (record: CalibrationRecord, isInternal: boolean) => {
         const so = serviceOrders.find(s => s.id === record.serviceOrderId);
@@ -143,16 +147,7 @@ export default function CalibrationHistoryModule({
                     <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-2 uppercase tracking-tight">Histórico & Rastreabilidade</h2>
                     <p className="text-slate-500 dark:text-slate-400 text-sm font-medium italic">Análise de deriva e histórico metrológico completo.</p>
                     
-                    <div className="relative max-w-md mt-6">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-                        <input
-                            type="text"
-                            placeholder="Buscar por instrumento ou cliente..."
-                            className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-amber-500/10 outline-none font-bold text-sm transition-all shadow-inner"
-                            value={searchTerm}
-                            onChange={e => setSearchTerm(e.target.value)}
-                        />
-                    </div>
+                    
                 </div>
 
                 <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
@@ -365,7 +360,7 @@ export default function CalibrationHistoryModule({
                                 .filter(r => {
                                     const so = serviceOrders.find(s => s.id === r.serviceOrderId);
                                     const cl = clients.find(c => c.id === so?.clienteId);
-                                    return `${r.certificateNumber} ${r.instrumentName} ${cl?.razaoSocial}`.toLowerCase().includes(searchTerm.toLowerCase());
+                                    return `${r.certificateNumber} ${r.instrumentName} ${cl?.razaoSocial}`.toLowerCase().includes(searchQuery.toLowerCase());
                                 })
                                 .map(record => {
                                     const so = serviceOrders.find(s => s.id === record.serviceOrderId);

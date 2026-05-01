@@ -1,1 +1,106 @@
-[]
+[
+  {
+    "id": "CAL-1776781131293",
+    "serviceOrderId": "OS-2026-001",
+    "quoteItemIndex": 0,
+    "unitIndex": 0,
+    "instrumentName": "Micrômetro Externo 0-25mm",
+    "certificateNumber": "CERT-2026-3374",
+    "calibrationDate": "2026-04-21",
+    "nextCalibrationDate": "2026-04-21",
+    "technicianName": "admin-1",
+    "manufacturer": "",
+    "model": "",
+    "serialNumber": "",
+    "identification": "",
+    "periodicity": "12 meses",
+    "calibrationLocation": "Laboratório",
+    "resolution": 0,
+    "capacidadeMinima": "",
+    "capacidadeMaxima": "",
+    "unidadeMedida": "",
+    "temperature": 20,
+    "humidity": 50,
+    "envStandardInstrumentId": "",
+    "environmentalStandardId": "",
+    "certificateMaskId": "mask-1776778687276",
+    "procedureId": "",
+    "standardInstrumentIds": [],
+    "observations": "",
+    "attachments": [],
+    "groups": [
+      {
+        "name": "Tabela de Resultados 1",
+        "blockId": "T1",
+        "columnDefinitions": [
+          {
+            "id": "TAG_1",
+            "name": "Nova Coluna",
+            "type": "NUMBER",
+            "behavior": "INPUT"
+          },
+          {
+            "id": "TAG_2",
+            "name": "Nova Coluna",
+            "type": "NUMBER",
+            "behavior": "INPUT",
+            "displayFormat": "percent"
+          },
+          {
+            "id": "TAG_3",
+            "name": "Nova Coluna",
+            "type": "NUMBER",
+            "behavior": "CALCULATED",
+            "formula": "[TAG_2]+[TAG_3]",
+            "decimalPlaces": 1,
+            "displayFormat": "percent"
+          },
+          {
+            "id": "TAG_4",
+            "name": "Nova Coluna",
+            "type": "NUMBER",
+            "behavior": "INPUT"
+          }
+        ],
+        "isDynamic": true,
+        "rows": [
+          {
+            "_pointIdx": "0",
+            "TAG_1": "10",
+            "TAG_2": "10",
+            "TAG_3": "",
+            "TAG_4": "10"
+          }
+        ],
+        "groupName": "Tabela de Resultados 1",
+        "columns": [
+          "TAG_1",
+          "TAG_2",
+          "TAG_3",
+          "TAG_4"
+        ]
+      }
+    ],
+    "status": "Devolvido para correção",
+    "isDraft": false,
+    "headerValidated": true,
+    "headerSaved": true,
+    "isAccredited": false,
+    "kFactorJustification": "Padrão (k=2 para 95.45%)",
+    "calculatedPoints": {
+      "T1_row0": {
+        "_pointIdx": "0",
+        "TAG_1": "10",
+        "TAG_2": "10",
+        "TAG_3": 10,
+        "TAG_4": "10",
+        "trace": {
+          "TAG_3": {
+            "formula": "[TAG_2]+[TAG_3]",
+            "output": 10
+          }
+        }
+      }
+    }
+  }
+]

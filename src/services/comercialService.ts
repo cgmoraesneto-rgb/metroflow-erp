@@ -10,8 +10,15 @@ export const comercialService = {
   },
 
   async saveClient(client: Partial<Client>): Promise<Client> {
-    const validated = ClientSchema.parse(client);
-    return apiClient.post<Client>('/api/mock/clients', validated);
+    console.log("[comercialService] Final client object to parse:", client);
+    try {
+      const validated = ClientSchema.parse(client) as Client;
+      const result = await apiClient.post<Client>('/api/mock/clients', validated, ClientSchema as any);
+      return result;
+    } catch (err) {
+      console.error("[comercialService] Validation ERROR for client:", client, err);
+      throw err;
+    }
   },
 
   async deleteClient(id: string): Promise<void> {

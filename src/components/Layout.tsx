@@ -3,6 +3,7 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTheme } from '../contexts/ThemeContext';
 import {
     Users,
     ShieldCheck,
@@ -17,31 +18,20 @@ import {
     Sun,
     Moon,
     ChevronRight,
-    Truck
+    Truck,
+    X
 } from 'lucide-react';
 import { Module } from '../types';
 import TopNotifications from './TopNotifications';
+import ThemeToggle from './ThemeToggle';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { user, employee, logout } = useAuth();
-    const { hasPermission, isSyncing } = useData();
+    const { hasPermission, isSyncing, searchQuery, setSearchQuery } = useData();
     const location = useLocation();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
-
-    useEffect(() => {
-        setIsSidebarOpen(false); // Close sidebar on route change
-    }, [location.pathname]);
-
-    useEffect(() => {
-        if (isDarkMode) {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-        }
-    }, [isDarkMode]);
+    const { theme, toggleTheme } = useTheme();
+    const isDarkMode = theme === 'dark';
 
     const navItems = [
         { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', module: Module.DASHBOARD },
@@ -156,7 +146,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     </div>
                     <div className="flex space-x-2">
                         <button
-                            onClick={() => setIsDarkMode(!isDarkMode)}
+                            onClick={toggleTheme}
                             className="flex-1 flex items-center justify-center p-2.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-xl transition-all"
                         >
                             {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -186,9 +176,19 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
                             <input
                                 type="text"
-                                placeholder="Pesquisar..."
-                                className="w-full pl-12 pr-6 py-2.5 bg-slate-100 dark:bg-slate-900 border-transparent focus:bg-white dark:focus:bg-slate-800 border focus:border-indigo-500/30 focus:ring-8 focus:ring-indigo-500/5 rounded-2xl text-sm transition-all outline-none font-medium dark:text-white"
+                                placeholder="Busca Global..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full pl-12 pr-10 py-2.5 bg-slate-100 dark:bg-slate-900 border-transparent focus:bg-white dark:focus:bg-slate-800 border focus:border-indigo-500/30 focus:ring-8 focus:ring-indigo-500/5 rounded-2xl text-sm transition-all outline-none font-medium dark:text-white"
                             />
+                            {searchQuery && (
+                                <button 
+                                    onClick={() => setSearchQuery('')}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors"
+                                >
+                                    <X className="w-3 h-3" />
+                                </button>
+                            )}
                         </div>
                     </div>
 

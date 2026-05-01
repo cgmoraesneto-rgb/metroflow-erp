@@ -1,1 +1,51 @@
-[]
+[
+  {
+    "type": "CALIBRATION_CERTIFICATE",
+    "id": "mask-1776778687276",
+    "title": "Teste",
+    "description": "Paquimetro",
+    "procedureId": "",
+    "standardInstrumentIds": [],
+    "version": 1,
+    "createdAt": "2026-04-21T13:38:07.276Z",
+    "updatedAt": "2026-04-21T13:39:21.160Z",
+    "measurementGroups": [
+      {
+        "name": "Tabela de Resultados 1",
+        "blockId": "T1",
+        "columnDefinitions": [
+          {
+            "id": "TAG_1",
+            "name": "Nova Coluna",
+            "type": "NUMBER",
+            "behavior": "INPUT"
+          },
+          {
+            "id": "TAG_2",
+            "name": "Nova Coluna",
+            "type": "NUMBER",
+            "behavior": "INPUT",
+            "displayFormat": "percent"
+          },
+          {
+            "id": "TAG_3",
+            "name": "Nova Coluna",
+            "type": "NUMBER",
+            "behavior": "CALCULATED",
+            "formula": "[TAG_2]+[TAG_3]",
+            "decimalPlaces": 1,
+            "displayFormat": "percent"
+          },
+          {
+            "id": "TAG_4",
+            "name": "Nova Coluna",
+            "type": "NUMBER",
+            "behavior": "INPUT"
+          }
+        ],
+        "isDynamic": true
+      }
+    ],
+    "uncertaintyBudget": []
+  }
+]

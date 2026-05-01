@@ -1,13 +1,14 @@
 import { Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import { useData } from './contexts/DataContext';
+import { Search } from 'lucide-react';
 import Login from './components/Login';
 import Layout from './components/Layout';
 import FirstLoginPasswordChange from './components/FirstLoginPasswordChange';
 import { toast } from 'sonner';
 import RBACGuard from './components/RBACGuard';
 import ErrorBoundary from './components/ErrorBoundary';
-import { Module, ClientStatus, CertificateStatus, UserRole, ServiceOrder } from './types';
+import { Module, ClientStatus, CertificateStatus, UserRole, ServiceOrder, CalibrationResult } from './types';
 import { lazy, Suspense } from 'react';
 
 // ─── Lazy-loaded Route Modules ────────────────────────────────────────────────
@@ -44,7 +45,8 @@ const ModuleLoader = ({ label }: { label?: string }) => (
 
 export default function App() {
   const { user, employee, loading: authLoading, logout, mustChangePassword, changePassword } = useAuth();
-  const { loading: dataLoading } = useData();
+  const { loading: dataLoading, searchQuery } = useData();
+  console.log('APP RENDERED WITH SEARCH:', searchQuery);
 
   if (authLoading || dataLoading) {
     return (
@@ -98,7 +100,8 @@ export default function App() {
   }
 
   return (
-    <Routes>
+    <div className="relative min-h-screen">
+      <Routes>
       <Route path="/portal/*" element={
         <ErrorBoundary moduleName="Portal do Cliente">
           <Suspense fallback={<ModuleLoader label="Carregando Portal..." />}>
@@ -184,11 +187,12 @@ export default function App() {
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
+    </div>
   );
 }
 
 function DashboardWrapper() {
-  const { clients, quotes, serviceOrders, financialControls, calibrationRecords, standardInstruments, saveItem, deleteItem } = useData();
+  const { searchQuery, clients, quotes, serviceOrders, financialControls, calibrationRecords, standardInstruments, saveItem, deleteItem } = useData();
   return (
     <DashboardModule
       clients={clients}
@@ -204,7 +208,7 @@ function DashboardWrapper() {
 }
 
 function ComercialWrapper() {
-  const { clients, quotes, serviceOrders, priceTables, paymentMethods, documentTemplates, saveItem, deleteItem, addClient } = useData();
+  const { searchQuery, clients, quotes, serviceOrders, priceTables, paymentMethods, documentTemplates, saveItem, deleteItem, addClient } = useData();
   const [searchParams, setSearchParams] = useSearchParams();
   const subTab = searchParams.get('tab') || 'clients';
 
@@ -213,18 +217,24 @@ function ComercialWrapper() {
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Módulo Comercial</h2>
-        <div className="flex bg-white p-1 rounded-xl shadow-sm border border-gray-200">
+    <div className="space-y-10">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 pb-10 border-b border-slate-100 dark:border-slate-800">
+        <div>
+          <span className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.3em] mb-2 block">Gestão de Vendas e Propostas</span>
+          <h2 className="text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Comercial</h2>
+        </div>
+
+        <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl gap-1 overflow-x-auto no-scrollbar">
           {(['clients', 'price_tables', 'quotes'] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setSubTab(tab)}
-              className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${subTab === tab ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'
+              className={`px-6 py-2.5 text-xs font-black rounded-xl transition-all duration-300 whitespace-nowrap ${subTab === tab
+                ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm'
+                : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                 }`}
             >
-              {tab === 'clients' ? 'Clientes' : tab === 'price_tables' ? 'Tabelas' : 'Orçamentos'}
+              {tab === 'clients' ? 'Clientes' : tab === 'price_tables' ? 'Tabelas de Preço' : 'Orçamentos'}
             </button>
           ))}
         </div>
@@ -232,6 +242,7 @@ function ComercialWrapper() {
 
       {subTab === 'clients' && (
         <ClientsSection
+          searchQuery={searchQuery}
           clients={clients}
           quotes={quotes}
           serviceOrders={serviceOrders}
@@ -245,6 +256,7 @@ function ComercialWrapper() {
 
       {subTab === 'price_tables' && (
         <PriceTableManagementModule
+          searchQuery={searchQuery}
           priceTables={priceTables}
           onSavePriceTable={(p: any) => saveItem('price_tables', p)}
           onDeletePriceTable={(id: string) => deleteItem('price_tables', id)}
@@ -253,6 +265,7 @@ function ComercialWrapper() {
 
       {subTab === 'quotes' && (
         <QuotesSection
+          searchQuery={searchQuery}
           clients={clients}
           priceTables={priceTables}
           quotes={quotes}
@@ -270,9 +283,10 @@ function ComercialWrapper() {
 }
 
 function LogisticsWrapper() {
-  const { serviceOrders, clients, quotes, documentTemplates, saveItem } = useData();
+  const { searchQuery, serviceOrders, clients, quotes, documentTemplates, saveItem } = useData();
   return (
     <LogisticsModule
+      searchQuery={searchQuery}
       serviceOrders={serviceOrders}
       clients={clients}
       quotes={quotes}
@@ -284,9 +298,10 @@ function LogisticsWrapper() {
 
 function QualityWrapper() {
   const { employee } = useAuth();
-  const { calibrationRecords, serviceOrders, clients, certificateMasks, standardInstruments, procedures, documentTemplates, employees, saveItem, deleteItem } = useData();
+  const { searchQuery, calibrationRecords, serviceOrders, clients, certificateMasks, standardInstruments, procedures, documentTemplates, employees, saveItem, deleteItem } = useData();
   return (
     <QualityModule
+      searchQuery={searchQuery}
       calibrationRecords={calibrationRecords}
       serviceOrders={serviceOrders}
       clients={clients}
@@ -404,9 +419,10 @@ function QualityWrapper() {
 }
 
 function TechnicalWrapper() {
-  const { serviceOrders, clients, quotes, instrumentTypes, certificateMasks, calibrationRecords, standardInstruments, procedures, documentTemplates, employees, saveItem, deleteItem } = useData();
+  const { searchQuery, serviceOrders, clients, quotes, instrumentTypes, certificateMasks, calibrationRecords, calibrationResults, standardInstruments, procedures, documentTemplates, employees, saveItem, deleteItem } = useData();
   return (
     <TechnicalModule
+      searchQuery={searchQuery}
       serviceOrders={serviceOrders}
       clients={clients}
       quotes={quotes}
@@ -418,11 +434,19 @@ function TechnicalWrapper() {
       documentTemplates={documentTemplates}
       employees={employees}
       onCalibrationRecordSubmit={() => { }}
+      onSaveCalibrationResult={async (result: any) => {
+        await saveItem('calibration_results', result);
+      }}
+      calibrationResults={calibrationResults}
       onSaveServiceOrder={(so: any) => saveItem('service_orders', so)}
       onSaveCalibrationRecord={async (record: any) => {
         await saveItem('calibration_records', record);
-        const so = serviceOrders.find(s => s.id === record.serviceOrderId);
-        if (so) await saveItem('service_orders', { ...so, statusCertificado: CertificateStatus.IN_ANALYSIS });
+        
+        // Só atualiza status da O.S. se for uma finalização oficial (não rascunho)
+        if (!record.isDraft) {
+          const so = serviceOrders.find(s => s.id === record.serviceOrderId);
+          if (so) await saveItem('service_orders', { ...so, statusCertificado: CertificateStatus.IN_ANALYSIS });
+        }
       }}
       onSaveCertificateMask={(mask) => saveItem('certificate_masks', mask)}
       onDeleteCertificateMask={(id) => deleteItem('certificate_masks', id)}
@@ -446,14 +470,16 @@ function TechnicalWrapper() {
 }
 
 function FinanceWrapper() {
-  const { quotes, serviceOrders, clients, financialControls, paymentMethods, saveItem, deleteItem } = useData();
+  const { searchQuery, quotes, serviceOrders, clients, financialControls, paymentMethods, banks, saveItem, deleteItem } = useData();
   return (
     <FinanceModule
+      searchQuery={searchQuery}
       quotes={quotes}
       serviceOrders={serviceOrders}
       clients={clients}
       financialControls={financialControls}
       paymentMethods={paymentMethods}
+      banks={banks}
       onFinancialControlsChange={async (newFc) => {
         await Promise.all(newFc.map(fc => saveItem('financial_controls', fc)));
       }}
@@ -461,17 +487,19 @@ function FinanceWrapper() {
       onDeleteFinancialControl={(id) => deleteItem('financial_controls', id)}
       onSavePaymentMethod={(pm) => saveItem('payment_methods', pm)}
       onDeletePaymentMethod={(id) => deleteItem('payment_methods', id)}
+      onSaveQuote={(quote) => saveItem('quotes', quote)}
     />
   );
 }
 
 function GeneralRegistersWrapper() {
-  const { employees, banks, unitsOfMeasure, paymentMethods, documentTemplates, saveItem, deleteItem } = useData();
+  const { searchQuery, employees, banks, unitsOfMeasure, paymentMethods, documentTemplates, saveItem, deleteItem } = useData();
   const [searchParams, setSearchParams] = useSearchParams();
   const subTab = searchParams.get('tab') || 'employees';
 
   return (
     <GeneralRegistersModule
+      searchQuery={searchQuery}
       employees={employees}
       banks={banks}
       unitsOfMeasure={unitsOfMeasure}

@@ -29,6 +29,7 @@ interface GeneralRegistersModuleProps {
   onDeletePaymentMethod: (pmId: string) => void;
   documentTemplates?: DocumentTemplate[];
   onSaveDocumentTemplate?: (doc: any) => void;
+  searchQuery?: string;
 }
 
 type SubTab = 'employees' | 'banks' | 'payment-methods' | 'vehicles' | 'document-templates' | 'audit';
@@ -47,11 +48,12 @@ export default function GeneralRegistersModule({
   onSavePaymentMethod,
   onDeletePaymentMethod,
   documentTemplates = [],
-  onSaveDocumentTemplate
+  onSaveDocumentTemplate,
+  searchQuery
 }: GeneralRegistersModuleProps) {
   const { saveItem, deleteItem, vehicles, quotes, serviceOrders, calibrationRecords, financialControls } = useData();
   const { employee } = useAuth();
-  const isDeveloper = employee?.cargo?.toLowerCase().includes('developer') || 
+  const isDeveloper = employee?.cargo?.toLowerCase()?.includes('developer') || 
                       employee?.username === 'developer' || 
                       (employee as any)?.isDeveloper === true;
   const [isMigrating, setIsMigrating] = useState(false);
@@ -242,24 +244,24 @@ export default function GeneralRegistersModule({
 
   return (
     <div className="space-y-10">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 pb-10 border-b border-slate-100 dark:border-slate-800">
         <div>
-          <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Cadastros</h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium italic">Gerenciamento de entidades auxiliares do sistema.</p>
+          <span className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.3em] mb-2 block">Administração do Sistema</span>
+          <h2 className="text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Configurações</h2>
         </div>
 
-        <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl">
+        <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl gap-1 overflow-x-auto no-scrollbar">
           {TAB_CONFIG.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveSubTab(tab.id as SubTab)}
-              className={`flex items-center px-4 md:px-6 py-2.5 rounded-xl font-black text-xs transition-all duration-300 ${activeSubTab === tab.id
+              className={`flex items-center px-6 py-2.5 rounded-xl font-black text-xs transition-all duration-300 whitespace-nowrap ${activeSubTab === tab.id
                 ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm'
                 : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                 }`}
             >
-              <tab.icon className="w-4 h-4 md:mr-2" />
-              <span className="hidden md:inline">{tab.label}</span>
+              <tab.icon className="w-4 h-4 mr-2" />
+              <span>{tab.label}</span>
             </button>
           ))}
         </div>
@@ -459,7 +461,15 @@ export default function GeneralRegistersModule({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
-                    {employees.map((emp) => (
+                    {employees
+                      .filter(emp => {
+                        if (!searchQuery) return true;
+                        const term = searchQuery.toLowerCase().trim();
+                        return emp.nome.toLowerCase().includes(term) ||
+                               emp.cargo.toLowerCase().includes(term) ||
+                               emp.email.toLowerCase().includes(term);
+                      })
+                      .map((emp) => (
                       <tr key={emp.id} className="rectilinear-tr group">
                         <td className="rectilinear-td">
                           <div className="flex items-center gap-3">
@@ -539,77 +549,7 @@ export default function GeneralRegistersModule({
                 </table>
               </div>
 
-              {/* ── MIGRATION PANEL ── */}
-              <div className="mt-12 p-8 rounded-[2.5rem] border border-amber-200 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-900/10">
-                <div className="flex items-start gap-5">
-                  <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-800/30 flex items-center justify-center text-amber-600 shrink-0">
-                    <RefreshCw className="w-6 h-6" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-black text-amber-900 dark:text-amber-300 uppercase tracking-widest text-sm mb-1">Migração de Numeração de Documentos</h4>
-                    <p className="text-xs text-amber-700 dark:text-amber-400 font-medium mb-4">
-                      Esta operação irá renumerar todos os Orçamentos e Ordens de Serviço existentes conforme o novo padrão
-                      (OCW041026+, OS 26280+), preservando todos os vínculos entre documentos. <strong>Execute apenas uma vez.</strong>
-                    </p>
 
-                    {migrationDone ? (
-                      <div className="flex items-center gap-3 px-5 py-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl border border-emerald-200 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-400">
-                        <span className="text-sm font-black uppercase tracking-wider">✓ Migração concluída com sucesso!</span>
-                      </div>
-                    ) : !migrationConfirm ? (
-                      <button
-                        onClick={() => setMigrationConfirm(true)}
-                        className="flex items-center gap-2 px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-amber-200 dark:shadow-none"
-                      >
-                        <RefreshCw className="w-4 h-4" />
-                        Iniciar Migração de Numeração
-                      </button>
-                    ) : (
-                      <div className="flex items-center gap-4">
-                        <p className="text-xs font-black text-amber-800 dark:text-amber-300 uppercase tracking-widest">Você tem certeza? Esta ação é irreversível.</p>
-                        <button
-                          onClick={() => setMigrationConfirm(false)}
-                          className="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition-all"
-                        >
-                          Cancelar
-                        </button>
-                        <button
-                          onClick={handleRunMigration}
-                          disabled={isMigrating}
-                          className="flex items-center gap-2 px-6 py-2 bg-rose-600 hover:bg-rose-700 disabled:opacity-60 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all active:scale-95"
-                        >
-                          {isMigrating ? <><RefreshCw className="w-4 h-4 animate-spin" /> Migrando...</> : 'Confirmar e Executar'}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* ── FIX QUOTE STATUS PANEL ── */}
-              <div className="mt-6 p-8 rounded-[2.5rem] border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-900/10">
-                <div className="flex items-start gap-5">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-800/30 flex items-center justify-center text-emerald-600 shrink-0">
-                    <CheckCircle2 className="w-6 h-6" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-black text-emerald-900 dark:text-emerald-300 uppercase tracking-widest text-sm mb-1">Corrigir Status dos Orçamentos</h4>
-                    <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium mb-4">
-                      Detecta todos os orçamentos com uma O.S. vinculada e força o status para <strong>APROVADO</strong> diretamente no banco de dados. Pode ser executado quantas vezes quiser — sem risco.
-                    </p>
-                    <button
-                      onClick={handleFixQuoteStatus}
-                      disabled={isFixingStatus}
-                      className="flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-emerald-200 dark:shadow-none"
-                    >
-                      {isFixingStatus
-                        ? <><RefreshCw className="w-4 h-4 animate-spin" /> Corrigindo...</>
-                        : <><CheckCircle2 className="w-4 h-4" /> Corrigir Status Agora</>
-                      }
-                    </button>
-                  </div>
-                </div>
-              </div>
             </div>
           )}
 
@@ -685,7 +625,14 @@ export default function GeneralRegistersModule({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
-                    {banks.map((bank) => (
+                    {banks
+                      .filter(bank => {
+                        if (!searchQuery) return true;
+                        const term = searchQuery.toLowerCase().trim();
+                        return bank.nome.toLowerCase().includes(term) ||
+                               bank.codigo.toLowerCase().includes(term);
+                      })
+                      .map((bank) => (
                       <tr key={bank.id} className="rectilinear-tr group">
                         <td className="rectilinear-td">
                           <div className="flex items-center gap-3">

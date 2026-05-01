@@ -57,33 +57,74 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       try {
-        if (sessionStorage.getItem('metroflow_dev_mode') === 'true') {
+        if (localStorage.getItem('metroflow_dev_mode') === 'true') {
           setDevState();
           setLoading(false);
           return;
         }
 
-        setUser(currentUser);
-        if (currentUser) {
-          // Try to find employee by UID first
-          let employeeDoc = await getDoc(doc(db, 'employees', currentUser.uid));
+        let finalUser = currentUser;
 
-          if (employeeDoc.exists()) {
-            setEmployee({ ...employeeDoc.data(), id: employeeDoc.id } as Employee);
-          } else {
-            // If not found by UID, try to find by email
-            const q = query(collection(db, 'employees'), where('email', '==', currentUser.email));
-            const querySnapshot = await getDocs(q);
+        // Fallback: Check local storage for persisted login if Firebase Auth yields null
+        if (!finalUser) {
+          const persistedUserId = localStorage.getItem('metroflow_local_uid');
+          if (persistedUserId) {
+            try {
+              let empData: any = null;
+              try {
+                let employeeDoc = await getDoc(doc(db, 'employees', persistedUserId));
+                if (employeeDoc.exists()) {
+                  empData = employeeDoc.data();
+                }
+              } catch(e) { console.warn('Firestore fallback fetch err', e); }
 
-            if (!querySnapshot.empty) {
-              const empData = querySnapshot.docs[0].data();
-              const empId = querySnapshot.docs[0].id;
-              const emp = { ...empData, id: empId } as Employee;
-              setEmployee(emp);
-            } else {
-              setEmployee(null);
+              if (!empData) {
+                const employees = await apiClient.fetch<Employee>('/api/mock/employees');
+                empData = employees.find(e => e.id === persistedUserId);
+              }
+
+              if (empData) {
+                finalUser = {
+                  uid: persistedUserId,
+                  email: empData.email,
+                  displayName: empData.nome,
+                  photoURL: null,
+                  emailVerified: true,
+                } as User;
+              }
+            } catch(e) {
+               console.warn("Failed to persist local session", e);
             }
           }
+        }
+
+        setUser(finalUser);
+        if (finalUser) {
+          let emp: Employee | null = null;
+          try {
+            // Try to find employee by UID first
+            let employeeDoc = await getDoc(doc(db, 'employees', finalUser.uid));
+            if (employeeDoc.exists()) {
+              emp = { ...employeeDoc.data(), id: employeeDoc.id } as Employee;
+            } else {
+              // If not found by UID, try to find by email
+              const q = query(collection(db, 'employees'), where('email', '==', finalUser.email));
+              const querySnapshot = await getDocs(q);
+              if (!querySnapshot.empty) {
+                const empData = querySnapshot.docs[0].data();
+                const empId = querySnapshot.docs[0].id;
+                emp = { ...empData, id: empId } as Employee;
+              }
+            }
+          } catch(e) { console.warn("Firestore employee fetch failed", e); }
+
+          if (!emp) {
+            try {
+              const employees = await apiClient.fetch<Employee>('/api/mock/employees');
+              emp = employees.find(e => e.id === finalUser?.uid || e.email === finalUser?.email) || null;
+            } catch(e) {}
+          }
+          setEmployee(emp);
         } else {
           setEmployee(null);
         }
@@ -172,6 +213,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(localUser);
       setEmployee(empData);
       setMustChangePassword(empData.mustChangePassword === true);
+      localStorage.setItem('metroflow_local_uid', empData.id);
       setLoading(false);
     } catch (error: any) {
       console.error('Username Login error:', error);
@@ -192,7 +234,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setDevState();
     setLoading(false);
     // Persist dev mode in session storage
-    sessionStorage.setItem('metroflow_dev_mode', 'true');
+    localStorage.setItem('metroflow_dev_mode', 'true');
   };
 
   const logout = async () => {
@@ -203,7 +245,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setUser(null);
       setEmployee(null);
-      sessionStorage.removeItem('metroflow_dev_mode');
+      localStorage.removeItem('metroflow_dev_mode');
+      localStorage.removeItem('metroflow_local_uid');
       setLoading(false);
     }
   };

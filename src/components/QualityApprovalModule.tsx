@@ -21,6 +21,7 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 import { usePdfGenerator } from '../hooks/usePdfGenerator';
+import { useData } from '../contexts/DataContext';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
@@ -36,6 +37,7 @@ interface QualityApprovalModuleProps {
     employees: any[];
     onUpdateCertificateStatus: (recordId: string, status: CertificateStatus, justification?: string, signatarioId?: string) => void;
     documentTemplates?: any[];
+    searchQuery?: string;
 }
 
 export default function QualityApprovalModule({
@@ -47,11 +49,11 @@ export default function QualityApprovalModule({
     certificateMasks,
     employees,
     onUpdateCertificateStatus,
-    documentTemplates = []
+    documentTemplates = [],
+    searchQuery
 }: QualityApprovalModuleProps) {
     const { employee } = useAuth();
     const { pdfState, previewUrl: previewPdfUrl, generate: generatePdf, reset: resetPdf } = usePdfGenerator();
-    const [searchTerm, setSearchTerm] = useState('');
     const [returnJustification, setReturnJustification] = useState<Record<string, string>>({});
     const [returnModalId, setReturnModalId] = useState<string | null>(null);
     const [numPages, setNumPages] = useState<number>();
@@ -77,11 +79,9 @@ export default function QualityApprovalModule({
         setNumPages(numPages);
     }
 
-    const recordsToReview = calibrationRecords.filter(record => {
+    const recordsToReview = (calibrationRecords || []).filter(record => {
         const serviceOrder = serviceOrders.find(so => so.id === record.serviceOrderId);
         const client = clients.find(c => c.id === serviceOrder?.clienteId);
-        const searchStr = `${record.certificateNumber} ${record.instrumentName} ${client?.razaoSocial || ''}`.toLowerCase();
-        const matchesSearch = searchStr.includes(searchTerm.toLowerCase());
         
         const status = record.status || serviceOrder?.statusCertificado;
         const isRelevantStatus = [
@@ -89,8 +89,24 @@ export default function QualityApprovalModule({
             CertificateStatus.APPROVED,
             CertificateStatus.READY_FOR_SENDING
         ].includes(status as CertificateStatus);
-        
-        return matchesSearch && isRelevantStatus;
+
+        if (!isRelevantStatus) return false;
+        if (!searchQuery) return true;
+
+        const term = searchQuery.toLowerCase().trim();
+        const digits = term.replace(/\D/g, '');
+
+        const searchStr = `${record.certificateNumber || ''} ${record.instrumentName || ''} ${client?.razaoSocial || ''} ${record.serviceOrderId || ''} ${serviceOrder?.orcamentoId || ''} ${client?.cnpj || ''}`.toLowerCase();
+        if (searchStr.includes(term)) return true;
+
+        if (digits && digits.length >= 3) {
+            const certDigits = (record.certificateNumber || "").replace(/\D/g, '');
+            const osDigits = (record.serviceOrderId || "").replace(/\D/g, '');
+            const cnpjDigits = (client?.cnpj || "").replace(/\D/g, '');
+            if (certDigits.includes(digits) || osDigits.includes(digits) || cnpjDigits.includes(digits)) return true;
+        }
+
+        return false;
     });
 
     const handleSuperiorApproval = (record: CalibrationRecord) => {
@@ -156,9 +172,7 @@ export default function QualityApprovalModule({
                 </div>
             </div>
 
-            <div className="mb-8 relative max-w-md">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-                <input type="text" placeholder="Filtrar fila de aprovação..." className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl outline-none font-bold text-xs" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            <div>
             </div>
 
             {viewMode === 'list' ? (

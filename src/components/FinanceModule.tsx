@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FinancialControl, PaymentStatus, Quote, ServiceOrder, Client, PaymentMethod } from '../types';
+import { FinancialControl, PaymentStatus, Quote, ServiceOrder, Client, PaymentMethod, InstrumentStatus, Bank } from '../types';
 import InvoiceModal from './InvoiceModal';
 import { Plus, Edit2, Trash2, CreditCard, Receipt, CircleDollarSign, Calendar, Download, ChevronRight, ArrowUpRight, CheckCircle, Clock, DollarSign, Search, Building2, Smartphone, X, Filter } from 'lucide-react';
 import { toast } from 'sonner';
@@ -12,11 +12,14 @@ interface FinanceModuleProps {
   clients: Client[];
   financialControls: FinancialControl[];
   paymentMethods: PaymentMethod[];
-  onFinancialControlsChange: (controls: FinancialControl[]) => void;
-  onSaveFinancialControl: (fc: any) => void;
+  banks: Bank[];
+  onFinancialControlsChange: (financials: FinancialControl[]) => void;
+  onSaveFinancialControl: (fc: FinancialControl) => void;
   onSavePaymentMethod: (pm: PaymentMethod) => void;
   onDeletePaymentMethod: (id: string) => void;
   onDeleteFinancialControl: (id: string) => void;
+  onSaveQuote?: (quote: Quote) => void;
+  searchQuery?: string;
 }
 
 export default function FinanceModule({
@@ -25,11 +28,14 @@ export default function FinanceModule({
   clients,
   financialControls,
   paymentMethods,
+  banks,
   onFinancialControlsChange,
   onSaveFinancialControl,
   onSavePaymentMethod,
   onDeletePaymentMethod,
-  onDeleteFinancialControl
+  onDeleteFinancialControl,
+  onSaveQuote,
+  searchQuery
 }: FinanceModuleProps) {
 
   const [activeSubTab, setActiveSubTab] = useState<'dashboard' | 'billing' | 'commissions'>('dashboard');
@@ -38,39 +44,108 @@ export default function FinanceModule({
   const [invoiceData, setInvoiceData] = useState<Partial<FinancialControl> | null>(null);
   const [paymentDates, setPaymentDates] = useState<{ [key: string]: string }>({});
   const [selectedMonth, setSelectedMonth] = useState<string>(new Date().toISOString().substring(0, 7)); // YYYY-MM
+  const [reportStartDate, setReportStartDate] = useState<string>(new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().substring(0, 10));
+  const [reportEndDate, setReportEndDate] = useState<string>(new Date().toISOString().substring(0, 10));
+  const [statusFilter, setStatusFilter] = useState<InstrumentStatus | 'ALL'>('ALL');
 
-  const filteredFinancials = financialControls.filter(f => f.dataEmissao.startsWith(selectedMonth));
+  const filteredFinancials = financialControls.filter(f => {
+    const matchesMonth = f.dataEmissao.startsWith(selectedMonth);
+    if (!searchQuery) return matchesMonth;
+
+    const client = clients.find(c => c.id === f.clienteId);
+    const term = searchQuery.toLowerCase().trim();
+    const digits = term.replace(/\D/g, '');
+
+    const matchesText = (f.numeroNF || "").toLowerCase().includes(term) ||
+                       (f.serviceOrderId || "").toLowerCase().includes(term) ||
+                       client?.razaoSocial?.toLowerCase().includes(term);
+
+    if (matchesText) return true;
+
+    if (digits && digits.length >= 3) {
+        const nfDigits = (f.numeroNF || "").replace(/\D/g, '');
+        const osDigits = (f.serviceOrderId || "").replace(/\D/g, '');
+        const cnpjDigits = (client?.cnpj || "").replace(/\D/g, '');
+        if (nfDigits.includes(digits) || osDigits.includes(digits) || cnpjDigits.includes(digits)) return true;
+    }
+
+    return false;
+  });
 
   const totalBilled = filteredFinancials.reduce((acc, curr) => acc + (curr.valorBruto || 0), 0);
   const totalReceived = filteredFinancials.filter(f => f.statusPagamento === PaymentStatus.PAID).reduce((acc, curr) => acc + (curr.valorLiquido || 0), 0);
   const totalToReceive = filteredFinancials.filter(f => f.statusPagamento === PaymentStatus.PENDING).reduce((acc, curr) => acc + (curr.valorLiquido || 0), 0);
   const totalOverdue = filteredFinancials.filter(f => f.statusPagamento === PaymentStatus.OVERDUE).reduce((acc, curr) => acc + (curr.valorLiquido || 0), 0);
 
-  const handleDownloadReport = () => {
-    const headers = ['NF', 'Emissão', 'Cliente', 'OS', 'Valor Bruto', 'Valor Líquido', 'Status'];
-    const rows = filteredFinancials.map(f => {
-      const client = clients.find(c => c.id === f.clienteId);
-      return [
-        f.numeroNF,
-        f.dataEmissao,
-        client?.razaoSocial || 'N/A',
-        f.serviceOrderId,
-        f.valorBruto?.toFixed(2),
-        f.valorLiquido?.toFixed(2),
-        f.statusPagamento
-      ];
-    });
+  const handleDownloadReport = (type: 'billing' | 'commissions') => {
+    const start = new Date(reportStartDate);
+    const end = new Date(reportEndDate);
+    
+    if (type === 'billing') {
+        const data = financialControls.filter(f => {
+            const date = new Date(f.dataEmissao);
+            return date >= start && date <= end;
+        });
 
-    const csvContent = [headers, ...rows].map(e => e.join(";")).join("\n");
-    const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", `Relatorio_Financeiro_${selectedMonth}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+        const headers = ['NF', 'Emissão', 'Cliente', 'OS', 'Valor Bruto', 'Valor Líquido', 'Status Pagamento', 'Data Pagamento'];
+        const rows = data.map(f => {
+            const client = clients.find(c => c.id === f.clienteId);
+            return [
+                f.numeroNF,
+                f.dataEmissao,
+                client?.razaoSocial || 'N/A',
+                f.serviceOrderId,
+                f.valorBruto?.toFixed(2),
+                f.valorLiquido?.toFixed(2),
+                f.statusPagamento,
+                f.dataPagamentoReal || '—'
+            ];
+        });
+
+        const csvContent = [headers, ...rows].map(e => e.join(";")).join("\n");
+        const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Relatorio_Faturamento_${reportStartDate}_a_${reportEndDate}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } else {
+        const data = financialControls.filter(fc => {
+            const quote = quotes.find(q => q.id === fc.orcamentoId);
+            const date = new Date(fc.dataEmissao);
+            return quote?.comissaoVendedor && date >= start && date <= end;
+        });
+
+        const headers = ['NF', 'Orçamento', 'Comissionado', 'Valor Bruto', '% Comissão', 'Valor Comissão', 'Status'];
+        const rows = data.map(f => {
+            const quote = quotes.find(q => q.id === f.orcamentoId);
+            const perc = f.percentualComissao || 0;
+            const val = (f.valorBruto || 0) * (perc / 100);
+            return [
+                f.numeroNF,
+                f.orcamentoId,
+                quote?.nomeComissionado || '—',
+                f.valorBruto?.toFixed(2),
+                perc + '%',
+                val.toFixed(2),
+                f.statusComissao || 'Pendente'
+            ];
+        });
+
+        const csvContent = [headers, ...rows].map(e => e.join(";")).join("\n");
+        const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Relatorio_Comissoes_${reportStartDate}_a_${reportEndDate}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
   };
 
   const handleOpenInvoiceModal = (serviceOrder: ServiceOrder) => {
@@ -115,76 +190,116 @@ export default function FinanceModule({
     }
   };
 
+  const getInternalStatusBadge = (status: InstrumentStatus) => {
+    let classes = '';
+    switch (status) {
+      case InstrumentStatus.PENDING:
+        classes = 'bg-slate-100 text-slate-600 border-slate-200';
+        break;
+      case InstrumentStatus.IN_PROGRESS:
+        classes = 'bg-amber-100 text-amber-700 border-amber-200';
+        break;
+      case InstrumentStatus.CALIBRATED:
+        classes = 'bg-blue-100 text-blue-700 border-blue-200';
+        break;
+      case InstrumentStatus.COMPLETED:
+        classes = 'bg-indigo-100 text-indigo-700 border-indigo-200';
+        break;
+      case InstrumentStatus.DELIVERED:
+        classes = 'bg-emerald-100 text-emerald-700 border-emerald-200';
+        break;
+      default:
+        classes = 'bg-slate-50 text-slate-400 border-slate-100';
+    }
+
+    return (
+      <span className={`px-3 py-1.5 text-[9px] font-black rounded-xl uppercase tracking-wider border shadow-sm transition-all ${classes}`}>
+        {status}
+      </span>
+    );
+  };
+
   return (
     <div className="space-y-10">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Financeiro</h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium italic">Gestão de faturamento, recebíveis e fluxo de caixa.</p>
+      {/* --- Main Module Header --- */}
+      <div className="flex flex-col lg:flex-row justify-between gap-8 pb-8 border-b border-slate-100 dark:border-slate-800">
+        <div className="pt-2">
+          <span className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.3em] mb-2 block">Gestão Estratégica</span>
+          <h2 className="text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Financeiro</h2>
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="flex items-center space-x-2 bg-white dark:bg-slate-900 p-1.5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
-            <Calendar className="w-4 h-4 text-emerald-500 ml-2" />
-            <input
-              type="month"
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="bg-transparent border-none text-sm font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer"
-            />
+        <div className="flex flex-col items-start lg:items-end gap-3">
+          {/* Tabs */}
+          <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl gap-1">
+            {[
+              { id: 'dashboard', label: 'Dashboard', icon: CircleDollarSign },
+              { id: 'billing', label: 'Faturamento', icon: Receipt },
+              { id: 'commissions', label: 'Comissões', icon: DollarSign }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveSubTab(tab.id as any)}
+                className={`flex items-center px-6 py-2.5 rounded-xl font-black text-xs transition-all duration-300 ${activeSubTab === tab.id
+                  ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                  }`}
+              >
+                <tab.icon className="w-4 h-4 mr-2" />
+                <span>{tab.label}</span>
+              </button>
+            ))}
           </div>
 
-          <button
-            onClick={handleDownloadReport}
-            className="flex items-center space-x-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 px-5 py-3 rounded-2xl transition-all shadow-sm font-black text-xs active:scale-95"
-          >
-            <Download className="w-4 h-4 text-emerald-500" />
-            <span>Relatório CSV</span>
-          </button>
+          {/* Reports & Period Controls */}
+          <div className="flex flex-wrap items-center gap-2 bg-slate-50/50 dark:bg-slate-800/30 p-1.5 rounded-2xl border border-slate-100 dark:border-slate-800/50">
+            <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Inicial</span>
+              <input
+                type="date"
+                value={reportStartDate}
+                onChange={(e) => setReportStartDate(e.target.value)}
+                className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[85px]"
+              />
+              <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-1"></div>
+              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Final</span>
+              <input
+                type="date"
+                value={reportEndDate}
+                onChange={(e) => setReportEndDate(e.target.value)}
+                className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[85px]"
+              />
+            </div>
 
-          <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl">
-            <button
-              onClick={() => setActiveSubTab('dashboard')}
-              className={`flex items-center px-6 py-2.5 text-xs font-black rounded-xl transition-all duration-300 ${activeSubTab === 'dashboard'
-                ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm'
-                : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-                }`}
-            >
-              <CircleDollarSign className="mr-2 w-4 h-4" />
-              Dashboard
-            </button>
-            <button
-              onClick={() => setActiveSubTab('billing')}
-              className={`flex items-center px-6 py-2.5 text-xs font-black rounded-xl transition-all duration-300 ${activeSubTab === 'billing'
-                ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm'
-                : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-                }`}
-            >
-              <Receipt className="mr-2 w-4 h-4" />
-              Faturamento
-            </button>
-            <button
-              onClick={() => setActiveSubTab('commissions')}
-              className={`flex items-center px-6 py-2.5 text-xs font-black rounded-xl transition-all duration-300 ${activeSubTab === 'commissions'
-                ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm'
-                : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-                }`}
-            >
-              <DollarSign className="mr-2 w-4 h-4" />
-              Comissões
-            </button>
+            <div className="flex gap-1.5">
+              <button
+                onClick={() => handleDownloadReport('billing')}
+                className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-xl transition-all shadow-md shadow-indigo-200 dark:shadow-none font-black text-[9px] uppercase tracking-wider active:scale-95 whitespace-nowrap"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Faturamento</span>
+              </button>
+              <button
+                onClick={() => handleDownloadReport('commissions')}
+                className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded-xl transition-all shadow-md shadow-emerald-200 dark:shadow-none font-black text-[9px] uppercase tracking-wider active:scale-95 whitespace-nowrap"
+              >
+                <DollarSign className="w-3.5 h-3.5" />
+                <span>Comissões</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
+
+
 
       <div className="mt-8 transition-all duration-300">
           {activeSubTab === 'dashboard' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
-                { label: 'Total Faturado', value: totalBilled, lightBg: 'bg-blue-50', darkBg: 'dark:bg-blue-900/20', iconColor: 'text-blue-600', icon: Receipt },
-                { label: 'Total Recebido', value: totalReceived, lightBg: 'bg-emerald-50', darkBg: 'dark:bg-emerald-900/20', iconColor: 'text-emerald-600', icon: CheckCircle },
-                { label: 'A Receber', value: totalToReceive, lightBg: 'bg-amber-50', darkBg: 'dark:bg-amber-900/20', iconColor: 'text-amber-600', icon: Clock },
-                { label: 'Valor Atrasado', value: totalOverdue, lightBg: 'bg-rose-50', darkBg: 'dark:bg-rose-900/20', iconColor: 'text-rose-600', icon: CircleDollarSign }
+                { label: 'Total Faturado (Bruto)', value: totalBilled, lightBg: 'bg-indigo-50', darkBg: 'dark:bg-indigo-900/20', iconColor: 'text-indigo-600', icon: Receipt },
+                { label: 'Total Recebido (Líquido)', value: totalReceived, lightBg: 'bg-emerald-50', darkBg: 'dark:bg-emerald-900/20', iconColor: 'text-emerald-600', icon: CheckCircle },
+                { label: 'A Receber (Líquido)', value: totalToReceive, lightBg: 'bg-amber-50', darkBg: 'dark:bg-amber-900/20', iconColor: 'text-amber-600', icon: Clock },
+                { label: 'Atrasado (Líquido)', value: totalOverdue, lightBg: 'bg-rose-50', darkBg: 'dark:bg-rose-900/20', iconColor: 'text-rose-600', icon: CircleDollarSign }
               ].map((stat, i) => (
                 <motion.div
                   key={stat.label}
@@ -209,11 +324,25 @@ export default function FinanceModule({
           ) : activeSubTab === 'billing' ? (
             <div className="space-y-12">
               <section>
-                <div className="flex items-center justify-between mb-8">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                   <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center">
                     <div className="w-2 h-8 bg-indigo-600 rounded-full mr-4"></div>
                     Status Financeiro das Ordens de Serviço
                   </h3>
+
+                  <div className="flex items-center gap-3 bg-white dark:bg-slate-900 p-1.5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+                    <Filter className="w-4 h-4 text-indigo-500 ml-2" />
+                    <select
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value as any)}
+                      className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer uppercase tracking-widest"
+                    >
+                      <option value="ALL">TODOS OS STATUS</option>
+                      {Object.values(InstrumentStatus).map(status => (
+                        <option key={status} value={status}>{status.toUpperCase()}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 <div className="rectilinear-container custom-scrollbar shadow-sm">
@@ -222,12 +351,34 @@ export default function FinanceModule({
                       <tr>
                         <th className="rectilinear-th col-md text-center pl-8">O.S. / Orç.</th>
                         <th className="rectilinear-th col-lg text-center">Cliente / Empresa Solicitante</th>
+                        <th className="rectilinear-th col-sm text-center">Data Limite NF</th>
                         <th className="rectilinear-th col-md text-center">Status Interno</th>
                         <th className="rectilinear-th col-md text-center pr-8">Ações</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
                       {serviceOrders
+                        .filter(order => {
+                          if (statusFilter !== 'ALL' && order.statusServico !== statusFilter) return false;
+                          if (!searchQuery) return true;
+                          const quote = quotes.find(q => q.id === order.orcamentoId);
+                          const client = clients.find(c => c.id === quote?.clienteId);
+                          const term = searchQuery.toLowerCase().trim();
+                          const digits = term.replace(/\D/g, '');
+
+                          const matchesText = (order.id || "").toLowerCase().includes(term) ||
+                                             (order.orcamentoId || "").toLowerCase().includes(term) ||
+                                             client?.razaoSocial?.toLowerCase().includes(term);
+                          if (matchesText) return true;
+
+                          if (digits && digits.length >= 3) {
+                              const osDigits = (order.id || "").replace(/\D/g, '');
+                              const quoteDigits = (order.orcamentoId || "").replace(/\D/g, '');
+                              const cnpjDigits = (client?.cnpj || "").replace(/\D/g, '');
+                              if (osDigits.includes(digits) || quoteDigits.includes(digits) || cnpjDigits.includes(digits)) return true;
+                          }
+                          return false;
+                        })
                         .map((order) => {
                           const quote = quotes.find(q => q.id === order.orcamentoId);
                           const client = clients.find(c => c.id === quote?.clienteId);
@@ -241,13 +392,11 @@ export default function FinanceModule({
                               <td className="rectilinear-td text-left font-bold text-slate-700 dark:text-slate-300 truncate" title={client?.razaoSocial}>
                                 {client?.razaoSocial || '—'}
                               </td>
+                              <td className="rectilinear-td text-center font-bold text-slate-500 tabular-nums text-xs">
+                                {client?.dataLimiteNF || '—'}
+                              </td>
                               <td className="rectilinear-td text-center">
-                                <span className={`px-3 py-1 text-[10px] font-black rounded-xl uppercase tracking-wider ${order.statusServico === 'Concluído'
-                                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30'
-                                  : 'bg-amber-50 text-amber-700 dark:bg-amber-900/30'
-                                  }`}>
-                                  {order.statusServico}
-                                </span>
+                                {getInternalStatusBadge(order.statusServico)}
                               </td>
                               <td className="rectilinear-td text-center pr-8">
                                 <button
@@ -285,7 +434,8 @@ export default function FinanceModule({
                         <th className="rectilinear-th col-lg text-center">Cliente Pagador</th>
                         <th className="rectilinear-th col-md text-center">Valores (L / B)</th>
                         <th className="rectilinear-th col-md text-center">Referência O.S.</th>
-                        <th className="rectilinear-th col-sm text-center">Status</th>
+                        <th className="rectilinear-th col-md text-center">Status</th>
+                        <th className="rectilinear-th col-md text-center">Data Pagam.</th>
                         <th className="rectilinear-th col-sm text-center pr-8">Ações</th>
                       </tr>
                     </thead>
@@ -296,7 +446,9 @@ export default function FinanceModule({
                           <tr key={fc.numeroNF} className="rectilinear-tr group">
                             <td className="rectilinear-td text-center pl-8">
                               <div className="font-black text-slate-900 dark:text-white tabular-nums">{fc.numeroNF}</div>
-                              <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">{fc.dataEmissao}</div>
+                              <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">
+                                {fc.dataEmissao.split('-').reverse().join('/')}
+                              </div>
                             </td>
                             <td className="rectilinear-td text-left font-bold text-slate-700 dark:text-slate-300 truncate" title={client?.razaoSocial}>
                               {client?.razaoSocial || '—'}
@@ -304,21 +456,44 @@ export default function FinanceModule({
                             <td className="rectilinear-td text-center">
                               <div className="flex flex-col items-center">
                                 <span className="text-xs font-black text-indigo-600 tabular-nums">L: {formatNumber(fc.valorLiquido ?? 0)}</span>
-                                <span className="text-[9px] text-slate-400 opacity-50 line-through tabular-nums">B: {formatNumber(fc.valorBruto ?? 0)}</span>
+                                <span className="text-[9px] text-slate-400 font-bold tabular-nums">B: {formatNumber(fc.valorBruto ?? 0)}</span>
                               </div>
                             </td>
                             <td className="rectilinear-td text-center text-xs font-black text-slate-500 uppercase tabular-nums">
                                 {fc.serviceOrderId}
                             </td>
                             <td className="rectilinear-td text-center">
-                                <div className="flex justify-center">
-                                    <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${
-                                        fc.statusPagamento === PaymentStatus.PAID ? 'bg-emerald-50 text-emerald-600' :
-                                        fc.statusPagamento === PaymentStatus.PENDING ? 'bg-amber-50 text-amber-600' :
-                                        'bg-rose-50 text-rose-600'
-                                    }`}>
-                                        {fc.statusPagamento}
-                                    </span>
+                                <div className="flex justify-center min-w-[100px]">
+                                    {(() => {
+                                        const isPaid = !!fc.dataPagamentoReal;
+                                        const isOverdue = !isPaid && fc.dataPagamento && new Date().toISOString().substring(0, 10) > fc.dataPagamento;
+                                        const status = isPaid ? PaymentStatus.PAID : (isOverdue ? PaymentStatus.OVERDUE : PaymentStatus.PENDING);
+                                        
+                                        return (
+                                            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm border ${
+                                                status === PaymentStatus.PAID ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
+                                                status === PaymentStatus.OVERDUE ? 'bg-rose-100 text-rose-700 border-rose-200' :
+                                                'bg-amber-100 text-amber-700 border-amber-200'
+                                            }`}>
+                                                {status}
+                                            </span>
+                                        );
+                                    })()}
+                                </div>
+                            </td>
+                            <td className="rectilinear-td text-center">
+                                <div className="flex flex-col items-center">
+                                    <input 
+                                        type="date"
+                                        className="text-xs border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1.5 rounded-lg text-slate-700 dark:text-slate-200 font-bold focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer transition-all"
+                                        value={fc.dataPagamentoReal || ''}
+                                        onChange={(e) => onSaveFinancialControl({ 
+                                            ...fc, 
+                                            dataPagamentoReal: e.target.value || undefined,
+                                            statusPagamento: e.target.value ? PaymentStatus.PAID : (fc.dataPagamento && new Date().toISOString().substring(0, 10) > fc.dataPagamento ? PaymentStatus.OVERDUE : PaymentStatus.PENDING) 
+                                        })}
+                                        title="Clique para definir a data de pagamento"
+                                    />
                                 </div>
                             </td>
                             <td className="rectilinear-td text-center pr-8">
@@ -374,8 +549,19 @@ export default function FinanceModule({
                             <td className="rectilinear-td text-center text-xs font-bold text-indigo-600">
                               {fc.orcamentoId}
                             </td>
-                            <td className="rectilinear-td text-center font-bold text-slate-700">
-                              {quote?.nomeComissionado || '—'}
+                            <td className="rectilinear-td text-center">
+                              <input
+                                type="text"
+                                className="w-full text-center border-none bg-transparent font-bold text-slate-700 dark:text-slate-300 outline-none hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-indigo-500 rounded px-2 py-1 transition-all"
+                                value={quote?.nomeComissionado || quote?.criadoPor || ''}
+                                placeholder="—"
+                                onChange={(e) => {
+                                  if (quote && onSaveQuote) {
+                                    onSaveQuote({ ...quote, nomeComissionado: e.target.value });
+                                  }
+                                }}
+                                title="Editar nome do comissionado"
+                              />
                             </td>
                             <td className="rectilinear-td text-center text-sm font-black text-slate-500 tabular-nums">
                               R$ {formatNumber(fc.valorBruto ?? 0)}
@@ -421,6 +607,7 @@ export default function FinanceModule({
         quotes={quotes}
         clients={clients}
         paymentMethods={paymentMethods}
+        banks={banks}
       />
     </div>
   );

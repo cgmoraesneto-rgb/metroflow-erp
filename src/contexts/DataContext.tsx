@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { z } from 'zod';
 import { db, auth } from '../firebaseConfig';
 import {
-  Client, Quote, ServiceOrder, StandardInstrument, CalibrationRecord,
+  Client, Quote, ServiceOrder, StandardInstrument, CalibrationRecord, CalibrationResult,
   FinancialControl, Employee, InstrumentType, CertificateMask, Procedure,
   PaymentMethod, Bank, UnitOfMeasure, ClientStatus, CertificateStatus, Module,
   StandardCustody, FleetLog, Vehicle, DocumentTemplate
@@ -25,6 +25,7 @@ interface DataContextType {
   serviceOrders: ServiceOrder[];
   standardInstruments: StandardInstrument[];
   calibrationRecords: CalibrationRecord[];
+  calibrationResults: CalibrationResult[];
   financialControls: FinancialControl[];
   employees: Employee[];
   priceTables: any[];
@@ -44,6 +45,8 @@ interface DataContextType {
   deleteItem: (collectionName: string, id: string) => Promise<void>;
   hasPermission: (module: Module) => boolean;
   addClient: () => Promise<void>;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -61,11 +64,13 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isSyncing, setIsSyncing] = useState(false);
 
   // State Management
+  const [searchQuery, setSearchQuery] = useState('');
   const [clients, setClients] = useState<Client[]>([]);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [serviceOrders, setServiceOrders] = useState<ServiceOrder[]>([]);
   const [standardInstruments, setStandardInstruments] = useState<StandardInstrument[]>([]);
   const [calibrationRecords, setCalibrationRecords] = useState<CalibrationRecord[]>([]);
+  const [calibrationResults, setCalibrationResults] = useState<CalibrationResult[]>([]);
   const [financialControls, setFinancialControls] = useState<FinancialControl[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [priceTables, setPriceTables] = useState<any[]>([]);
@@ -99,6 +104,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       case 'service_orders': return { state: serviceOrders, setter: setServiceOrders, save: tecnicoService.saveServiceOrder };
       case 'standard_instruments': return { state: standardInstruments, setter: setStandardInstruments, save: tecnicoService.saveStandardInstrument };
       case 'calibration_records': return { state: calibrationRecords, setter: setCalibrationRecords, save: tecnicoService.saveCalibrationRecord };
+      case 'calibration_results': return { state: calibrationResults, setter: setCalibrationResults, save: tecnicoService.saveCalibrationResult };
       case 'financial_controls': return { state: financialControls, setter: setFinancialControls, save: financeiroService.saveFinancialControl };
       case 'fleet_logs': return { state: fleetLogs, setter: setFleetLogs, save: logisticaService.saveFleetLog };
       case 'standard_custodies': return { state: standardCustodies, setter: setStandardCustodies, save: logisticaService.saveStandardCustody };
@@ -229,7 +235,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (nid > maxId) maxId = nid;
       }
     });
-    const newId = (maxId + 1).toString().padStart(4, '0');
+    const newId = (maxId + 1).toString().padStart(3, '0');
     
     await saveItem('clients', {
       id: newId,
@@ -243,15 +249,13 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const fetchAllData = async () => {
     setIsSyncing(true);
     try {
-      const [
-        clientsData, quotesData, soData, stdData, calData, finData, 
-        empData, fleetData, vehData, custodyData
-      ] = await Promise.all([
+      const results = await Promise.allSettled([
         comercialService.getClients(),
         comercialService.getQuotes(),
         tecnicoService.getServiceOrders(),
         tecnicoService.getStandardInstruments(),
         tecnicoService.getCalibrationRecords(),
+        tecnicoService.getCalibrationResults(),
         financeiroService.getFinancialControls(),
         apiClient.fetch<Employee>('/api/mock/employees'),
         logisticaService.getFleetLogs(),
@@ -259,19 +263,28 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         logisticaService.getStandardCustodies()
       ]);
 
-      setClients(clientsData);
-      setQuotes(quotesData);
-      setServiceOrders(soData);
-      setStandardInstruments(stdData);
-      setCalibrationRecords(calData);
-      setFinancialControls(finData);
-      setEmployees(empData);
-      setFleetLogs(fleetData);
-      setVehicles(vehData);
-      setStandardCustodies(custodyData);
+      const safeGet = (r: PromiseSettledResult<any>, fallback: any[] = []) => {
+        if (r.status === 'fulfilled') return r.value ?? fallback;
+        console.warn('Collection fetch failed, using fallback:', (r as PromiseRejectedResult).reason);
+        return fallback;
+      };
+
+      const [clientsData, quotesData, soData, stdData, calData, resData, finData, empData, fleetData, vehData, custodyData] = results;
+
+      setClients(safeGet(clientsData));
+      setQuotes(safeGet(quotesData));
+      setServiceOrders(safeGet(soData));
+      setStandardInstruments(safeGet(stdData));
+      setCalibrationRecords(safeGet(calData));
+      setCalibrationResults(safeGet(resData));
+      setFinancialControls(safeGet(finData));
+      setEmployees(safeGet(empData));
+      setFleetLogs(safeGet(fleetData));
+      setVehicles(safeGet(vehData));
+      setStandardCustodies(safeGet(custodyData));
 
       // Fetch secondary collections via apiClient (Firestore)
-      const [ptData, itData, cmData, procData, pmData, bankData, uomData, dtRawData] = await Promise.all([
+      const secondaryResults = await Promise.allSettled([
         apiClient.fetch<any>('/api/mock/price_tables'),
         apiClient.fetch<InstrumentType>('/api/mock/instrument_types'),
         apiClient.fetch<CertificateMask>('/api/mock/certificate_masks'),
@@ -282,13 +295,16 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         apiClient.fetch<DocumentTemplate>('/api/mock/document_templates'),
       ]);
 
-      setPriceTables(ptData);
-      setInstrumentTypes(itData);
-      setCertificateMasks(cmData);
-      setProcedures(procData);
-      setPaymentMethods(pmData);
-      setBanks(bankData);
-      setUnitsOfMeasure(uomData);
+      const [ptData, itData, cmData, procData, pmData, bankData, uomData, dtRawResult] = secondaryResults;
+      const dtRawData = safeGet(dtRawResult);
+
+      setPriceTables(safeGet(ptData));
+      setInstrumentTypes(safeGet(itData));
+      setCertificateMasks(safeGet(cmData));
+      setProcedures(safeGet(procData));
+      setPaymentMethods(safeGet(pmData));
+      setBanks(safeGet(bankData));
+      setUnitsOfMeasure(safeGet(uomData));
       setDocumentTemplates(dtRawData);
 
       // Initialize default document template configurations if missing
@@ -352,11 +368,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <DataContext.Provider value={{
-      clients, quotes, serviceOrders, standardInstruments, calibrationRecords,
+      clients, quotes, serviceOrders, standardInstruments, calibrationRecords, calibrationResults,
       financialControls, employees, priceTables, instrumentTypes, certificateMasks,
       procedures, paymentMethods, banks, unitsOfMeasure,
       standardCustodies, fleetLogs, vehicles, documentTemplates,
-      loading, isSyncing, saveItem, deleteItem, hasPermission, addClient
+      loading, isSyncing, saveItem, deleteItem, hasPermission, addClient,
+      searchQuery, setSearchQuery
     }}>
       {children}
     </DataContext.Provider>

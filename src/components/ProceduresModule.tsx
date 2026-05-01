@@ -17,18 +17,22 @@ import {
 
 interface ProceduresModuleProps {
   procedures: Procedure[];
-  onSaveProcedure: (proc: any) => void;
+  onSaveProcedure: (procedure: Omit<Procedure, 'id'> | Procedure) => void;
   onDeleteProcedure: (id: string) => void;
+  searchQuery?: string;
 }
 
 export default function ProceduresModule({ 
   procedures, 
   onSaveProcedure, 
-  onDeleteProcedure 
+  onDeleteProcedure,
+  searchQuery
 }: ProceduresModuleProps) {
   const [newProcedure, setNewProcedure] = useState<Omit<Procedure, 'id'>>({ title: '', content: '' });
   const [editingProcedure, setEditingProcedure] = useState<Procedure | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [localSearchTerm, setLocalSearchTerm] = useState('');
+  
+  const effectiveSearch = searchQuery !== undefined ? searchQuery : localSearchTerm;
   
   // View mode management
   const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
@@ -53,8 +57,8 @@ export default function ProceduresModule({
   };
 
   const filteredProcedures = procedures.filter(proc =>
-    proc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    proc.content.toLowerCase().includes(searchTerm.toLowerCase())
+    proc.title.toLowerCase().includes(effectiveSearch.toLowerCase()) ||
+    proc.content.toLowerCase().includes(effectiveSearch.toLowerCase())
   );
 
   return (
@@ -126,8 +130,9 @@ export default function ProceduresModule({
                 type="text" 
                 placeholder="Pesquisar procedimentos..." 
                 className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 outline-none font-bold text-sm transition-all dark:text-white"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                value={effectiveSearch}
+                onChange={(e) => searchQuery !== undefined ? null : setLocalSearchTerm(e.target.value)}
+                readOnly={searchQuery !== undefined}
             />
         </div>
         <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest hidden md:block">

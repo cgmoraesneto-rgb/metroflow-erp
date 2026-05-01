@@ -23,6 +23,7 @@ export interface Client {
   senha?: string; // Para portal do cliente
   inscricaoMunicipal?: string;
   inscricaoEstadual?: string;
+  dataLimiteNF?: string;
 }
 
 export interface DocumentTemplate {
@@ -207,7 +208,10 @@ export interface CustodyItem {
 export interface StandardCustody {
   id: string;
   items: CustodyItem[];
+  origem: string;
+  responsavelOrigem: string;
   destino: string;
+  responsavelDestino: string;
   dataSaida: string;
   dataRetorno?: string;
   responsavel: string;
@@ -231,7 +235,7 @@ export interface FleetLog {
 }
 
 export interface StandardInstrument {
-  id: string;
+  id?: string;
   nome: string;
   identificacao: string;
   certificadoCalibracao: string;
@@ -240,9 +244,10 @@ export interface StandardInstrument {
   orgaoCalibrador: string;
   periodicidade: string;
   dataValidadeCalibracao: string;
-  traceabilityChain: string[]; // Phase 3: ISO 17025
+  traceabilityChain?: string[]; // Phase 3: ISO 17025
   resolucao: string;
   uncertainty?: number;
+  kFactor?: number; // Fator de abrangência (Metrológico)
   unidadeMedida: string;
   statusMovimentacao: 'Disponível' | 'Vencido' | 'Em calibração' | 'Em manutenção' | 'Emprestado';
 }
@@ -296,6 +301,8 @@ export interface CalibrationGroupRecord {
   hiddenColumns?: string[]; // columns hidden in the client certificate
   formulas?: Record<string, string>; // formula definitions per column
   rows: CalibrationRow[];
+  blockId?: string; // LOGICAL BLOCK ID (e.g. A, B, C)
+  isDynamic?: boolean; // If rows can be added/removed
 }
 
 export interface CalibrationRecord {
@@ -370,6 +377,10 @@ export interface CalibrationRecord {
   // Phase 4.6: Approval Workflow
   signedBy?: string[]; // IDs of signers (Tech, Reviewer, Approver)
   approvedAt?: string; // ISO final sign-off
+
+  // Data Integrity: Snapshot of standards used at the time of calibration
+  standardInstrumentsSnapshot?: StandardInstrument[];
+  envStandardInstrumentSnapshot?: StandardInstrument;
 }
 
 export interface ExecutionSnapshot {
@@ -392,10 +403,12 @@ export interface FinancialControl {
   numeroNF: string;
   dataEmissao: string;
   valorBruto: number;
+  percentualImposto?: number;
   impostosRetidos: number;
   desconto: number;
   valorLiquido: number;
   dataPagamento?: string;
+  dataPagamentoReal?: string;
   formaPagamento: string;
   banco: string;
   comissao: number;
@@ -416,6 +429,7 @@ export interface PriceTableItem {
   ensaio: number;
   teste: number;
   qualificacao: number;
+  logistica: number;
 }
 
 export interface PriceTable {
@@ -487,11 +501,13 @@ export enum ColumnType {
   DESVIO_PADRAO = "DESVIO_PADRAO",
   INCERTEZA = "INCERTEZA",
   CONFORMIDADE = "CONFORMIDADE",
-  TEXTO = "TEXTO"
+  TEXTO = "TEXTO",
+  NUMBER = "NUMBER"
 }
 
 export enum ColumnBehavior {
   INPUT = "INPUT",
+  MANUAL = "MANUAL",
   CALCULATED = "CALCULATED",
   DERIVED = "DERIVED",
   METROLOGY = "METROLOGY"
@@ -524,6 +540,8 @@ export interface ColumnDefinition {
   behavior: ColumnBehavior; // Required behavior control
   metrologyField?: MetrologyField; // Field from metrology engine
   formula?: string; // Excel-like formula
+  decimalPlaces?: number;
+  displayFormat?: string;
 }
 
 export interface MeasurementGroup {
@@ -534,6 +552,10 @@ export interface MeasurementGroup {
   formulas?: Record<string, string>;
   hasGraph?: boolean;
   graphType?: 'error_curve' | 'uncertainty_band';
+  numberOfPoints?: number;  // Per-group override
+  repetitions?: number;     // Per-group override
+  blockId?: string;
+  isDynamic?: boolean;
 }
 
 export interface StandardInstrumentUncertainty {
@@ -545,6 +567,7 @@ export interface StandardInstrumentUncertainty {
 export interface CertificateMask {
   id: string;
   title: string;
+  description?: string;
   procedureId: string;
   standardInstrumentIds: string[];
   standardInstrumentUncertainties?: StandardInstrumentUncertainty[];
@@ -563,6 +586,10 @@ export interface CertificateMask {
   isActive?: boolean;
   version?: number;
   validityMonths?: number; // Para cálculo automático no PDF
+  createdAt?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  uncertaintyBudget?: any[];
 }
 
 export interface MaskVersion extends CertificateMask {

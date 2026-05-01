@@ -1,216 +1,122 @@
-import { ColumnDefinition, ColumnType, ColumnBehavior, CellValue, RowData, ExecutionResult, ExecutionTrace, ExecutionSnapshot } from '../types';
-import { evaluate, extractColumnDependencies } from './formulaParser';
-import { executeMetrology } from './metrologyEngine';
+import { 
+  CalibrationGroupRecord, 
+  StandardInstrumentUncertainty,
+  ColumnBehavior
+} from '../types';
+import { evaluate } from './formulaParser';
 
 /**
- * Builds a topological sort order for column execution
+ * Motor de Cálculo MetroFlow
+ * Realiza cálculos metrológicos robustos e avalia fórmulas dinâmicas.
  */
-export function getExecutionOrder(definitions: ColumnDefinition[]): ColumnDefinition[] {
-  const order: ColumnDefinition[] = [];
-  const visited = new Set<string>();
-  const visiting = new Set<string>();
-  const defMap = new Map<string, ColumnDefinition>();
-  definitions.forEach(d => defMap.set(d.id, d));
 
-  function visit(id: string) {
-    if (visiting.has(id)) throw new Error('Depêndencia circular detectada!');
-    if (visited.has(id)) return;
+export const executeRow = (
+  row: any, 
+  globalValues: Record<string, number>,
+  columnDefinitions: any[]
+) => {
+  const results: Record<string, any> = { ...row };
+  const trace: Record<string, { formula: string, output: any }> = {};
 
-    visiting.add(id);
-    const def = defMap.get(id);
-    if (def && def.formula) {
-      const deps = extractColumnDependencies(def.formula);
-      deps.forEach(depId => visit(depId));
+  // 1. Extrair valores numéricos da linha para o contexto da fórmula
+  const rowContext: Record<string, number> = { ...globalValues };
+  columnDefinitions.forEach(col => {
+    const val = row[col.id];
+    if (val !== undefined && val !== '') {
+      // Replaces all commas with dots to ensure correct parsing in PT-BR context
+      rowContext[col.id] = parseFloat(String(val).replace(/,/g, '.')) || 0;
     }
-    visiting.delete(id);
-    visited.add(id);
-    if (def) order.push(def);
-  }
+  });
 
-  definitions.forEach(d => visit(d.id));
-  return order;
-}
+  // 2. Processar colunas que possuem fórmulas
+  columnDefinitions.forEach(col => {
+    if (col.behavior === ColumnBehavior.CALCULATED && col.formula) {
+      try {
+        const cleanFormula = col.formula.startsWith('=') ? col.formula.substring(1) : col.formula;
+        const result = evaluate(cleanFormula, rowContext);
+        
+        results[col.id] = result;
+        trace[col.id] = { formula: col.formula, output: result };
+        
+        // Atualizar contexto para fórmulas subsequentes na mesma linha
+        rowContext[col.id] = result;
+      } catch (e) {
+        results[col.id] = 'Erro';
+        trace[col.id] = { formula: col.formula, output: 'Erro na fórmula' };
+      }
+    }
+  });
 
-/**
- * Industrial execution engine for a single row
- */
-export function executeRow(
-  rowData: RowData,
-  definitions: ColumnDefinition[],
-  metrologyContext?: {
-    readings: number[];
-    vvc: number;
-    resolution: number;
-    uncertainties: any[];
-  },
-  enableTrace: boolean = false
-): ExecutionResult {
-  const values = { ...rowData };
-  const errors: Record<string, string> = {};
-  const trace: ExecutionTrace = {};
+  return { results, trace };
+};
+
+export const executeDocument = (
+  data: { groups: CalibrationGroupRecord[] },
+  standardInstruments: any[],
+  globalContext: Record<string, number> = {},
+  standardDetails: StandardInstrumentUncertainty[] = [],
+  metrologyContext: { resolution?: number } = {}
+) => {
+  const results: Record<string, any> = {};
   
-  // 1. Resolve Order
-  let order: ColumnDefinition[];
-  try {
-    order = getExecutionOrder(definitions);
-  } catch (e: any) {
-    return { values, errors: { global: e.message } };
-  }
+  // 1. Calcular U_PADRAO Combinada (RSS - Root Sum Square)
+  // U_total = sqrt( U1^2 + U2^2 + ... )
+  let sumSq = 0;
+  let maxK = 2.0;
 
-  // 2. Compute Metrology Context if available (Source of Truth)
-  let metrologyResult: any = null;
-  if (metrologyContext) {
-    metrologyResult = executeMetrology(
-      metrologyContext.readings,
-      metrologyContext.uncertainties,
-      metrologyContext.resolution,
-      metrologyContext.vvc
-    );
-  }
-
-  // 3. Execute in Order
-  order.forEach((def, index) => {
-    try {
-      if (def.behavior === ColumnBehavior.METROLOGY && def.metrologyField) {
-        if (metrologyResult) {
-           values[def.id] = metrologyResult[def.metrologyField];
-           
-           if (enableTrace) {
-             trace[def.id] = {
-               formula: `metrology:${def.metrologyField}`,
-               dependencies: [],
-               inputs: {},
-               output: values[def.id],
-               executionIndex: index,
-               timestamp: Date.now()
-             };
-           }
-        }
-      } else if (def.behavior === ColumnBehavior.CALCULATED && def.formula) {
-        const deps = extractColumnDependencies(def.formula);
-        const inputs: Record<string, CellValue> = {};
-        deps.forEach(d => inputs[d] = values[d]);
-
-        values[def.id] = evaluate(def.formula, values);
-
-        if (enableTrace) {
-          trace[def.id] = {
-            formula: def.formula,
-            dependencies: deps,
-            inputs: inputs,
-            output: values[def.id],
-            executionIndex: index,
-            timestamp: Date.now()
-          };
-        }
-      }
-    } catch (err: any) {
-      values[def.id] = null;
-      errors[def.id] = err.message;
+  standardDetails.forEach(detail => {
+    const u = detail.declaredU || 0;
+    sumSq += (u * u);
+    if (detail.certificateK && detail.certificateK > maxK) {
+      maxK = detail.certificateK;
     }
   });
 
-  return { values, errors, trace: enableTrace ? trace : undefined };
-}
+  const combinedUPadrao = Math.sqrt(sumSq);
 
-/**
- * Milestone 6: Captures a full execution snapshot for a mask/result pair.
- * Ensures that if the mask is edited later, the historical record remains frozen.
- */
-export async function captureSnapshot(
-    groups: any[],
-    definitions: ColumnDefinition[]
-): Promise<ExecutionSnapshot> {
-    const rowData: Record<string, CellValue> = {};
-    const computedValues: Record<string, number> = {};
-    const formulas: Record<string, string> = {};
-    
-    // Aggregate data across all groups
-    groups.forEach(group => {
-        group.rows.forEach((row: any, idx: number) => {
-            const rowKeyPrefix = `${group.name}_row${idx}_`;
-            definitions.forEach(def => {
-                rowData[`${rowKeyPrefix}${def.id}`] = row[def.id];
-            });
-        });
+  // 2. Preparar valores globais (TAGS fixas)
+  const globalValues: Record<string, number> = {
+    ...globalContext,
+    'U_PADRAO': combinedUPadrao,
+    'K_PADRAO': maxK,
+    'RESOLUCAO': metrologyContext.resolution || 0
+  };
+
+  // 3. Processar cada grupo e linha
+  data.groups.forEach(group => {
+    group.rows.forEach((row, ri) => {
+      const rowResult = executeRow(row, globalValues, group.columnDefinitions || []);
+      const key = `${group.blockId || group.name}_row${ri}`;
+      results[key] = {
+        ...rowResult.results,
+        trace: rowResult.trace
+      };
     });
-
-    const executionOrder = getExecutionOrder(definitions).map(d => d.id);
-    definitions.forEach(d => {
-        if (d.formula) formulas[d.id] = d.formula;
-    });
-
-    const snapshot: Omit<ExecutionSnapshot, 'hash'> = {
-        rowData,
-        computedValues,
-        executionOrder,
-        formulas,
-        timestamp: new Date().toISOString()
-    };
-
-    // Calculate integrity hash
-    const snapshotString = JSON.stringify(snapshot);
-    const hash = await import('./auditEngine').then(m => m.sha256(snapshotString));
-
-    return {
-        ...snapshot,
-        hash
-    };
-}
-
-/**
- * Helper to identify which columns need recalculating when one changes
- */
-export function getAffectedColumns(changedId: string, definitions: ColumnDefinition[]): string[] {
-  const affected: string[] = [];
-  const defMap = new Map<string, ColumnDefinition>();
-  definitions.forEach(d => defMap.set(d.id, d));
-
-  function search(id: string) {
-    definitions.forEach(d => {
-      if (d.formula && extractColumnDependencies(d.formula).includes(id)) {
-        if (!affected.includes(d.id)) {
-          affected.push(d.id);
-          search(d.id);
-        }
-      }
-    });
-  }
-
-  search(changedId);
-  return affected;
-}
-
-/**
- * Migration utility for legacy name-based formulas
- */
-export function migrateFormula(formula: string, columns: ColumnDefinition[]): string {
-  let migrated = formula;
-  columns.forEach(col => {
-    // Regex to match [Name] specifically (not partially)
-    const escapedName = col.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`\\[${escapedName}\\]`, 'g');
-    migrated = migrated.replace(regex, `[${col.id}]`);
   });
-  return migrated;
-}
 
-export function validateFormula(formula: string, columns: ColumnDefinition[]): { valid: boolean; error?: string } {
-  try {
-    const deps = extractColumnDependencies(formula);
-    const validIds = new Set(columns.map(c => c.id));
-    for (const depId of deps) {
-      if (!validIds.has(depId)) return { valid: false, error: `Referência desconhecida: ${depId}` };
-    }
-    
-    // Check syntax
-    evaluate(formula, Object.fromEntries(columns.map(c => [c.id, 0])));
-    
-    // Check circular dependencies by simulating execution order
-    getExecutionOrder(columns);
-    
-    return { valid: true };
-  } catch (e: any) {
-    return { valid: false, error: e.message };
-  }
-}
+  return { results };
+};
+
+export const captureSnapshot = async (
+  groups: CalibrationGroupRecord[],
+  columnDefinitions: any[]
+) => {
+  const rowData: Record<string, any> = {};
+  const computedValues: Record<string, any> = {};
+  
+  groups.forEach(group => {
+    group.rows.forEach((row, ri) => {
+      const key = `${group.blockId || group.name}_row${ri}`;
+      rowData[key] = row;
+    });
+  });
+
+  return {
+    rowData,
+    computedValues,
+    executionOrder: [],
+    formulas: {},
+    timestamp: new Date().toISOString(),
+    hash: 'audit-' + Date.now()
+  };
+};

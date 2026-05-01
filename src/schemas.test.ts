@@ -25,12 +25,12 @@ describe('ClientSchema Validation', () => {
         expect(result.success).toBe(true);
     });
 
-    it('should fail if razaoSocial is too short', () => {
-        const invalidClient = { ...validClient, razaoSocial: 'Me' };
+    it('should fail if razaoSocial is empty', () => {
+        const invalidClient = { ...validClient, razaoSocial: '' };
         const result = ClientSchema.safeParse(invalidClient);
         expect(result.success).toBe(false);
         if (!result.success) {
-            expect(result.error.issues[0].message).toBe('Razão Social deve ter pelo menos 3 caracteres');
+            expect(result.error.issues[0].message).toBe('Razão Social é obrigatória');
         }
     });
 

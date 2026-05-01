@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FinancialControl, ServiceOrder, Quote, Client, PaymentStatus, PaymentMethod } from '../types';
+import { FinancialControl, ServiceOrder, Quote, Client, PaymentStatus, PaymentMethod, Bank } from '../types';
 
 interface InvoiceModalProps {
   isOpen: boolean;
@@ -10,9 +10,10 @@ interface InvoiceModalProps {
   quotes: Quote[];
   clients: Client[];
   paymentMethods: PaymentMethod[];
+  banks: Bank[];
 }
 
-export default function InvoiceModal({ isOpen, onClose, onSave, initialData, serviceOrder, quotes, clients, paymentMethods }: InvoiceModalProps) {
+export default function InvoiceModal({ isOpen, onClose, onSave, initialData, serviceOrder, quotes, clients, paymentMethods, banks }: InvoiceModalProps) {
   const [invoiceData, setInvoiceData] = useState<Partial<FinancialControl>>({});
 
   useEffect(() => {
@@ -30,10 +31,10 @@ export default function InvoiceModal({ isOpen, onClose, onSave, initialData, ser
         orcamentoId: serviceOrder.orcamentoId,
         clienteId: client?.id,
         valorBruto: valorBruto,
-        impostosRetidos: impostosRetidos,
+        percentualImposto: 5,
+        impostosRetidos: valorBruto * 0.05,
         desconto: 0,
-        valorLiquido: valorBruto - impostosRetidos,
-        comissao: 0, // Inicia em 0 para preenchimento manual conforme necessidade do faturamento
+        valorLiquido: valorBruto - (valorBruto * 0.05),
         statusPagamento: PaymentStatus.PENDING,
         formaPagamento: quote?.formaPagamento || '',
         banco: '',
@@ -43,15 +44,30 @@ export default function InvoiceModal({ isOpen, onClose, onSave, initialData, ser
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    const numericValue = ['valorBruto', 'impostosRetidos', 'desconto', 'valorLiquido', 'comissao'].includes(name) ? parseFloat(value) || 0 : value;
-    setInvoiceData(prev => ({ ...prev, [name]: numericValue }));
+    const numericValue = ['valorBruto', 'impostosRetidos', 'desconto', 'valorLiquido', 'percentualImposto'].includes(name) ? parseFloat(value) || 0 : value;
+    
+    setInvoiceData(prev => {
+      const updated = { ...prev, [name]: numericValue };
+      
+      // Auto-calculate tax if valorBruto or percentualImposto changes
+      if (name === 'valorBruto' || name === 'percentualImposto') {
+        const bruto = name === 'valorBruto' ? numericValue as number : (prev.valorBruto || 0);
+        const perc = name === 'percentualImposto' ? numericValue as number : (prev.percentualImposto || 5);
+        updated.impostosRetidos = bruto * (perc / 100);
+      }
+      
+      return updated;
+    });
   };
 
   useEffect(() => {
     const valorBruto = invoiceData.valorBruto || 0;
     const impostosRetidos = invoiceData.impostosRetidos || 0;
     const desconto = invoiceData.desconto || 0;
-    setInvoiceData(prev => ({ ...prev, valorLiquido: valorBruto - impostosRetidos - desconto }));
+    setInvoiceData(prev => {
+        if (prev.valorLiquido === valorBruto - impostosRetidos - desconto) return prev;
+        return { ...prev, valorLiquido: valorBruto - impostosRetidos - desconto };
+    });
   }, [invoiceData.valorBruto, invoiceData.impostosRetidos, invoiceData.desconto]);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -98,9 +114,15 @@ export default function InvoiceModal({ isOpen, onClose, onSave, initialData, ser
             </div>
 
             <div className="space-y-1.5">
+              <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Imposto (%)</label>
+              <input type="number" name="percentualImposto" placeholder="5" value={invoiceData.percentualImposto ?? 5} onChange={handleChange} className="w-full border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium bg-white dark:bg-slate-800 dark:text-white" />
+              <p className="text-[9px] text-gray-400 ml-1 italic">Percentual de imposto para cálculo automático.</p>
+            </div>
+
+            <div className="space-y-1.5">
               <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Impostos Retidos (R$)</label>
-              <input type="number" name="impostosRetidos" placeholder="0.00" value={invoiceData.impostosRetidos || ''} onChange={handleChange} className="w-full border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium bg-white dark:bg-slate-800 dark:text-white" />
-              <p className="text-[9px] text-gray-400 ml-1 italic">Valor de impostos retidos na fonte.</p>
+              <input type="number" name="impostosRetidos" placeholder="0.00" value={invoiceData.impostosRetidos?.toFixed(2) || ''} onChange={handleChange} className="w-full border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium bg-white dark:bg-slate-800 dark:text-white" />
+              <p className="text-[9px] text-gray-400 ml-1 italic">Valor de impostos retidos (Bruto * %).</p>
             </div>
 
             <div className="space-y-1.5">
@@ -140,15 +162,20 @@ export default function InvoiceModal({ isOpen, onClose, onSave, initialData, ser
 
             <div className="space-y-1.5">
               <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Banco / Destino</label>
-              <input type="text" name="banco" placeholder="Ex: Banco do Brasil" value={invoiceData.banco || ''} onChange={handleChange} className="w-full border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium bg-white dark:bg-slate-800 dark:text-white" />
+              <select 
+                name="banco" 
+                value={invoiceData.banco || ''} 
+                onChange={handleChange} 
+                className="w-full border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium bg-white dark:bg-slate-800 dark:text-white appearance-none"
+              >
+                <option value="">Selecione o banco...</option>
+                {banks.map(bank => (
+                  <option key={bank.id} value={bank.nome}>{bank.nome} (AG: {bank.agencia} / CC: {bank.conta})</option>
+                ))}
+              </select>
               <p className="text-[9px] text-gray-400 ml-1 italic">Conta bancária onde o valor será depositado.</p>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Comissão (R$)</label>
-              <input type="number" name="comissao" placeholder="0.00" value={invoiceData.comissao ?? ''} onChange={handleChange} className="w-full border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium bg-white dark:bg-slate-800 dark:text-white" />
-              <p className="text-[9px] text-gray-400 ml-1 italic">Valor destinado ao vendedor/parceiro.</p>
-            </div>
           </div>
 
           <div className="mt-8 flex justify-end space-x-3 border-t border-gray-100 dark:border-slate-800 pt-6 shrink-0">

@@ -171,6 +171,8 @@ export class Parser {
       case 'min': return Math.min(...flatArgs);
       case 'max': return Math.max(...flatArgs);
       case 'abs': return Math.abs(Number(args[0]) || 0);
+      case 'raiz':
+      case 'sqrt': return Math.sqrt(Number(args[0]) || 0);
       default: throw new Error(`Função desconhecida: ${name}`);
     }
   }

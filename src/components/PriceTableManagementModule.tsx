@@ -14,9 +14,10 @@ interface PriceTableManagementModuleProps {
   priceTables: PriceTable[];
   onSavePriceTable: (priceTable: PriceTable) => void;
   onDeletePriceTable: (id: string) => void;
+  searchQuery?: string;
 }
 
-export default function PriceTableManagementModule({ priceTables, onSavePriceTable, onDeletePriceTable }: PriceTableManagementModuleProps) {
+export default function PriceTableManagementModule({ priceTables, onSavePriceTable, onDeletePriceTable, searchQuery }: PriceTableManagementModuleProps) {
   const [newPriceTableName, setNewPriceTableName] = useState('');
   const [editingPriceTableId, setEditingPriceTableId] = useState<string | null>(null);
   const [editingPriceTable, setEditingPriceTable] = useState<PriceTable | null>(null);
@@ -29,6 +30,7 @@ export default function PriceTableManagementModule({ priceTables, onSavePriceTab
     ensaio: 0,
     teste: 0,
     qualificacao: 0,
+    logistica: 0,
   });
 
   const handleAddPriceTable = () => {
@@ -99,6 +101,7 @@ export default function PriceTableManagementModule({ priceTables, onSavePriceTab
         ensaio: 0,
         teste: 0,
         qualificacao: 0,
+        logistica: 0,
       });
     }
   };
@@ -113,6 +116,7 @@ export default function PriceTableManagementModule({ priceTables, onSavePriceTab
       ensaio: item.ensaio,
       teste: item.teste,
       qualificacao: item.qualificacao,
+      logistica: item.logistica || 0,
     });
   };
 
@@ -126,34 +130,38 @@ export default function PriceTableManagementModule({ priceTables, onSavePriceTab
   };
 
   return (
-    <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
-      <div className="mb-10">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Tabelas de Preço</h2>
-        <p className="text-sm text-gray-500 mb-6">Gerencie os valores de calibração e serviços por instrumento.</p>
+    <div className="space-y-6">
+      <div className="mb-6">
 
-        <div className="flex space-x-3 bg-gray-50 p-4 rounded-2xl border border-gray-100">
+        <div className="flex space-x-3 bg-slate-50 dark:bg-slate-900/50 p-6 rounded-3xl border border-slate-100 dark:border-slate-800">
           <div className="relative flex-grow">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
             <input
               type="text"
               placeholder="Nome da nova tabela (ex: Tabela 2024)"
               value={newPriceTableName}
               onChange={(e) => setNewPriceTableName(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium text-sm"
+              className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-sm shadow-sm"
             />
           </div>
           <button
             onClick={handleAddPriceTable}
-            className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all flex items-center"
+            className="px-8 py-3 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-indigo-100 dark:shadow-none transition-all flex items-center group active:scale-95"
           >
-            <Plus className="mr-2 w-4 h-4" />
+            <Plus className="mr-2 w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
             Criar Tabela
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {priceTables.map((table) => (
+        {priceTables
+          .filter(table => {
+            if (!searchQuery) return true;
+            const term = searchQuery.toLowerCase().trim();
+            return table.nome.toLowerCase().includes(term);
+          })
+          .map((table) => (
           <div key={table.id} className="bg-white p-6 rounded-2xl border border-gray-100 hover:border-indigo-200 hover:shadow-md transition-all group">
             <div className="flex justify-between items-start mb-4">
               <div>
@@ -228,11 +236,12 @@ export default function PriceTableManagementModule({ priceTables, onSavePriceTab
                           <th className="py-3 px-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Instrumento</th>
                           <th className="py-3 px-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Rastreável</th>
                           <th className="py-3 px-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Acreditado</th>
+                          <th className="py-3 px-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Logística</th>
                           <th className="py-3 px-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-wider">Ações</th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-100">
-                        {editingPriceTable.items.map((item) => (
+                        {[...editingPriceTable.items].sort((a, b) => a.nomeInstrumento.localeCompare(b.nomeInstrumento, undefined, { numeric: true, sensitivity: 'base' })).map((item) => (
                           <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                             <td className="py-3 px-4 text-sm font-bold text-gray-700">{item.nomeInstrumento}</td>
                             <td className="py-3 px-4 text-sm text-gray-500">
@@ -240,6 +249,9 @@ export default function PriceTableManagementModule({ priceTables, onSavePriceTab
                             </td>
                             <td className="py-3 px-4 text-sm text-gray-500">
                               <FinancialValue value={item.valorAcreditado ?? 0} />
+                            </td>
+                            <td className="py-3 px-4 text-sm text-gray-500">
+                              <FinancialValue value={item.logistica ?? 0} />
                             </td>
                             <td className="py-3 px-4 text-right">
                               <div className="flex justify-end space-x-1">
@@ -344,6 +356,16 @@ export default function PriceTableManagementModule({ priceTables, onSavePriceTab
                       />
                     </div>
                   </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Logística</label>
+                    <input
+                      type="number"
+                      value={newPriceTableItem.logistica}
+                      onChange={(e) => setNewPriceTableItem(prev => ({ ...prev!, logistica: parseFloat(e.target.value) || 0 }))}
+                      className="w-full border border-gray-200 p-2.5 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium text-sm"
+                    />
+                  </div>
                 </div>
 
                 <div className="flex space-x-2">
@@ -351,7 +373,7 @@ export default function PriceTableManagementModule({ priceTables, onSavePriceTab
                     <button
                       onClick={() => {
                         setEditingItemId(null);
-                        setNewPriceTableItem({ nomeInstrumento: '', valorRastreavel: 0, valorAcreditado: 0, manutencao: 0, ensaio: 0, teste: 0, qualificacao: 0 });
+                        setNewPriceTableItem({ nomeInstrumento: '', valorRastreavel: 0, valorAcreditado: 0, logistica: 0, manutencao: 0, ensaio: 0, teste: 0, qualificacao: 0 });
                       }}
                       className="flex-1 px-4 py-2.5 bg-white border border-gray-200 text-gray-500 rounded-xl font-bold text-xs hover:bg-gray-50 transition-all"
                     >

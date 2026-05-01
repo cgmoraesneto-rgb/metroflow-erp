@@ -1,45 +1,56 @@
-import { useState, useRef, useEffect } from 'react';
-import { 
-    ServiceOrder, 
-    CalibrationRecord, 
-    CertificateMask, 
-    Procedure, 
-    StandardInstrument, 
-    Quote, 
+import { useState, useRef, useEffect, useMemo } from 'react';
+import {
+    ServiceOrder,
+    CalibrationRecord,
+    CertificateMask,
+    Procedure,
+    StandardInstrument,
+    Quote,
     Client,
-    CertificateStatus, 
-    CalibrationResult 
+    CertificateStatus,
+    CalibrationResult
 } from '../types';
-import { 
-    CheckCircle2, 
-    ArrowLeft, 
-    ClipboardList, 
-    Thermometer, 
-    Droplets, 
-    User, 
-    Calendar, 
-    Info, 
-    Activity, 
-    Edit2, 
-    Plus, 
-    CheckCircle, 
-    PlayCircle, 
-    AlertTriangle, 
+import { useData } from '../contexts/DataContext';
+import {
+    Pencil,
+    CheckCircle2,
+    ArrowLeft,
+    ClipboardList,
+    Thermometer,
+    Droplets,
+    User,
+    Calendar,
+    Info,
+    Activity,
+    Plus,
+    CheckCircle,
+    PlayCircle,
+    AlertTriangle,
     Lock,
     Search,
     LayoutGrid,
-    List,
+    LayoutList,
     ChevronRight,
+    ArrowRight,
+    TrendingUp,
+    FileText,
+    History,
+    AlertCircle,
+    FileCheck,
+    Download,
     Loader2,
     X
 } from 'lucide-react';
 import CalibrationLaunchModal from './CalibrationLaunchModal';
 import EmployeeSelect from './EmployeeSelect';
 import { toast } from 'sonner';
+import { generateCertificatePdf } from '../utils/pdfGenerator';
+
 
 interface CalibrationRecordModuleProps {
     serviceOrders: ServiceOrder[];
     calibrationRecords: CalibrationRecord[];
+    calibrationResults?: any[];
     certificateMasks: CertificateMask[];
     procedures: Procedure[];
     standardInstruments: StandardInstrument[];
@@ -48,6 +59,8 @@ interface CalibrationRecordModuleProps {
     onSaveCalibrationRecord: (record: CalibrationRecord) => void;
     onSaveCalibrationResult?: (result: CalibrationResult) => Promise<void>;
     documentTemplates?: any[];
+    employees?: any[];
+    searchQuery?: string;
 }
 
 export default function CalibrationRecordModule({
@@ -60,7 +73,10 @@ export default function CalibrationRecordModule({
     clients,
     onSaveCalibrationRecord,
     onSaveCalibrationResult,
-    documentTemplates = []
+    calibrationResults = [],
+    documentTemplates = [],
+    employees = [],
+    searchQuery: searchQueryProp
 }: CalibrationRecordModuleProps) {
     const [selectedOS, setSelectedOS] = useState<ServiceOrder | null>(null);
     const [selectedQuoteItemIndex, setSelectedQuoteItemIndex] = useState<number | null>(null);
@@ -70,12 +86,34 @@ export default function CalibrationRecordModule({
     const [isSaving, setIsSaving] = useState(false);
     const [launchModalRecord, setLaunchModalRecord] = useState<CalibrationRecord | null>(null);
     const [isLaunchModalOpen, setIsLaunchModalOpen] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
+
+    const handlePreviewPdf = async (tempRecord: CalibrationRecord) => {
+        const client = clients.find(c => c.id === tempRecord.clientId || c.id === selectedOS?.clienteId);
+        // Use the context/global employees if available, otherwise pass empty array
+        const resUrl = await generateCertificatePdf(
+            tempRecord,
+            client,
+            procedures,
+            standardInstruments,
+            certificateMasks,
+            employees, // Pass real employees list
+            true, // isPreview
+            false,
+            documentTemplates
+        );
+        if (resUrl) window.open(resUrl, '_blank');
+    };
+
+    const { searchQuery: searchQueryContext, setSearchQuery } = useData();
+    const searchQuery = searchQueryProp !== undefined ? searchQueryProp : searchQueryContext;
     const [observations, setObservations] = useState('');
     const [attachments, setAttachments] = useState<string[]>([]);
-    
+
+    const [isAvulsoMode, setIsAvulsoMode] = useState(false);
+    const [selectedClientId, setSelectedClientId] = useState('');
+
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
-    
+
     const [instrumentDetails, setInstrumentDetails] = useState({
         manufacturer: '',
         model: '',
@@ -95,49 +133,27 @@ export default function CalibrationRecordModule({
         certificateNumber: `CERT-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
         calibrationDate: new Date().toISOString().split('T')[0],
         nextCalibrationDate: '',
-        technicianName: ''
+        technicianName: '',
+        isAccredited: false
     });
-
-    const [isAccredited, setIsAccredited] = useState<boolean>(false);
 
     const [envConditions, setEnvConditions] = useState({
         temperature: 20,
         humidity: 50,
-        envStandardInstrumentId: ''
+        envStandardInstrumentId: '',
+        calibrationLocation: 'Laboratório Wantec/LRM'
     });
 
     const [kFactorJustification, setKFactorJustification] = useState<'Padrão (k=2 para 95.45%)' | 'Welch-Satterthwaite'>('Padrão (k=2 para 95.45%)');
 
-    useEffect(() => {
-        // Only auto-generate for NEW records
-        if (!editingRecordId && selectedOS && selectedQuoteItemIndex !== null) {
-            const quote = quotes.find(q => q.id === selectedOS.orcamentoId);
-            const item = quote?.items[selectedQuoteItemIndex];
-            const isEnsaio = item?.tipoServico?.toLowerCase().includes('ensaio');
-            
-            let prefix = 'CRW26';
-            if (isEnsaio) {
-                prefix = isAccredited ? 'RTW26' : 'REW26';
-            }
-
-            // Find max sequence in ALL records that follow this pattern
-            let maxSeq = 0;
-            calibrationRecords.forEach(r => {
-                const match = r.certificateNumber?.match(/^[A-Z]{2,3}W26(\d+)$/);
-                if (match && match[1]) {
-                    const seq = parseInt(match[1], 10);
-                    if (seq > maxSeq) maxSeq = seq;
-                }
-            });
-
-            const newNumber = `${prefix}${(maxSeq + 1).toString().padStart(3, '0')}`;
-            setTopDetails(prev => ({ ...prev, certificateNumber: newNumber }));
-        }
-    }, [selectedOS, selectedQuoteItemIndex, isAccredited, editingRecordId, calibrationRecords, quotes]);
-
     const handleSaveHeader = async (isOfficial: boolean = false) => {
-        if (!selectedOS || selectedQuoteItemIndex === null) {
+        if (!isAvulsoMode && (!selectedOS || selectedQuoteItemIndex === null)) {
             toast.error("Preencha todos os campos obrigatórios do cabeçalho.");
+            return;
+        }
+
+        if (isAvulsoMode && (!selectedClientId || !instrumentDetails.instrumentName)) {
+            toast.error("Selecione o cliente e informe o nome do instrumento.");
             return;
         }
 
@@ -147,15 +163,17 @@ export default function CalibrationRecordModule({
         }
 
         setIsSaving(true);
+        const existing = calibrationRecords.find(r => r.id === (editingRecordId || ''));
+        
         const record: CalibrationRecord = {
+            ...existing,
             id: editingRecordId || `CAL-${Date.now()}`,
-            serviceOrderId: selectedOS.id,
-            clientId: undefined,
-            quoteItemIndex: selectedQuoteItemIndex as number,
+            serviceOrderId: isAvulsoMode ? 'AVULSO' : (selectedOS?.id || 'AVULSO'),
+            clientId: isAvulsoMode ? selectedClientId : undefined,
+            quoteItemIndex: isAvulsoMode ? -1 : (selectedQuoteItemIndex as number),
             unitIndex: selectedUnitIndex !== null ? selectedUnitIndex : undefined,
             instrumentName: instrumentDetails.instrumentName,
             certificateNumber: topDetails.certificateNumber,
-            isAccredited: isAccredited,
             calibrationDate: topDetails.calibrationDate,
             nextCalibrationDate: topDetails.nextCalibrationDate,
             technicianName: topDetails.technicianName,
@@ -164,7 +182,7 @@ export default function CalibrationRecordModule({
             serialNumber: instrumentDetails.serialNumber,
             identification: instrumentDetails.identification,
             periodicity: instrumentDetails.periodicity,
-            calibrationLocation: instrumentDetails.calibrationLocation,
+            calibrationLocation: envConditions.calibrationLocation || 'Laboratório Wantec/LRM',
             resolution: instrumentDetails.resolution,
             capacidadeMinima: instrumentDetails.capacidadeMinima,
             capacidadeMaxima: instrumentDetails.capacidadeMaxima,
@@ -173,24 +191,29 @@ export default function CalibrationRecordModule({
             humidity: envConditions.humidity,
             envStandardInstrumentId: envConditions.envStandardInstrumentId,
             environmentalStandardId: envConditions.envStandardInstrumentId,
-            certificateMaskId: '', 
-            procedureId: '', 
-            standardInstrumentIds: [], 
+            // Preserve these if they exist (important for edits)
+            certificateMaskId: existing?.certificateMaskId || '',
+            procedureId: existing?.procedureId || '',
+            standardInstrumentIds: existing?.standardInstrumentIds || [],
             observations: observations,
             attachments: attachments,
-            groups: [],
-            status: CertificateStatus.BEING_MADE,
-            isDraft: true,
+            groups: existing?.groups || [],
+            calculatedPoints: existing?.calculatedPoints || {},
+            status: existing?.status || CertificateStatus.BEING_MADE,
+            isDraft: existing?.isDraft ?? true,
             headerValidated: isOfficial,
             headerSaved: true,
-            kFactorJustification: kFactorJustification
+            isAccredited: topDetails.isAccredited,
+            kFactorJustification: kFactorJustification,
+            // Snapshot of environmental standard
+            envStandardInstrumentSnapshot: standardInstruments?.find(si => si.id === envConditions.envStandardInstrumentId)
         };
 
         try {
             await onSaveCalibrationRecord(record);
             setShowSuccess(true);
             toast.success(isOfficial ? 'Cabeçalho validado com sucesso!' : 'Cabeçalho salvo como rascunho!');
-            
+
             setTimeout(() => {
                 setShowSuccess(false);
                 if (isOfficial) {
@@ -210,14 +233,15 @@ export default function CalibrationRecordModule({
         setSelectedQuoteItemIndex(index);
         setSelectedUnitIndex(unitIdx);
         setEditingRecordId(record.id);
-        
+
         setTopDetails({
             certificateNumber: record.certificateNumber,
             calibrationDate: record.calibrationDate,
             nextCalibrationDate: record.nextCalibrationDate,
-            technicianName: record.technicianName
+            technicianName: record.technicianName,
+            isAccredited: record.isAccredited || false
         });
-        
+
         setInstrumentDetails({
             manufacturer: record.manufacturer,
             model: record.model,
@@ -232,15 +256,15 @@ export default function CalibrationRecordModule({
             periodicity: record.periodicity || '12 meses',
             calibrationLocation: record.calibrationLocation || 'Laboratório'
         });
-        
+
         setEnvConditions({
             temperature: record.temperature,
             humidity: record.humidity,
-            envStandardInstrumentId: record.envStandardInstrumentId
+            envStandardInstrumentId: record.envStandardInstrumentId,
+            calibrationLocation: record.calibrationLocation || 'Laboratório Wantec/LRM'
         });
-        
+
         setKFactorJustification(record.kFactorJustification || 'Padrão (k=2 para 95.45%)');
-        setIsAccredited(record.isAccredited || false);
         setObservations(record.observations);
         setAttachments(record.attachments || []);
     };
@@ -249,7 +273,7 @@ export default function CalibrationRecordModule({
         setSelectedQuoteItemIndex(index);
         setSelectedUnitIndex(unitIdx);
         setEditingRecordId(null);
-        setInstrumentDetails({ 
+        setInstrumentDetails({
             instrumentName: itemName,
             manufacturer: '',
             model: '',
@@ -263,7 +287,6 @@ export default function CalibrationRecordModule({
             periodicity: '12 meses',
             calibrationLocation: 'Laboratório'
         });
-        setIsAccredited(false);
         setAttachments([]);
     };
 
@@ -272,42 +295,64 @@ export default function CalibrationRecordModule({
             toast.error("O cabeçalho precisa ser validado oficialmente antes de lançar resultados.");
             return;
         }
-        
-        setLaunchModalRecord(record);
+
+        // Se o registro não tem grupos (legado), tenta buscar nos resultados carregados
+        const recordToLaunch = { ...record };
+        if (!recordToLaunch.groups || recordToLaunch.groups.length === 0) {
+            const foundResult = (calibrationResults as any[]).find(r => r.calibrationRecordId === record.id);
+            if (foundResult) {
+                recordToLaunch.groups = foundResult.groups;
+                recordToLaunch.calculatedPoints = foundResult.calculatedPoints;
+                recordToLaunch.standardInstrumentUncertainties = foundResult.standardInstrumentUncertainties;
+            }
+        }
+
+        setLaunchModalRecord(recordToLaunch);
         setIsLaunchModalOpen(true);
     };
 
     const handleSubmitResults = async (result: any, maskId?: string) => {
         if (!launchModalRecord) return;
-        
+
         const mask = certificateMasks.find(m => m.id === maskId);
-        
-        const officialRecord: CalibrationRecord = { 
-            ...launchModalRecord, 
+
+        const officialRecord: CalibrationRecord = {
+            ...launchModalRecord,
             groups: result.groups,
             calculatedPoints: result.calculatedPoints,
             standardInstrumentUncertainties: result.standardInstrumentUncertainties,
             resolution: result.resolution || launchModalRecord.resolution,
             certificateMaskId: maskId || launchModalRecord.certificateMaskId,
             procedureId: mask?.procedureId || launchModalRecord.procedureId,
-            standardInstrumentIds: mask?.standardInstrumentIds || launchModalRecord.standardInstrumentIds,
-            maskSnapshot: mask || launchModalRecord.maskSnapshot,
+            standardInstrumentIds: result.standardInstrumentIds || mask?.standardInstrumentIds || launchModalRecord.standardInstrumentIds,
+            // Capture snapshots of all standards used
+            standardInstrumentsSnapshot: standardInstruments?.filter(si => 
+                (result.standardInstrumentIds || mask?.standardInstrumentIds || launchModalRecord.standardInstrumentIds || []).includes(si.id as string)
+            ) || [],
+            envStandardInstrumentSnapshot: standardInstruments?.find(si => si.id === launchModalRecord.envStandardInstrumentId),
+            maskSnapshot: mask,
             status: CertificateStatus.IN_ANALYSIS,
-            isDraft: false 
+            isDraft: false
         };
 
-        if (onSaveCalibrationResult) await onSaveCalibrationResult(result);
-        await onSaveCalibrationRecord(officialRecord);
-        
-        setIsLaunchModalOpen(false);
-        setLaunchModalRecord(null);
-        toast.success('Calibração finalizada e enviada para revisão!');
+        try {
+            if (onSaveCalibrationResult) await onSaveCalibrationResult(result);
+            await onSaveCalibrationRecord(officialRecord);
+
+            setIsLaunchModalOpen(false);
+            setLaunchModalRecord(null);
+            toast.success('Calibração finalizada e enviada para revisão!');
+        } catch (error) {
+            console.error("Erro ao finalizar calibração:", error);
+            toast.error("Falha ao finalizar calibração. Verifique os dados.");
+            throw error;
+        }
     };
 
     const handleSaveLaunchDraft = async (result: any, maskId?: string) => {
         if (!launchModalRecord) return;
         const mask = certificateMasks.find(m => m.id === maskId);
-        
+
         const updatedRecord: CalibrationRecord = {
             ...launchModalRecord,
             groups: result.groups,
@@ -316,38 +361,87 @@ export default function CalibrationRecordModule({
             resolution: result.resolution || launchModalRecord.resolution,
             certificateMaskId: maskId || launchModalRecord.certificateMaskId,
             procedureId: mask?.procedureId || launchModalRecord.procedureId,
-            standardInstrumentIds: mask?.standardInstrumentIds || launchModalRecord.standardInstrumentIds,
-            maskSnapshot: mask || launchModalRecord.maskSnapshot,
+            standardInstrumentIds: result.standardInstrumentIds || mask?.standardInstrumentIds || launchModalRecord.standardInstrumentIds,
+            // Update snapshots even in draft to maintain consistency
+            standardInstrumentsSnapshot: standardInstruments?.filter(si => 
+                (result.standardInstrumentIds || mask?.standardInstrumentIds || launchModalRecord.standardInstrumentIds || []).includes(si.id as string)
+            ) || [],
+            envStandardInstrumentSnapshot: standardInstruments?.find(si => si.id === launchModalRecord.envStandardInstrumentId),
+            maskSnapshot: mask,
+            isDraft: true
         };
-        
-        await onSaveCalibrationRecord(updatedRecord);
-        toast.info('Rascunho de lançamento atualizado');
+
+        try {
+            // Salvamento Dual: Record (Header) + Result (Metrology)
+            const resultPayload = {
+                id: updatedRecord.id, // Usamos o mesmo ID do registro para facilitar o vínculo
+                calibrationRecordId: updatedRecord.id,
+                groups: result.groups,
+                calculatedPoints: result.calculatedPoints,
+                standardInstrumentUncertainties: result.standardInstrumentUncertainties,
+                resolution: result.resolution || launchModalRecord.resolution
+            };
+
+            if (onSaveCalibrationResult) await onSaveCalibrationResult(resultPayload);
+            await onSaveCalibrationRecord(updatedRecord);
+            
+            setLaunchModalRecord(updatedRecord); 
+            toast.success('Rascunho de lançamento atualizado!');
+        } catch (error) {
+            console.error("Erro ao salvar rascunho:", error);
+            toast.error("Falha ao salvar rascunho.");
+            throw error;
+        }
     };
 
-    const filteredOS = serviceOrders.filter(os => 
-        os.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        quotes.find(q => q.id === os.orcamentoId)?.clienteId.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredOS = useMemo(() => {
+        const lowerSearch = searchQuery.trim().toLowerCase();
+        const searchDigits = lowerSearch.replace(/\D/g, '');
+
+        if (!lowerSearch) return serviceOrders;
+
+        return serviceOrders.filter(os => {
+            console.log('FILTRANDO OS:', os.id, 'COM TERMO:', lowerSearch);
+            const quote = quotes.find(q => q.id === os.orcamentoId);
+            const client = clients.find(c => c.id === quote?.clienteId || c.razaoSocial === quote?.clienteId);
+            
+            const osId = String(os.id).toLowerCase();
+            const quoteId = String(os.orcamentoId || "").toLowerCase();
+            const clientName = (client?.razaoSocial || "").toLowerCase();
+            const clientCnpj = (client?.cnpj || "").toLowerCase();
+            
+            // 1. Textual matches
+            if (
+                osId.includes(lowerSearch) || 
+                quoteId.includes(lowerSearch) || 
+                clientName.includes(lowerSearch) || 
+                clientCnpj.includes(lowerSearch)
+            ) return true;
+            
+            // 2. Numeric-only matches (for CNPJ, O.S. numbers with dots/dashes)
+            if (searchDigits && searchDigits.length >= 3) {
+                const osIdDigits = osId.replace(/\D/g, '');
+                const cnpjDigits = clientCnpj.replace(/\D/g, '');
+                if (osIdDigits.includes(searchDigits) || cnpjDigits.includes(searchDigits)) return true;
+            }
+            
+            return false;
+        });
+    }, [serviceOrders, quotes, clients, searchQuery]);
 
     return (
-    <div className="bg-white dark:bg-slate-900 p-4 sm:p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 w-full max-w-full overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 p-4 sm:p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 w-full max-w-full overflow-hidden">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
                 <div className="flex-1">
                     <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-2 uppercase tracking-tight">Registros de Calibração</h2>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm font-medium italic">Fluxo operacional para emissão de certificados.</p>
-                    
-                    {!selectedOS && (
-                        <div className="relative max-w-md mt-6">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-                            <input
-                                type="text"
-                                placeholder="Buscar O.S. ou Cliente..."
-                                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-sm transition-all shadow-inner"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                        </div>
-                    )}
+                    <p className="text-slate-500 dark:text-slate-400 text-sm font-medium italic">
+                        Fluxo operacional para emissão de certificados.
+                        {searchQuery && (
+                            <span className="ml-2 px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-md text-[10px] font-black uppercase ring-1 ring-indigo-200 animate-pulse">
+                                {filteredOS.length} resultado(s) para "{searchQuery}"
+                            </span>
+                        )}
+                    </p>
                 </div>
 
                 {!selectedOS && (
@@ -356,7 +450,7 @@ export default function CalibrationRecordModule({
                             onClick={() => setViewMode('list')}
                             className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                         >
-                            <List className="w-5 h-5" />
+                            <LayoutList className="w-5 h-5" />
                         </button>
                         <button
                             onClick={() => setViewMode('grid')}
@@ -416,7 +510,7 @@ export default function CalibrationRecordModule({
                                                 <td className="rectilinear-td text-center">
                                                     <div className="flex items-center justify-center gap-3">
                                                         <div className="flex-1 max-w-[100px] bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                                                            <div 
+                                                            <div
                                                                 className={`h-full transition-all duration-1000 ${isComplete ? 'bg-emerald-500' : 'bg-indigo-600'}`}
                                                                 style={{ width: `${progress}%` }}
                                                             />
@@ -464,7 +558,7 @@ export default function CalibrationRecordModule({
                                                 <p className="text-[9px] text-slate-900 font-black tracking-widest">{recordedItems}/{totalItems}</p>
                                             </div>
                                             <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                                                <div 
+                                                <div
                                                     className="h-full bg-indigo-600 transition-all"
                                                     style={{ width: `${progress}%` }}
                                                 />
@@ -488,10 +582,11 @@ export default function CalibrationRecordModule({
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Itens Detalhados</p>
                             <h3 className="text-xl font-black text-indigo-600">{selectedOS.id}</h3>
                         </div>
-                        <button 
+                        <button
                             onClick={() => {
                                 setSelectedOS(null);
-                            }} 
+                                setIsAvulsoMode(false);
+                            }}
                             className="flex items-center px-4 py-2 bg-white text-slate-600 rounded-xl font-bold text-sm hover:shadow-md transition-all border border-slate-200"
                         >
                             <ArrowLeft className="w-4 h-4 mr-2" /> Voltar para lista de O.S.
@@ -511,11 +606,25 @@ export default function CalibrationRecordModule({
                             </thead>
                             <tbody>
                                 {(quotes.find(q => q.id === selectedOS.orcamentoId)?.items || []).flatMap((item, itemIdx) => {
-                                    const itemRecords = calibrationRecords.filter(r => r.serviceOrderId === selectedOS.id && r.quoteItemIndex === itemIdx);
+                                    const term = searchQuery.toLowerCase().trim();
                                     const qtdNum = item.quantidade || 1;
                                     
-                                    return Array.from({ length: qtdNum }).map((_, unitIdx) => {
-                                        const existingRecord = itemRecords.find(r => r.unitIndex === unitIdx);
+                                    // Generate the unit array first
+                                    const units = Array.from({ length: qtdNum }).map((_, unitIdx) => ({ item, itemIdx, unitIdx }));
+                                    
+                                    // Filter units if search is active
+                                    if (searchQuery) {
+                                      return units.filter(u => {
+                                        const r = calibrationRecords.find(rec => rec.serviceOrderId === selectedOS.id && rec.quoteItemIndex === u.itemIdx && rec.unitIndex === u.unitIdx);
+                                        return u.item.descricao?.toLowerCase().includes(term) || 
+                                               r?.identification?.toLowerCase().includes(term) ||
+                                               r?.certificateNumber?.toLowerCase().includes(term);
+                                      });
+                                    }
+                                    
+                                    return units;
+                                }).map(({ item, itemIdx, unitIdx }) => {
+                                    const existingRecord = calibrationRecords.find(r => r.serviceOrderId === selectedOS.id && r.quoteItemIndex === itemIdx && r.unitIndex === unitIdx);
                                         return (
                                             <tr key={`${itemIdx}-${unitIdx}`} className="rectilinear-tr">
                                                 <td className="rectilinear-td text-left pl-8 font-bold text-slate-900 dark:text-white uppercase text-xs truncate max-w-sm" title={item.descricao}>{item.descricao}</td>
@@ -524,22 +633,13 @@ export default function CalibrationRecordModule({
                                                     <div className="flex items-center justify-center gap-2">
                                                         {existingRecord ? (
                                                             <>
-                                                                <div className="flex flex-col items-center gap-1">
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className="text-[10px] font-black text-slate-900 dark:text-white tabular-nums">{existingRecord.certificateNumber}</span>
-                                                                        {existingRecord.isAccredited && (
-                                                                            <span className="bg-indigo-600 text-white text-[8px] font-black px-2 py-0.5 rounded-md uppercase shadow-sm">RBC</span>
-                                                                        )}
-                                                                    </div>
-                                                                    <span className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase ${
-                                                                        existingRecord.status === CertificateStatus.IN_ANALYSIS ? 'bg-amber-100 text-amber-700' :
+                                                                <span className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase ${existingRecord.status === CertificateStatus.IN_ANALYSIS ? 'bg-amber-100 text-amber-700' :
                                                                         existingRecord.headerValidated ? 'bg-indigo-100 text-indigo-700' :
-                                                                        'bg-slate-100 text-slate-400'
+                                                                            'bg-slate-100 text-slate-400'
                                                                     }`}>
-                                                                        {existingRecord.status === CertificateStatus.IN_ANALYSIS ? 'Em Análise' :
-                                                                         existingRecord.headerValidated ? 'Apto p/ Lanç' : 'Rascunho'}
-                                                                    </span>
-                                                                </div>
+                                                                    {existingRecord.status === CertificateStatus.IN_ANALYSIS ? 'Em Análise' :
+                                                                        existingRecord.headerValidated ? 'Apto p/ Lanç' : 'Rascunho'}
+                                                                </span>
                                                                 {existingRecord.revisionOf && (
                                                                     <span className="bg-orange-100 text-orange-700 text-[9px] font-black px-2 py-0.5 rounded-full uppercase">Rev</span>
                                                                 )}
@@ -556,12 +656,12 @@ export default function CalibrationRecordModule({
                                                     <div className="flex items-center justify-center gap-2">
                                                         {existingRecord ? (
                                                             <>
-                                                                <button 
+                                                                <button
                                                                     onClick={() => handleEditRecord(existingRecord, itemIdx, unitIdx)}
                                                                     className="p-1.5 text-slate-400 hover:text-indigo-600 transition-all"
                                                                     title="Editar Cabeçalho"
                                                                 >
-                                                                    <Edit2 className="w-3.5 h-3.5" />
+                                                                    <Pencil className="w-3.5 h-3.5" />
                                                                 </button>
                                                                 {existingRecord.headerValidated && (
                                                                     <button
@@ -573,7 +673,7 @@ export default function CalibrationRecordModule({
                                                                 )}
                                                             </>
                                                         ) : (
-                                                            <button 
+                                                            <button
                                                                 onClick={() => handleNewRecord(itemIdx, item.descricao, unitIdx)}
                                                                 className="flex items-center px-3 py-1 bg-emerald-500 text-white rounded-lg font-black text-[9px] hover:bg-emerald-600 transition-all uppercase tracking-widest shadow-sm"
                                                             >
@@ -583,9 +683,8 @@ export default function CalibrationRecordModule({
                                                     </div>
                                                 </td>
                                             </tr>
-                                        );
-                                    });
-                                })}
+                                        )
+                                    })}
                             </tbody>
                         </table>
                     </div>
@@ -598,12 +697,16 @@ export default function CalibrationRecordModule({
                             <p className="text-[10px] font-black text-indigo-200 uppercase tracking-widest">Etapa 1: Cabeçalho & Instrumento</p>
                             <h3 className="text-xl font-black">{selectedOS.id}</h3>
                         </div>
-                        <button 
+                        <button
                             onClick={() => {
-                                setSelectedQuoteItemIndex(null);
-                                setSelectedUnitIndex(null);
-                                setEditingRecordId(null);
-                            }} 
+                                if (isAvulsoMode) {
+                                    setSelectedQuoteItemIndex(null);
+                                } else {
+                                    setSelectedQuoteItemIndex(null);
+                                    setSelectedUnitIndex(null);
+                                    setEditingRecordId(null);
+                                }
+                            }}
                             className="flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold text-sm transition-all border border-white/20"
                         >
                             <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
@@ -615,59 +718,77 @@ export default function CalibrationRecordModule({
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             <div className="space-y-1.5">
                                 <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nº Certificado</label>
-                                <input 
-                                    type="text" 
+                                <input
+                                    type="text"
                                     value={topDetails.certificateNumber}
                                     onChange={(e) => setTopDetails(prev => ({ ...prev, certificateNumber: e.target.value }))}
                                     className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-sm"
                                 />
+                                <div className="flex items-center gap-2 mt-2 ml-1">
+                                    <button
+                                        type="button"
+                                        onClick={() => setTopDetails(prev => ({ ...prev, isAccredited: !prev.isAccredited }))}
+                                        className={`relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${topDetails.isAccredited ? 'bg-indigo-600' : 'bg-slate-200'}`}
+                                    >
+                                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${topDetails.isAccredited ? 'translate-x-4' : 'translate-x-0'}`} />
+                                    </button>
+                                    <span className={`text-[9px] font-black uppercase tracking-widest ${topDetails.isAccredited ? 'text-indigo-600' : 'text-slate-400'}`}>
+                                        Acreditação RBC
+                                    </span>
+                                </div>
                             </div>
                             <div className="space-y-1.5">
                                 <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Data Calibração</label>
-                                <input 
-                                    type="date" 
+                                <input
+                                    type="date"
                                     value={topDetails.calibrationDate}
                                     onChange={(e) => setTopDetails(prev => ({ ...prev, calibrationDate: e.target.value }))}
                                     className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-sm"
                                 />
                             </div>
-                            <div className="space-y-1.5">
+                            <div className="space-y-1.5 relative group">
                                 <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Vencimento</label>
-                                <input 
-                                    type="date" 
-                                    value={topDetails.nextCalibrationDate}
-                                    onChange={(e) => setTopDetails(prev => ({ ...prev, nextCalibrationDate: e.target.value }))}
-                                    className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-sm"
-                                />
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        value={topDetails.nextCalibrationDate}
+                                        onChange={(e) => setTopDetails(prev => ({ ...prev, nextCalibrationDate: e.target.value }))}
+                                        className="w-full bg-slate-50 border border-slate-200 p-3 pr-10 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-sm"
+                                        placeholder="Selecione ou digite..."
+                                    />
+                                    <select
+                                        className="absolute right-0 top-0 h-full w-10 opacity-0 cursor-pointer"
+                                        onChange={(e) => {
+                                            const rule = e.target.value;
+                                            if (rule === 'customer') {
+                                                setTopDetails(prev => ({ ...prev, nextCalibrationDate: 'Determinado pelo Cliente' }));
+                                            } else if (rule === 'standard') {
+                                                if (topDetails.calibrationDate) {
+                                                    const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+                                                    const d = new Date(topDetails.calibrationDate);
+                                                    d.setFullYear(d.getFullYear() + 1);
+                                                    const formatted = `${months[d.getMonth()]}/${d.getFullYear()}`;
+                                                    setTopDetails(prev => ({ ...prev, nextCalibrationDate: formatted }));
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <option value="">Regras...</option>
+                                        <option value="standard">Padrão (12 meses)</option>
+                                        <option value="customer">Determinado pelo Cliente</option>
+                                    </select>
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                        <ChevronRight size={16} className="rotate-90" />
+                                    </div>
+                                </div>
                             </div>
                             <div className="space-y-1.5">
-                                <EmployeeSelect 
+                                <EmployeeSelect
                                     label="Técnico Resp."
                                     value={topDetails.technicianName}
                                     onChange={(val) => setTopDetails(prev => ({ ...prev, technicianName: val }))}
                                     placeholder="Selecione o técnico"
                                 />
-                            </div>
-                            <div className="col-span-full md:col-span-2 lg:col-span-4 mt-2">
-                                <label className={`flex items-center space-x-3 p-4 rounded-xl border transition-all cursor-pointer select-none ${isAccredited 
-                                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700' 
-                                    : 'bg-white border-slate-200 text-slate-500'}`}>
-                                    <input 
-                                        type="checkbox" 
-                                        className="hidden" 
-                                        checked={isAccredited} 
-                                        onChange={(e) => setIsAccredited(e.target.checked)} 
-                                    />
-                                    <div className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${isAccredited ? 'bg-indigo-500 border-indigo-500' : 'border-slate-300'}`}>
-                                        {isAccredited && <CheckCircle className="w-3.5 h-3.5 text-white" />}
-                                    </div>
-                                    <div>
-                                        <p className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
-                                            Acreditação RBC
-                                        </p>
-                                        <p className="text-[9px] font-medium opacity-70">Marque se o certificado fará parte do escopo acreditado (Layout RBC).</p>
-                                    </div>
-                                </label>
                             </div>
                         </div>
                     </div>
@@ -681,8 +802,8 @@ export default function CalibrationRecordModule({
                             <div className="space-y-4">
                                 <div className="space-y-1.5">
                                     <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Instrumento (Confirmação)</label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={instrumentDetails.instrumentName}
                                         onChange={(e) => setInstrumentDetails(prev => ({ ...prev, instrumentName: e.target.value }))}
                                         className="w-full bg-white border border-slate-200 p-3 rounded-xl font-bold text-sm"
@@ -726,10 +847,21 @@ export default function CalibrationRecordModule({
                         </div>
 
                         <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100">
-                             <h4 className="text-xs font-black text-slate-900 uppercase tracking-widest mb-6 flex items-center gap-2">
+                            <h4 className="text-xs font-black text-slate-900 uppercase tracking-widest mb-6 flex items-center gap-2">
                                 <Thermometer className="w-4 h-4 text-rose-500" /> Condições Ambientais
-                             </h4>
-                             <div className="grid grid-cols-2 gap-4">
+                            </h4>
+                            <div className="grid grid-cols-3 gap-4">
+                                <div className="space-y-1.5">
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Local de Calibração</label>
+                                    <select
+                                        value={envConditions.calibrationLocation || 'Laboratório Wantec/LRM'}
+                                        onChange={(e) => setEnvConditions(prev => ({ ...prev, calibrationLocation: e.target.value }))}
+                                        className="w-full bg-white border border-slate-200 p-2.5 rounded-lg font-bold text-xs"
+                                    >
+                                        <option value="Laboratório Wantec/LRM">Laboratório Wantec/LRM</option>
+                                        <option value="Dependências do Cliente">Dependências do Cliente</option>
+                                    </select>
+                                </div>
                                 <div className="space-y-1.5">
                                     <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Temperatura (°C)</label>
                                     <input type="number" value={envConditions.temperature} onChange={(e) => setEnvConditions(prev => ({ ...prev, temperature: parseFloat(e.target.value) }))} className="w-full bg-white border border-slate-200 p-2.5 rounded-lg font-bold text-xs" />
@@ -738,70 +870,44 @@ export default function CalibrationRecordModule({
                                     <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Umidade (%UR)</label>
                                     <input type="number" value={envConditions.humidity} onChange={(e) => setEnvConditions(prev => ({ ...prev, humidity: parseFloat(e.target.value) }))} className="w-full bg-white border border-slate-200 p-2.5 rounded-lg font-bold text-xs" />
                                 </div>
-                                <div className="col-span-2 space-y-1.5">
+                                <div className="col-span-3 space-y-1.5">
                                     <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Padrão Ambiental Utilizado</label>
-                                    <select 
+                                    <select
                                         value={envConditions.envStandardInstrumentId}
                                         onChange={(e) => setEnvConditions(prev => ({ ...prev, envStandardInstrumentId: e.target.value }))}
                                         className="w-full bg-white border border-slate-200 p-3 rounded-xl font-bold text-sm"
                                     >
                                         <option value="">-- Selecione o Padrão --</option>
                                         {standardInstruments.map(si => (
-                                            <option key={si.id} value={si.id}>{si.nome}</option>
+                                            <option key={si.id} value={si.id}>{si.identificacao} - {si.nome}</option>
                                         ))}
                                     </select>
                                 </div>
-                             </div>
-                             
-                             <div className="mt-8 space-y-1.5">
+                            </div>
+
+                            <div className="mt-8 space-y-1.5">
                                 <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Observações do Registro</label>
-                                <textarea 
+                                <textarea
                                     value={observations}
                                     onChange={(e) => setObservations(e.target.value)}
                                     className="w-full bg-white border border-slate-200 p-3 rounded-xl font-medium text-xs h-24 resize-none"
                                     placeholder="Notas técnicas sobre a calibração..."
                                 />
-                             </div>
+                            </div>
 
-                             <div className="mt-6 space-y-4">
+                            <div className="mt-6 space-y-4">
                                 <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Anexos / Imagens do Registro</label>
-                                <input 
-                                    type="file" 
+                                <input
+                                    type="file"
                                     accept="image/*"
-                                    multiple 
+                                    multiple
                                     onChange={(e) => {
                                         const files = Array.from(e.target.files || []);
                                         files.forEach(file => {
                                             const reader = new FileReader();
                                             reader.onload = (ev) => {
                                                 if (ev.target?.result) {
-                                                    const img = new Image();
-                                                    img.onload = () => {
-                                                        const canvas = document.createElement('canvas');
-                                                        const MAX_WIDTH = 800;
-                                                        const MAX_HEIGHT = 800;
-                                                        let width = img.width;
-                                                        let height = img.height;
-                                                        
-                                                        if (width > height) {
-                                                            if (width > MAX_WIDTH) {
-                                                                height *= MAX_WIDTH / width;
-                                                                width = MAX_WIDTH;
-                                                            }
-                                                        } else {
-                                                            if (height > MAX_HEIGHT) {
-                                                                width *= MAX_HEIGHT / height;
-                                                                height = MAX_HEIGHT;
-                                                            }
-                                                        }
-                                                        canvas.width = width;
-                                                        canvas.height = height;
-                                                        const ctx = canvas.getContext('2d');
-                                                        ctx?.drawImage(img, 0, 0, width, height);
-                                                        const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
-                                                        setAttachments(prev => [...prev, dataUrl]);
-                                                    };
-                                                    img.src = ev.target.result as string;
+                                                    setAttachments(prev => [...prev, ev.target.result as string]);
                                                 }
                                             };
                                             reader.readAsDataURL(file);
@@ -814,7 +920,7 @@ export default function CalibrationRecordModule({
                                         {attachments.map((src, idx) => (
                                             <div key={idx} className="relative w-24 h-24 rounded-xl border border-slate-200 overflow-hidden group shadow-sm">
                                                 <img src={src} alt="Anexo" className="w-full h-full object-cover" />
-                                                <button 
+                                                <button
                                                     type="button"
                                                     onClick={() => setAttachments(prev => prev.filter((_, i) => i !== idx))}
                                                     className="absolute top-1 right-1 bg-rose-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -825,7 +931,7 @@ export default function CalibrationRecordModule({
                                         ))}
                                     </div>
                                 )}
-                             </div>
+                            </div>
                         </div>
                     </div>
 
@@ -840,14 +946,14 @@ export default function CalibrationRecordModule({
                             </div>
                         </div>
                         <div className="flex gap-4 w-full md:w-auto">
-                            <button 
+                            <button
                                 onClick={() => handleSaveHeader(false)}
                                 disabled={isSaving}
                                 className="flex-1 md:flex-none bg-white/10 hover:bg-white/20 text-white px-6 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all disabled:opacity-50"
                             >
                                 {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Salvar Rascunho'}
                             </button>
-                            <button 
+                            <button
                                 onClick={() => handleSaveHeader(true)}
                                 disabled={isSaving}
                                 className="flex-1 md:flex-none bg-emerald-500 hover:bg-emerald-600 text-white px-10 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all disabled:opacity-50"
@@ -870,6 +976,9 @@ export default function CalibrationRecordModule({
                     onClose={() => setIsLaunchModalOpen(false)}
                     onSaveDraft={handleSaveLaunchDraft}
                     onSubmit={handleSubmitResults}
+                    onPreview={handlePreviewPdf}
+                    existingResult={launchModalRecord}
+                    calibrationResults={calibrationResults}
                 />
             )}
         </div>

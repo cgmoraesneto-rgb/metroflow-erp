@@ -2,22 +2,16 @@
   {
     "id": "OS-2026-001",
     "orcamentoId": "ORC-999",
+    "clienteId": "cli-001",
     "dataEntrada": "2026-04-09",
-    "previsaoSaida": "2026-04-15",
+    "dataSaida": "",
     "statusServico": "Em Aberto",
     "statusCertificado": "Pendente",
-    "observacoes": "O.S. de Teste para Homologação do RBC"
+    "responsavelEntrada": "Sistema",
+    "responsavelSaida": "",
+    "tecnicoExecutante": "",
+    "calibracaoConcluida": false,
+    "certificadosEnviados": false,
+    "observacoes": "O.S. de Teste para Homologacao do RBC"
   }
-],
-"ORC-999": {
-  "id": "ORC-999",
-  "clienteId": "cli-001",
-  "status": "APPROVED",
-  "items": [
-    {
-      "descricao": "Micrômetro Externo 0-25mm",
-      "quantidade": 1,
-      "identificacao": "MIC-01"
-    }
-  ]
-}
+]

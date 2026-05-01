@@ -34,6 +34,7 @@ interface IssuedCertificatesModuleProps {
     serviceOrders: ServiceOrder[];
     onUpdateCertificateStatus: (recordId: string, status: CertificateStatus, justification?: string) => void;
     documentTemplates?: any[];
+    searchQuery?: string;
 }
 
 export default function IssuedCertificatesModule({
@@ -41,11 +42,11 @@ export default function IssuedCertificatesModule({
     clients,
     serviceOrders,
     onUpdateCertificateStatus,
-    documentTemplates = []
+    documentTemplates = [],
+    searchQuery
 }: IssuedCertificatesModuleProps) {
     const { employee } = useAuth();
     const { saveItem, deleteItem, procedures, standardInstruments, certificateMasks, employees = [] } = useData();
-    const [searchTerm, setSearchTerm] = useState('');
     const [revisionDetailTarget, setRevisionDetailTarget] = useState<CalibrationRecord | null>(null);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
         return (localStorage.getItem('issued_certs_view_mode') as 'grid' | 'list') || 'list';
@@ -53,12 +54,30 @@ export default function IssuedCertificatesModule({
     const [expandedClients, setExpandedClients] = useState<Record<string, boolean>>({});
     const [expandedYears, setExpandedYears] = useState<Record<string, boolean>>({});
 
-    const issuedRecords = calibrationRecords.filter(record => {
+    const issuedRecords = (calibrationRecords || []).filter(record => {
         const serviceOrder = serviceOrders.find(so => so.id === record.serviceOrderId);
         const client = clients.find(c => c.id === serviceOrder?.clienteId);
-        const searchStr = `${record.certificateNumber} ${record.instrumentName} ${client?.razaoSocial}`.toLowerCase();
+        
         const isIssued = record.status === CertificateStatus.READY_FOR_SENDING || serviceOrder?.isCertificateSent;
-        return isIssued && searchStr.includes(searchTerm.toLowerCase());
+        if (!isIssued) return false;
+        if (!searchQuery) return true;
+
+        const term = searchQuery.toLowerCase().trim();
+        const digits = term.replace(/\D/g, '');
+
+        const searchStr = `${record.certificateNumber || ''} ${record.instrumentName || ''} ${client?.razaoSocial || ''} ${record.serviceOrderId || ''} ${serviceOrder?.orcamentoId || ''} ${client?.cnpj || ''}`.toLowerCase();
+        const matchesText = searchStr.includes(term);
+
+        if (matchesText) return true;
+
+        if (digits && digits.length >= 3) {
+            const certDigits = (record.certificateNumber || "").replace(/\D/g, '');
+            const osDigits = (record.serviceOrderId || "").replace(/\D/g, '');
+            const cnpjDigits = (client?.cnpj || "").replace(/\D/g, '');
+            if (certDigits.includes(digits) || osDigits.includes(digits) || cnpjDigits.includes(digits)) return true;
+        }
+
+        return false;
     });
 
     // Grouping logic
@@ -153,17 +172,6 @@ export default function IssuedCertificatesModule({
                 <div className="flex-1">
                     <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-2 uppercase tracking-tight">Certificados Emitidos</h2>
                     <p className="text-slate-500 dark:text-slate-400 text-sm font-medium italic">Histórico completo de certificados aprovados e enviados aos clientes.</p>
-                    
-                    <div className="relative max-w-md mt-6">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-                        <input
-                            type="text"
-                            placeholder="Buscar por cliente, certificado ou instrumento..."
-                            className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-inner"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
                 </div>
 
                 <div className="flex items-center gap-3 self-start md:self-end">

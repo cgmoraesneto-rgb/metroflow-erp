@@ -50,7 +50,8 @@ export const testPriceTables: PriceTable[] = [
         manutencao: 50.00,
         ensaio: 0,
         teste: 0,
-        qualificacao: 0
+        qualificacao: 0,
+        logistica: 0
       },
       {
         id: 'PT-02',
@@ -60,7 +61,8 @@ export const testPriceTables: PriceTable[] = [
         manutencao: 30.00,
         ensaio: 0,
         teste: 0,
-        qualificacao: 0
+        qualificacao: 0,
+        logistica: 0
       }
     ]
   }

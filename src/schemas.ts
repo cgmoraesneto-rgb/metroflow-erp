@@ -7,15 +7,15 @@ export const IdSchema = z.string().min(1);
 // --- Clientes ---
 export const ClientSchema = z.object({
   id: z.string().optional(),
-  razaoSocial: z.string().min(1, 'Razão Social é obrigatória'),
+  razaoSocial: z.string({ message: 'Razão Social é obrigatória' }).trim().min(1, 'Razão Social é obrigatória').optional(),
   cnpj: z.string().optional(),
   enderecoPrincipal: z.string().optional(),
   enderecoColeta: z.string().optional(),
   solicitanteNome: z.string().optional(),
-  solicitanteEmail: z.string().optional(),
+  solicitanteEmail: z.string().email('Email do solicitante inválido').optional().or(z.literal('')),
   solicitanteContato: z.string().optional(),
-  emailFinanceiro: z.string().optional(),
-  emailCertificados: z.string().optional(),
+  emailFinanceiro: z.string().email('Email financeiro inválido').optional().or(z.literal('')),
+  emailCertificados: z.string().email('Email de certificados inválido').optional().or(z.literal('')),
   retencaoImpostoFonte: z.boolean().optional(),
   status: z.nativeEnum(ClientStatus).optional(),
   restricaoPagamento: z.boolean().optional(),
@@ -23,6 +23,7 @@ export const ClientSchema = z.object({
   senha: z.string().optional(),
   inscricaoMunicipal: z.string().optional(),
   inscricaoEstadual: z.string().optional(),
+  dataLimiteNF: z.string().optional(),
 });
 
 export type ClientFormData = z.infer<typeof ClientSchema>;
@@ -60,6 +61,7 @@ export const QuoteSchema = z.object({
   observacoes: z.string().optional().default(''),
   parentQuoteId: z.string().optional(),
   revision: z.number().optional().default(0),
+  nomeComissionado: z.string().optional().default(''),
 });
 
 // --- Técnico ---
@@ -85,12 +87,14 @@ export const StandardInstrumentSchema = z.object({
   nome: z.string().min(1, 'Nome do padrão é obrigatório'),
   identificacao: z.string().min(1, 'Identificação é obrigatória'),
   certificadoCalibracao: z.string().optional().default(''),
+  certificadoPdf: z.string().optional(),
   dataCalibracao: z.string().optional().default(''),
   dataValidadeCalibracao: z.string(),
   periodicidade: z.string().optional().default(''),
   orgaoCalibrador: z.string().optional().default(''),
   resolucao: z.string().optional().default(''),
   uncertainty: z.number().optional().default(0),
+  kFactor: z.number().optional().default(2.00),
   unidadeMedida: z.string().optional().default(''),
   statusMovimentacao: z.string().optional().default('Disponível'),
   procedureId: z.string().optional(),
@@ -143,6 +147,10 @@ export const FinancialControlSchema = z.object({
   formaPagamento: z.string().optional().default(''),
   banco: z.string().optional().default(''),
   comissao: z.number().optional().default(0),
+  percentualComissao: z.number().optional().default(0),
+  statusComissao: z.enum(['Pendente', 'Pago']).optional().default('Pendente'),
+  percentualImposto: z.number().optional().default(0),
+  dataPagamentoReal: z.string().optional(),
 });
 
 // --- Logística ---

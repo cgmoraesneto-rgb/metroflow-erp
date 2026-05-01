@@ -13,6 +13,7 @@ interface ClientsSectionProps {
     onDeleteClient: (id: string) => void;
     onUpdateStatus: (id: string) => void;
     documentTemplates?: any[];
+    searchQuery?: string;
 }
 
 const ClientsSection: React.FC<ClientsSectionProps> = ({
@@ -23,13 +24,13 @@ const ClientsSection: React.FC<ClientsSectionProps> = ({
     onSaveClient,
     onDeleteClient,
     onUpdateStatus,
-    documentTemplates = []
+    documentTemplates = [],
+    searchQuery
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingClient, setEditingClient] = useState<Client | null>(null);
     const [viewingClient, setViewingClient] = useState<Client | null>(null);
     const [viewModalTab, setViewModalTab] = useState<'details' | 'quotes' | 'services'>('details');
-    const [searchTerm, setSearchTerm] = useState('');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>(() =>
         (localStorage.getItem('clientsViewMode') as 'grid' | 'list') || 'grid'
     );
@@ -45,40 +46,87 @@ const ClientsSection: React.FC<ClientsSectionProps> = ({
         setIsModalOpen(true);
     };
 
-    const filteredClients = clients.filter(client =>
-        client.razaoSocial.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.cnpj.includes(searchTerm)
-    );
+    const handleAddNewClient = () => {
+        // Encontra o próximo ID sequencial (ignorando timestamps de Date.now())
+        const numericIds = (clients || [])
+            .map(c => {
+                // Remove qualquer prefixo não numérico
+                const numericPart = c.id.replace(/\D/g, '');
+                return numericPart.length > 0 && numericPart.length < 10 ? parseInt(numericPart, 10) : null;
+            })
+            .filter((id): id is number => id !== null);
 
-    const sortedClients = [...filteredClients].sort((a, b) => a.razaoSocial.localeCompare(b.razaoSocial));
+        const maxId = numericIds.length > 0 ? Math.max(...numericIds) : 0;
+        const nextId = (maxId + 1).toString().padStart(4, '0');
+
+        const newClient: Client = {
+            id: nextId,
+            razaoSocial: '',
+            cnpj: '',
+            enderecoPrincipal: '',
+            enderecoColeta: '',
+            solicitanteNome: '',
+            solicitanteEmail: '',
+            solicitanteContato: '',
+            emailFinanceiro: '',
+            emailCertificados: '',
+            retencaoImpostoFonte: false,
+            status: ClientStatus.NOT_UPDATED,
+            restricaoPagamento: false,
+            funcionarioCadastro: 'Sistema',
+        };
+        setEditingClient(newClient);
+        setIsModalOpen(true);
+    };
+
+
+    const filteredClients = (clients || []).filter(client => {
+        if (!searchQuery) return true;
+        const term = searchQuery.toLowerCase().trim();
+        const digits = term.replace(/\D/g, '');
+
+        const matchesText = (client.razaoSocial || "").toLowerCase().includes(term) ||
+                           (client.cnpj || "").includes(term);
+
+        if (matchesText) return true;
+
+        if (digits && digits.length >= 3) {
+            const cnpjDigits = (client.cnpj || "").replace(/\D/g, '');
+            if (cnpjDigits.includes(digits)) return true;
+        }
+
+        return false;
+    });
+
+    const sortedClients = [...filteredClients].sort((a, b) => (a.razaoSocial || '').localeCompare(b.razaoSocial || ''));
 
     return (
-        <div className="space-y-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div>
-                    <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Clientes</h2>
-                    <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium italic">Gerenciamento centralizado da base de parceiros.</p>
-                </div>
-
-        <div className="flex items-center gap-4">
-                    <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
+        <div className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-end gap-4">
+                <div className="flex flex-wrap items-center gap-4">
+                    {searchQuery && (
+                        <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-[10px] font-black uppercase tracking-widest animate-pulse border border-indigo-100">
+                             {filteredClients.length} registros
+                        </span>
+                    )}
+                    <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200 dark:border-slate-800">
                         <button
                             onClick={() => { setViewMode('list'); localStorage.setItem('clientsViewMode', 'list'); }}
-                            className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                            className={`p-2.5 rounded-xl transition-all ${viewMode === 'list' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                         >
                             <List className="w-5 h-5" />
                         </button>
                         <button
                             onClick={() => { setViewMode('grid'); localStorage.setItem('clientsViewMode', 'grid'); }}
-                            className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                            className={`p-2.5 rounded-xl transition-all ${viewMode === 'grid' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                         >
                             <LayoutGrid className="w-5 h-5" />
                         </button>
                     </div>
 
                     <button
-                        onClick={onAddClient}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl font-black text-sm shadow-lg shadow-indigo-200 dark:shadow-none transition-all flex items-center group active:scale-95 whitespace-nowrap"
+                        onClick={handleAddNewClient}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-indigo-100 dark:shadow-none transition-all flex items-center group active:scale-95 whitespace-nowrap"
                     >
                         <Plus className="mr-2 w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
                         Novo Cliente
@@ -233,7 +281,8 @@ const ClientsSection: React.FC<ClientsSectionProps> = ({
                         <table className="rectilinear-table">
                             <thead>
                                 <tr className="rectilinear-tr">
-                                    <th className="rectilinear-th col-lg text-center pl-8">Razão Social</th>
+                                    <th className="rectilinear-th col-sm text-center pl-8">ID</th>
+                                    <th className="rectilinear-th col-lg text-left">Razão Social</th>
                                     <th className="rectilinear-th col-md text-center">CNPJ / Documento</th>
                                     <th className="rectilinear-th col-md text-center">Solicitante Primário</th>
                                     <th className="rectilinear-th col-sm text-center">Status VLD</th>
@@ -243,7 +292,10 @@ const ClientsSection: React.FC<ClientsSectionProps> = ({
                             <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
                                 {sortedClients.map((client) => (
                                     <tr key={client.id} className="rectilinear-tr group">
-                                        <td className="rectilinear-td text-left pl-8 font-black text-slate-900 dark:text-white truncate" title={client.razaoSocial}>
+                                        <td className="rectilinear-td text-center pl-8 font-mono font-black text-indigo-600 dark:text-indigo-400 text-xs tabular-nums">
+                                            {client.id}
+                                        </td>
+                                        <td className="rectilinear-td text-left font-black text-slate-900 dark:text-white truncate" title={client.razaoSocial}>
                                             {client.razaoSocial}
                                         </td>
                                         <td className="rectilinear-td text-center text-[11px] text-slate-500 dark:text-slate-400 font-black tracking-widest tabular-nums">
@@ -265,7 +317,7 @@ const ClientsSection: React.FC<ClientsSectionProps> = ({
                                                 {client.status === ClientStatus.NOT_UPDATED && (
                                                     <button 
                                                         onClick={() => onUpdateStatus(client.id)} 
-                                                        className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all" 
+                                                        className="p-2 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-all" 
                                                         title="Validar Cadastro (Marcar como Atualizado)"
                                                     >
                                                         <ShieldCheck className="w-4 h-4" />
@@ -287,8 +339,13 @@ const ClientsSection: React.FC<ClientsSectionProps> = ({
                             <div key={client.id} className="rectilinear-card group flex flex-col justify-between h-full">
                                 <div>
                                     <div className="flex items-center justify-between mb-4">
-                                        <div className={`p-2 rounded-xl ${client.status === ClientStatus.UPDATED ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
-                                            <Users className="w-5 h-5" />
+                                        <div className="flex items-center gap-3">
+                                            <div className={`p-2 rounded-xl ${client.status === ClientStatus.UPDATED ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+                                                <Users className="w-5 h-5" />
+                                            </div>
+                                            <span className="font-mono text-xs font-black text-indigo-600 dark:text-indigo-400">
+                                                #{client.id}
+                                            </span>
                                         </div>
                                         <span className={`text-[9px] font-black px-2 py-1 rounded-md uppercase tracking-wider ${client.status === ClientStatus.UPDATED ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
                                             {client.status}
@@ -313,8 +370,13 @@ const ClientsSection: React.FC<ClientsSectionProps> = ({
 
                                 <div className="flex items-center justify-between gap-2 border-t border-slate-50 dark:border-slate-800 pt-4">
                                     <button onClick={() => setViewingClient(client)} className="flex-1 py-2 text-slate-400 hover:text-indigo-600 font-black text-[10px] uppercase tracking-widest transition-all">Perfil</button>
-                                    <button onClick={() => handleEdit(client)} className="p-2 text-slate-400 hover:text-amber-600"><Pencil className="w-4 h-4" /></button>
-                                    <button onClick={() => onDeleteClient(client.id)} className="p-2 text-slate-400 hover:text-rose-500"><Trash2 className="w-4 h-4" /></button>
+                                    {client.status === ClientStatus.NOT_UPDATED && (
+                                        <button onClick={() => onUpdateStatus(client.id)} className="p-2 text-slate-400 hover:text-emerald-600 transition-all" title="Validar Cadastro">
+                                            <ShieldCheck className="w-4 h-4" />
+                                        </button>
+                                    )}
+                                    <button onClick={() => handleEdit(client)} className="p-2 text-slate-400 hover:text-amber-600 transition-all"><Pencil className="w-4 h-4" /></button>
+                                    <button onClick={() => onDeleteClient(client.id)} className="p-2 text-slate-400 hover:text-rose-500 transition-all"><Trash2 className="w-4 h-4" /></button>
                                 </div>
                             </div>
                         ))}

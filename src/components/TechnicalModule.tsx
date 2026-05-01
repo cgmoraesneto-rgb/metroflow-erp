@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FileText, ClipboardList, Activity, Clock, CheckCircle2 } from 'lucide-react';
 
 interface TechnicalModuleProps {
+  searchQuery?: string;
   standardInstruments: StandardInstrument[];
   serviceOrders: ServiceOrder[];
   quotes: Quote[];
@@ -11,10 +12,12 @@ interface TechnicalModuleProps {
   instrumentTypes: InstrumentType[];
   certificateMasks: CertificateMask[];
   calibrationRecords: CalibrationRecord[];
+  calibrationResults?: any[];
   procedures: Procedure[];
   onCalibrationRecordSubmit: (record: CalibrationRecord) => void;
   onSaveServiceOrder: (serviceOrder: ServiceOrder) => void;
   onSaveCalibrationRecord: (record: CalibrationRecord) => void;
+  onSaveCalibrationResult?: (result: any) => Promise<void>;
   onSaveCertificateMask: (mask: any) => void;
   onDeleteCertificateMask: (id: string) => void;
   onUpdateCertificateStatus: (recordId: string, status: CertificateStatus, justification?: string) => void;
@@ -30,6 +33,7 @@ import { toast } from 'sonner';
 type SubTab = 'masks' | 'records' | 'history';
 
 export default function TechnicalModule({
+  searchQuery = '',
   standardInstruments,
   serviceOrders,
   quotes,
@@ -37,9 +41,11 @@ export default function TechnicalModule({
   instrumentTypes,
   certificateMasks,
   calibrationRecords,
+  calibrationResults = [],
   procedures,
   onSaveServiceOrder,
   onSaveCalibrationRecord,
+  onSaveCalibrationResult,
   onSaveCertificateMask,
   onDeleteCertificateMask,
   onUpdateCertificateStatus,
@@ -81,18 +87,18 @@ export default function TechnicalModule({
 
   return (
     <div className="space-y-10">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 pb-10 border-b border-slate-100 dark:border-slate-800">
         <div>
-          <h2 className="text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Módulo Técnico</h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium italic">Gestão operacional de calibrações e máscaras de certificados.</p>
+          <span className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.3em] mb-2 block">Operação Técnica</span>
+          <h2 className="text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Laboratório</h2>
         </div>
 
-        <div className="flex flex-wrap lg:flex-nowrap bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl gap-1">
+        <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl gap-1">
           {TAB_CONFIG.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveSubTab(tab.id as SubTab)}
-              className={`flex items-center px-4 py-2.5 rounded-xl font-black text-xs transition-all duration-300 ${activeSubTab === tab.id
+              className={`flex items-center px-6 py-2.5 rounded-xl font-black text-xs transition-all duration-300 ${activeSubTab === tab.id
                 ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm'
                 : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                 }`}
@@ -115,14 +121,15 @@ export default function TechnicalModule({
           {activeSubTab === 'masks' && (
             <CertificateMasksModule
               masks={certificateMasks}
+              onSave={onSaveCertificateMask}
+              onDelete={onDeleteCertificateMask}
               procedures={procedures}
               standardInstruments={standardInstruments}
-              onSaveCertificateMask={onSaveCertificateMask}
-              onDeleteCertificateMask={onDeleteCertificateMask}
             />
           )}
           {activeSubTab === 'records' &&
             <CalibrationRecordModule
+              searchQuery={searchQuery}
               serviceOrders={serviceOrders}
               calibrationRecords={calibrationRecords}
               certificateMasks={certificateMasks}
@@ -131,9 +138,13 @@ export default function TechnicalModule({
               quotes={quotes}
               clients={clients}
               onSaveCalibrationRecord={onSaveCalibrationRecord}
+              onSaveCalibrationResult={onSaveCalibrationResult}
+              calibrationResults={calibrationResults}
+              employees={employees}
             />}
           {activeSubTab === 'history' && (
             <CalibrationHistoryModule
+              searchQuery={searchQuery}
               calibrationRecords={calibrationRecords}
               serviceOrders={serviceOrders}
               clients={clients}

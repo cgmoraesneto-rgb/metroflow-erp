@@ -131,11 +131,11 @@ export default function AuditLogModule() {
         if (search) {
           const q = search.toLowerCase();
           return (
-            log.userName.toLowerCase().includes(q) ||
-            log.entityType.toLowerCase().includes(q) ||
-            log.entityId.toLowerCase().includes(q) ||
-            log.action.toLowerCase().includes(q) ||
-            (log.justification ?? '').toLowerCase().includes(q)
+            (log.userName || '').toLowerCase().includes(q) ||
+            (log.entityType || '').toLowerCase().includes(q) ||
+            (log.entityId || '').toLowerCase().includes(q) ||
+            (log.action || '').toLowerCase().includes(q) ||
+            (log.justification || '').toLowerCase().includes(q)
           );
         }
         return true;

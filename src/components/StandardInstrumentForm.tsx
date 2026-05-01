@@ -1,223 +1,261 @@
-import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import * as z from 'zod';
 import { StandardInstrument } from '../types';
-import { Plus, Pencil, X, Calendar, FileUp, FileCheck, Save } from 'lucide-react';
-import { parseNumericInput } from '../utils/formatters';
+import { useEffect } from 'react';
+import { Shield, Hash, Calendar, Ruler, Info, Search, FileUp, CheckCircle2, X } from 'lucide-react';
 import { toast } from 'sonner';
 
-const standardInstrumentSchema = z.object({
+const schema = z.object({
   id: z.string().optional(),
   nome: z.string().min(1, 'Nome é obrigatório'),
   identificacao: z.string().min(1, 'Identificação é obrigatória'),
-  certificadoCalibracao: z.string().min(1, 'Certificado é obrigatório'),
+  certificadoCalibracao: z.string().min(1, 'Número do certificado é obrigatório'),
+  certificadoPdf: z.string().optional(),
   dataCalibracao: z.string().min(1, 'Data de calibração é obrigatória'),
+  dataValidadeCalibracao: z.string().min(1, 'Data de validade é obrigatória'),
   orgaoCalibrador: z.string().min(1, 'Órgão calibrador é obrigatório'),
   periodicidade: z.string().min(1, 'Periodicidade é obrigatória'),
-  dataValidadeCalibracao: z.string().min(1, 'Validade é obrigatória'),
-  resolucao: z.string().optional(),
-  unidadeMedida: z.string().optional(),
-  uncertainty: z.number().optional(),
+  resolucao: z.string().min(1, 'Resolução é obrigatória'),
+  unidadeMedida: z.string().min(1, 'Unidade de medida é obrigatória'),
   statusMovimentacao: z.enum(['Disponível', 'Vencido', 'Em calibração', 'Em manutenção', 'Emprestado']),
-  certificadoPdf: z.string().optional()
+  uncertainty: z.number().min(0, 'Incerteza deve ser positiva'),
+  kFactor: z.number().min(0, 'Fator k deve ser positivo').default(2.00),
 });
 
-export type StandardInstrumentFormData = z.infer<typeof standardInstrumentSchema>;
-
 interface StandardInstrumentFormProps {
-  initialData?: StandardInstrument | null;
-  onSave: (data: StandardInstrumentFormData) => void;
+  onSubmit: (data: StandardInstrument) => void | Promise<void>;
+  initialData?: Partial<StandardInstrument>;
   onCancel: () => void;
 }
 
-export default function StandardInstrumentForm({ initialData, onSave, onCancel }: StandardInstrumentFormProps) {
-  const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<StandardInstrumentFormData>({
-    resolver: zodResolver(standardInstrumentSchema),
+export default function StandardInstrumentForm({ onSubmit, initialData, onCancel }: StandardInstrumentFormProps) {
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm({
+    resolver: zodResolver(schema),
     defaultValues: {
-      nome: '',
-      identificacao: '',
-      certificadoCalibracao: '',
-      dataCalibracao: '',
-      orgaoCalibrador: '',
-      periodicidade: '',
-      dataValidadeCalibracao: '',
-      resolucao: '',
-      unidadeMedida: '',
-      uncertainty: 0,
       statusMovimentacao: 'Disponível',
-      certificadoPdf: ''
+      uncertainty: 0,
+      kFactor: 2.00,
+      ...initialData
     }
   });
 
-  useEffect(() => {
-    if (initialData) {
-      reset({
-        ...initialData,
-        unidadeMedida: initialData.unidadeMedida || '',
-        resolucao: initialData.resolucao || '',
-        uncertainty: initialData.uncertainty || 0,
-        certificadoPdf: initialData.certificadoPdf || '',
-        statusMovimentacao: initialData.statusMovimentacao || 'Disponível'
-      });
-    } else {
-      reset({
-        nome: '', identificacao: '', certificadoCalibracao: '', dataCalibracao: '', orgaoCalibrador: '',
-        periodicidade: '', dataValidadeCalibracao: '', resolucao: '', unidadeMedida: '', uncertainty: 0,
-        statusMovimentacao: 'Disponível', certificadoPdf: ''
-      });
-    }
-  }, [initialData, reset]);
-
-  const dataCalibracao = watch('dataCalibracao');
-  const periodicidade = watch('periodicidade');
-  const certificadoPdf = watch('certificadoPdf');
+  const watchDataCalibracao = watch('dataCalibracao');
+  const watchPeriodicidade = watch('periodicidade');
 
   useEffect(() => {
-    if (dataCalibracao && periodicidade) {
-      const d = new Date(dataCalibracao + 'T00:00:00');
-      if (!isNaN(d.getTime())) {
-        const m = parseInt(periodicidade, 10);
-        if (!isNaN(m)) {
-          d.setMonth(d.getMonth() + m);
-          setValue('dataValidadeCalibracao', d.toISOString().split('T')[0], { shouldValidate: true });
-        }
+    if (watchDataCalibracao && watchPeriodicidade) {
+      const date = new Date(watchDataCalibracao);
+      const months = parseInt(watchPeriodicidade, 10);
+      if (!isNaN(date.getTime()) && !isNaN(months)) {
+        date.setMonth(date.getMonth() + months);
+        setValue('dataValidadeCalibracao', date.toISOString().split('T')[0]);
       }
     }
-  }, [dataCalibracao, periodicidade, setValue]);
+  }, [watchDataCalibracao, watchPeriodicidade, setValue]);
 
-  const onSubmit = (data: StandardInstrumentFormData) => {
-    onSave(data);
-    toast.success(initialData ? 'Instrumento Padrão atualizado com sucesso!' : 'Novo Instrumento Padrão cadastrado com sucesso!');
+  const parseNumericInput = (val: string) => {
+    const sanitized = val.replace(',', '.');
+    return parseFloat(sanitized) || 0;
   };
 
   return (
-    <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 mb-12">
-      <div className="flex items-center justify-between mb-8">
-        <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center">
-          <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center mr-3 shadow-lg shadow-indigo-100">
-            {initialData ? <Pencil className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-          </div>
-          {initialData ? 'Editar Instrumento Padrão' : 'Cadastrar Novo Padrão'}
-        </h3>
-        {initialData && (
-          <button 
-            type="button"
-            onClick={onCancel} 
-            className="text-slate-400 hover:text-slate-600 flex items-center font-bold text-xs"
-          >
-            <X className="w-4 h-4 mr-1" /> Cancelar Edição
-          </button>
-        )}
-      </div>
-      
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="space-y-2 lg:col-span-2">
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nome do Instrumento</label>
-            <input 
-              {...register('nome')}
-              placeholder="Ex: Bloco Padrão de Aço"
-              className={`w-full border-2 bg-white p-3.5 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-sm ${errors.nome ? 'border-red-400' : 'border-transparent'}`}
-            />
-            {errors.nome && <p className="text-red-500 text-xs mt-1 ml-1">{errors.nome.message}</p>}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <div className="space-y-6">
+        {/* Linha 1 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Descrição do Padrão</label>
+            <div className="relative group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-hover:text-indigo-500 transition-colors" />
+              <input 
+                {...register('nome')} 
+                className="w-full border-2 border-transparent bg-slate-50 p-3.5 pl-11 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-sm"
+                placeholder="Ex: Micrômetro Analógico"
+              />
+            </div>
+            {errors.nome && <p className="text-rose-500 text-[10px] font-bold ml-1 uppercase">{errors.nome.message as string}</p>}
           </div>
 
           <div className="space-y-2">
             <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Identificação / TAG</label>
-            <input 
-              {...register('identificacao')}
-              placeholder="Ex: MET-001"
-              className={`w-full border-2 bg-white p-3.5 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-sm ${errors.identificacao ? 'border-red-400' : 'border-transparent'}`}
-            />
-            {errors.identificacao && <p className="text-red-500 text-xs mt-1 ml-1">{errors.identificacao.message}</p>}
+            <div className="relative group">
+              <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-hover:text-indigo-500 transition-colors" />
+              <input 
+                {...register('identificacao')} 
+                className="w-full border-2 border-transparent bg-slate-50 p-3.5 pl-11 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-sm"
+                placeholder="Ex: PAD-001"
+              />
+            </div>
+            {errors.identificacao && <p className="text-rose-500 text-[10px] font-bold ml-1 uppercase">{errors.identificacao.message as string}</p>}
           </div>
+        </div>
 
+        {/* Linha 2 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Certificado</label>
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nº do Certificado</label>
             <input 
-              {...register('certificadoCalibracao')}
-              placeholder="Nº Certificado"
-              className={`w-full border-2 bg-white p-3.5 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-sm ${errors.certificadoCalibracao ? 'border-red-400' : 'border-transparent'}`}
+              {...register('certificadoCalibracao')} 
+              className="w-full border-2 border-transparent bg-slate-50 p-3.5 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-sm"
             />
-            {errors.certificadoCalibracao && <p className="text-red-500 text-xs mt-1 ml-1">{errors.certificadoCalibracao.message}</p>}
+            {errors.certificadoCalibracao && <p className="text-rose-500 text-[10px] font-bold ml-1 uppercase">{errors.certificadoCalibracao.message as string}</p>}
           </div>
+          <div className="space-y-2">
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Calibrado por (Órgão)</label>
+            <input 
+              {...register('orgaoCalibrador')} 
+              className="w-full border-2 border-transparent bg-slate-50 p-3.5 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-sm"
+            />
+            {errors.orgaoCalibrador && <p className="text-rose-500 text-[10px] font-bold ml-1 uppercase">{errors.orgaoCalibrador.message as string}</p>}
+          </div>
+        </div>
 
-          <div className="space-y-2 text-slate-500">
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 flex items-center">
-              <Calendar className="w-3 h-3 mr-1" /> Data da Calibração
+        {/* Linha 3 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="space-y-2">
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Data Calib.</label>
+            <input 
+              type="date"
+              {...register('dataCalibracao')} 
+              className="w-full border-2 border-transparent bg-slate-50 p-3.5 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-sm"
+            />
+            {errors.dataCalibracao && <p className="text-rose-500 text-[10px] font-bold ml-1 uppercase">{errors.dataCalibracao.message as string}</p>}
+          </div>
+          <div className="space-y-2">
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Periodicidade (Meses)</label>
+            <input 
+              type="number"
+              min="1"
+              {...register('periodicidade')} 
+              className="w-full border-2 border-transparent bg-slate-50 p-3.5 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-sm"
+              placeholder="Ex: 12"
+            />
+            {errors.periodicidade && <p className="text-rose-500 text-[10px] font-bold ml-1 uppercase">{errors.periodicidade.message as string}</p>}
+          </div>
+          <div className="space-y-2">
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-1">
+              Validade (Auto) <Info className="w-3 h-3 text-indigo-400" />
             </label>
             <input 
               type="date"
-              {...register('dataCalibracao')}
-              className={`w-full border-2 bg-white p-3.5 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-sm ${errors.dataCalibracao ? 'border-red-400' : 'border-transparent'}`}
-            />
-            {errors.dataCalibracao && <p className="text-red-500 text-xs mt-1 ml-1">{errors.dataCalibracao.message}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Calibrador (Órgão)</label>
-            <input 
-              {...register('orgaoCalibrador')}
-              placeholder="Ex: RBC / INMETRO"
-              className={`w-full border-2 bg-white p-3.5 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-sm ${errors.orgaoCalibrador ? 'border-red-400' : 'border-transparent'}`}
-            />
-            {errors.orgaoCalibrador && <p className="text-red-500 text-xs mt-1 ml-1">{errors.orgaoCalibrador.message}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Período (Meses)</label>
-            <input 
-              type="number"
-              {...register('periodicidade')}
-              className={`w-full border-2 bg-white p-3.5 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-sm ${errors.periodicidade ? 'border-red-400' : 'border-transparent'}`}
-            />
-            {errors.periodicidade && <p className="text-red-500 text-xs mt-1 ml-1">{errors.periodicidade.message}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Validade</label>
-            <input 
-              type="date"
-              {...register('dataValidadeCalibracao')}
+              {...register('dataValidadeCalibracao')} 
               readOnly
-              className={`w-full border-2 border-transparent bg-slate-100 p-3.5 rounded-2xl font-bold text-sm text-slate-400 cursor-not-allowed ${errors.dataValidadeCalibracao ? 'border-red-400' : 'border-transparent'}`}
+              className="w-full border-2 border-transparent bg-slate-100 p-3.5 rounded-2xl outline-none font-bold text-sm text-slate-500 shadow-sm cursor-not-allowed"
             />
-            {errors.dataValidadeCalibracao && <p className="text-red-500 text-xs mt-1 ml-1">{errors.dataValidadeCalibracao.message}</p>}
+            {errors.dataValidadeCalibracao && <p className="text-rose-500 text-[10px] font-bold ml-1 uppercase">{errors.dataValidadeCalibracao.message as string}</p>}
           </div>
+        </div>
 
+        {/* Linha 4 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="space-y-2">
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Resolução / Unidade</label>
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Resolução</label>
+            <input 
+              {...register('resolucao')} 
+              className="w-full border-2 border-transparent bg-slate-50 p-3.5 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-sm text-center"
+            />
+            {errors.resolucao && <p className="text-rose-500 text-[10px] font-bold ml-1 uppercase">{errors.resolucao.message as string}</p>}
+          </div>
+          <div className="space-y-2">
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Unidade</label>
+            <input 
+              {...register('unidadeMedida')} 
+              className="w-full border-2 border-transparent bg-slate-50 p-3.5 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-sm text-center"
+            />
+            {errors.unidadeMedida && <p className="text-rose-500 text-[10px] font-bold ml-1 uppercase">{errors.unidadeMedida.message as string}</p>}
+          </div>
+          <div className="space-y-2">
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Incerteza Padrão / Fator k</label>
             <div className="flex gap-2">
-                <input 
-                  {...register('resolucao')}
-                  placeholder="0.01"
-                  className="w-1/2 border-2 border-transparent bg-white p-3.5 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-sm"
-                />
-                <input 
-                  {...register('unidadeMedida')}
-                  placeholder="mm"
-                  className="w-1/2 border-2 border-transparent bg-white p-3.5 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-sm"
-                />
+                <div className="w-2/3">
+                  <input 
+                    type="text" 
+                    defaultValue={initialData?.uncertainty?.toString().replace('.', ',') || ''}
+                    onChange={(e) => setValue('uncertainty', parseNumericInput(e.target.value))}
+                    placeholder="Incerteza"
+                    className="w-full border-2 border-transparent bg-white p-3.5 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-sm border-slate-200"
+                  />
+                  {errors.uncertainty && <p className="text-rose-500 text-[9px] font-bold mt-1 uppercase">{errors.uncertainty.message as string}</p>}
+                </div>
+                <div className="w-1/3">
+                  <input 
+                    type="text" 
+                    defaultValue={initialData?.kFactor?.toString().replace('.', ',') || '2,00'}
+                    onChange={(e) => setValue('kFactor', parseNumericInput(e.target.value))}
+                    placeholder="k"
+                    className="w-full border-2 border-transparent bg-white p-3.5 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-sm text-center border-slate-200"
+                  />
+                  {errors.kFactor && <p className="text-rose-500 text-[9px] font-bold mt-1 uppercase">{errors.kFactor.message as string}</p>}
+                </div>
             </div>
           </div>
+        </div>
 
+        {/* Linha 5 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-slate-100 pt-6">
           <div className="space-y-2">
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Incerteza Padrão</label>
-            <input 
-              type="text" 
-              defaultValue={initialData?.uncertainty?.toString().replace('.', ',') || ''}
-              onChange={(e) => setValue('uncertainty', parseNumericInput(e.target.value))}
-              placeholder="0,005"
-              className="w-full border-2 border-transparent bg-white p-3.5 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-sm"
-            />
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Anexo do Certificado (PDF)</label>
+            <div className="flex items-center gap-2">
+              <label className="flex-1 cursor-pointer border-2 border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 p-3 rounded-2xl flex items-center justify-center transition-all text-slate-500 font-bold text-xs gap-2">
+                <FileUp className="w-4 h-4" />
+                Upload PDF
+                <input 
+                  type="file" 
+                  accept=".pdf"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      if (file.size > 800 * 1024) {
+                        toast.error('O arquivo PDF é muito grande (máximo 800KB). Para arquivos maiores, utilize um link externo.');
+                        e.target.value = '';
+                        return;
+                      }
+
+                      const reader = new FileReader();
+                      reader.onloadstart = () => {
+                        toast.loading('Processando PDF...', { id: 'pdf-loading' });
+                      };
+                      reader.onloadend = () => {
+                        setValue('certificadoPdf', reader.result as string, { shouldDirty: true });
+                        toast.dismiss('pdf-loading');
+                        toast.success('PDF anexado com sucesso!');
+                      };
+                      reader.onerror = () => {
+                        toast.dismiss('pdf-loading');
+                        toast.error('Erro ao ler o arquivo PDF.');
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
+              </label>
+              {watch('certificadoPdf') && (
+                <div className="flex items-center gap-2">
+                  <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center border border-emerald-100 shadow-sm shrink-0" title="PDF Anexado">
+                    <CheckCircle2 className="w-5 h-5" />
+                  </div>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                        setValue('certificadoPdf', undefined, { shouldDirty: true });
+                        toast.info('Anexo removido.');
+                    }}
+                    className="p-2 text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
+                    title="Remover anexo"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-
           <div className="space-y-2">
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Status</label>
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Status Operacional</label>
             <select
               {...register('statusMovimentacao')}
-              className="w-full border-2 border-transparent bg-white p-3.5 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-sm"
+              className="w-full border-2 border-transparent bg-slate-50 p-3.5 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-sm"
             >
               <option value="Disponível">Disponível</option>
               <option value="Vencido">Vencido</option>
@@ -226,50 +264,24 @@ export default function StandardInstrumentForm({ initialData, onSave, onCancel }
               <option value="Emprestado">Emprestado</option>
             </select>
           </div>
-
-          <div className="space-y-2 lg:col-span-2">
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Anexo PDF (Certificado)</label>
-            <div className={`relative flex items-center gap-4 p-1.5 rounded-2xl border-2 border-dashed transition-all ${certificadoPdf ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200 bg-white'}`}>
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${certificadoPdf ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
-                    {certificadoPdf ? <FileCheck className="w-6 h-6" /> : <FileUp className="w-6 h-6" />}
-                </div>
-                <div className="flex-1">
-                    <p className={`text-xs font-bold ${certificadoPdf ? 'text-emerald-700' : 'text-slate-400'}`}>
-                        {certificadoPdf || 'Nenhum arquivo selecionado'}
-                    </p>
-                    <p className="text-[10px] text-slate-400">PDF de calibração do padrão</p>
-                </div>
-                <input 
-                    type="file" 
-                    accept=".pdf"
-                    onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) setValue('certificadoPdf', file.name, { shouldValidate: true });
-                    }}
-                    className="absolute inset-0 opacity-0 cursor-pointer"
-                />
-                {certificadoPdf && (
-                    <button 
-                        onClick={(e) => { e.preventDefault(); setValue('certificadoPdf', '', { shouldValidate: true }); }}
-                        className="p-2 text-rose-500 hover:bg-rose-100 rounded-lg mr-2 relative z-10"
-                    >
-                        <X className="w-4 h-4" />
-                    </button>
-                )}
-            </div>
-          </div>
         </div>
+      </div>
 
-        <div className="mt-10 flex justify-end">
-          <button 
-            type="submit" 
-            className="bg-indigo-600 text-white px-10 py-4 rounded-2xl font-black text-sm shadow-xl shadow-indigo-100 hover:bg-indigo-700 hover:-translate-y-1 transition-all flex items-center"
-          >
-            <Save className="mr-2 w-5 h-5" />
-            {initialData ? 'Salvar Alterações' : 'Cadastrar Instrumento'}
-          </button>
-        </div>
-      </form>
-    </div>
+      <div className="flex justify-end gap-3 pt-6 border-t border-slate-100">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest text-slate-400 hover:bg-slate-50 transition-all"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          className="px-8 py-3 rounded-2xl bg-indigo-600 text-white font-black text-xs uppercase tracking-widest hover:bg-slate-900 transition-all shadow-lg active:scale-95"
+        >
+          Salvar Padrão
+        </button>
+      </div>
+    </form>
   );
 }

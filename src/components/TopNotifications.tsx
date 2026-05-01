@@ -6,7 +6,7 @@ import { Bell, AlertCircle, FileText, Wrench, X, ExternalLink } from 'lucide-rea
 import { useNavigate } from 'react-router-dom';
 
 export default function TopNotifications() {
-    const { calibrationRecords, quotes, standardInstruments, hasPermission } = useData();
+    const { calibrationRecords, quotes, standardInstruments, serviceOrders, hasPermission } = useData();
     const { employee } = useAuth();
     const navigate = useNavigate();
     
@@ -26,6 +26,7 @@ export default function TopNotifications() {
 
     const notifications = useMemo(() => {
         const notifs: any[] = [];
+        const todayStr = new Date().toISOString().split('T')[0];
 
         // 1. Notificações do Técnico (Certificados Devolvidos)
         if (hasPermission(Module.TECHNICAL)) {
@@ -45,59 +46,107 @@ export default function TopNotifications() {
                     time: 'Técnico'
                 });
             });
+
+            // Certificados Aguardando Assinatura (Para Revisores/RT)
+            const signaturePending = calibrationRecords.filter(r => r.status === CertificateStatus.IN_ANALYSIS);
+            signaturePending.forEach(r => {
+                notifs.push({
+                    id: `sign-pending-${r.id}`,
+                    type: 'warning',
+                    icon: Wrench,
+                    title: 'Aguardando Assinatura',
+                    message: `O Certificado ${r.certificateNumber} está pronto para análise e assinatura.`,
+                    action: () => navigate('/qualidade'),
+                    time: 'Qualidade'
+                });
+            });
         }
 
         // 2. Notificações da Qualidade (Padrões Vencendo / Vencidos)
-        if (hasPermission(Module.QUALITY) || hasPermission(Module.TECHNICAL)) {
+        if (hasPermission(Module.QUALITY)) {
             const now = new Date();
             const soon = new Date();
-            soon.setDate(now.getDate() + 30); // 30 dias de aviso
+            soon.setDate(now.getDate() + 30); 
 
             standardInstruments.forEach(std => {
-                if (!std.dataValidadeCalibracao) return;
-                const dueDate = new Date(std.dataValidadeCalibracao);
-                if (dueDate < now) {
+                const dueDate = std.dataValidadeCalibracao ? new Date(std.dataValidadeCalibracao) : null;
+                if (dueDate && dueDate < now) {
                     notifs.push({
                         id: `std-exp-${std.id}`,
                         type: 'danger',
                         icon: Wrench,
                         title: 'Padrão Vencido',
                         message: `O Padrão ${std.identificacao} venceu em ${dueDate.toLocaleDateString('pt-BR')}.`,
-                        action: () => navigate('/cadastros?tab=standards'), // Exemplo
-                        time: 'Qualidade'
-                    });
-                } else if (dueDate <= soon) {
-                    notifs.push({
-                        id: `std-warn-${std.id}`,
-                        type: 'warning',
-                        icon: Wrench,
-                        title: 'Padrão a Vencer',
-                        message: `O Padrão ${std.identificacao} vence dia ${dueDate.toLocaleDateString('pt-BR')}.`,
                         action: () => navigate('/cadastros'), 
                         time: 'Qualidade'
                     });
                 }
             });
+
+            // Certificados Aprovados Hoje
+            const approvedToday = calibrationRecords.filter(r => r.status === CertificateStatus.APPROVED && r.calibrationDate === todayStr);
+            if (approvedToday.length > 0) {
+              notifs.push({
+                  id: 'certs-approved-today',
+                  type: 'info',
+                  icon: FileText,
+                  title: 'Certificados Aprovados',
+                  message: `${approvedToday.length} certificados foram aprovados e estão prontos para envio.`,
+                  action: () => navigate('/qualidade'),
+                  time: 'Sucesso'
+              });
+            }
         }
 
-        // 3. Notificações Comerciais (Orçamentos Pendentes há muito tempo)
-        if (hasPermission(Module.COMMERCIAL)) {
-            const pendingQuotes = quotes.filter(q => q.status === QuoteStatus.PENDING);
-            if (pendingQuotes.length > 0) {
+        // 3. Notificações Comerciais & Logística (O.S. Criadas e Pendências)
+        if (hasPermission(Module.COMMERCIAL) || hasPermission(Module.LOGISTICS)) {
+            const newOS = serviceOrders.filter(os => os.dataEmissao === todayStr);
+            if (newOS.length > 0) {
                 notifs.push({
-                    id: 'quotes-pending',
+                    id: 'new-os-today',
                     type: 'info',
                     icon: FileText,
-                    title: 'Orçamentos Pendentes',
-                    message: `Você possui ${pendingQuotes.length} orçamentos aguardando aprovação.`,
-                    action: () => navigate('/comercial?tab=quotes'),
-                    time: 'Comercial'
+                    title: 'Novas O.S. Criadas',
+                    message: `Existem ${newOS.length} novas Ordens de Serviço abertas hoje.`,
+                    action: () => navigate('/logistica'),
+                    time: 'Logística'
+                });
+            }
+
+            const pendingQuotes = quotes.filter(q => q.status === QuoteStatus.PENDING);
+            const pendingOS = serviceOrders.filter(os => os.statusServico === 'Pendente');
+            
+            if (pendingQuotes.length > 0 || pendingOS.length > 0) {
+                notifs.push({
+                    id: 'summary-pending',
+                    type: 'warning',
+                    icon: FileText,
+                    title: 'Resumo de Pendências',
+                    message: `Pendentes: ${pendingQuotes.length} orçamentos e ${pendingOS.length} ordens de serviço.`,
+                    action: () => navigate('/comercial'),
+                    time: 'Ação Necessária'
+                });
+            }
+        }
+
+        // 4. Notificações Financeiras (Serviços Concluídos)
+        if (hasPermission(Module.FINANCE)) {
+            const completedServices = serviceOrders.filter(os => os.statusServico === 'Concluído');
+            if (completedServices.length > 0) {
+                notifs.push({
+                    id: 'finance-pending',
+                    type: 'info',
+                    icon: FileText,
+                    title: 'Serviços Concluídos',
+                    message: `Existem ${completedServices.length} serviços concluídos aguardando faturamento.`,
+                    action: () => navigate('/financeiro'),
+                    time: 'Financeiro'
                 });
             }
         }
 
         return notifs;
-    }, [calibrationRecords, quotes, standardInstruments, hasPermission, employee, navigate]);
+    }, [calibrationRecords, quotes, standardInstruments, serviceOrders, hasPermission, employee, navigate]);
 
     return (
         <div className="relative" ref={dropdownRef}>

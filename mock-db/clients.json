@@ -18,5 +18,43 @@
     "telefone": "(19) 3322-1100",
     "enderecoPrincipal": "Rua Técnica, 42 - Campinas/SP",
     "status": "Ativo"
+  },
+  {
+    "id": "001",
+    "razaoSocial": "Novo Cliente 001",
+    "cnpj": "00.000.000/0000-00",
+    "status": "NÃO ATUALIZADO",
+    "funcionarioCadastro": "C.G. Moraes Neto",
+    "enderecoPrincipal": "RUA RAUL BOOP, 37, COMPENSA, MANAUS - AM",
+    "enderecoColeta": "",
+    "solicitanteNome": "",
+    "solicitanteEmail": "",
+    "solicitanteContato": "9292135116",
+    "emailFinanceiro": "",
+    "emailCertificados": "",
+    "retencaoImpostoFonte": false,
+    "restricaoPagamento": false,
+    "senha": "",
+    "inscricaoMunicipal": "",
+    "inscricaoEstadual": ""
+  },
+  {
+    "id": "002",
+    "razaoSocial": "Novo Cliente 002",
+    "cnpj": "00.000.000/0000-00",
+    "status": "NÃO ATUALIZADO",
+    "funcionarioCadastro": "Desenvolvedor MetroFlow",
+    "enderecoPrincipal": "RUA RAUL BOOP, 37, COMPENSA, MANAUS - AM",
+    "enderecoColeta": "",
+    "solicitanteNome": "",
+    "solicitanteEmail": "",
+    "solicitanteContato": "9292135116",
+    "emailFinanceiro": "",
+    "emailCertificados": "",
+    "retencaoImpostoFonte": false,
+    "restricaoPagamento": false,
+    "senha": "",
+    "inscricaoMunicipal": "",
+    "inscricaoEstadual": ""
   }
 ]

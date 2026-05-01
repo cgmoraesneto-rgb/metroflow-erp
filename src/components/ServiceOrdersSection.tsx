@@ -42,10 +42,14 @@ export default function ServiceOrdersSection({ clients, quotes, serviceOrders, c
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedQuoteId, setSelectedQuoteId] = useState('');
 
+  const [statusFilter, setStatusFilter] = useState<'all' | InstrumentStatus>('all');
+
   const filteredOS = serviceOrders.filter(os => {
     const client = clients.find(c => c.id === os.clienteId);
     const searchStr = `${os.id} ${os.orcamentoId} ${client?.razaoSocial}`.toLowerCase();
-    return searchStr.includes(searchTerm.toLowerCase());
+    const matchesSearch = searchStr.includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || os.statusServico === statusFilter;
+    return matchesSearch && matchesStatus;
   });
 
 
@@ -94,26 +98,60 @@ export default function ServiceOrdersSection({ clients, quotes, serviceOrders, c
 
   return (
     <div className="space-y-8">
-      <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Ordens de Serviço</h2>
-            <p className="text-sm text-gray-500">Gerencie o fluxo de trabalho técnico a partir de orçamentos aprovados.</p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Ordens de Serviço</h3>
+          <div className="flex items-center gap-4 mt-2">
+            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium italic">Gerencie o fluxo de trabalho técnico a partir de orçamentos aprovados.</p>
+            <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-800 ml-4">
+              <button 
+                onClick={() => setStatusFilter('all')}
+                className={`px-3 py-1 text-[9px] font-black uppercase rounded-md transition-all ${statusFilter === 'all' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+              >
+                Todas
+              </button>
+              <button 
+                onClick={() => setStatusFilter(InstrumentStatus.PENDING)}
+                className={`px-3 py-1 text-[9px] font-black uppercase rounded-md transition-all ${statusFilter === InstrumentStatus.PENDING ? 'bg-white dark:bg-amber-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+              >
+                Pendentes
+              </button>
+              <button 
+                onClick={() => setStatusFilter(InstrumentStatus.IN_PROGRESS)}
+                className={`px-3 py-1 text-[9px] font-black uppercase rounded-md transition-all ${statusFilter === InstrumentStatus.IN_PROGRESS ? 'bg-white dark:bg-amber-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+              >
+                Em Andamento
+              </button>
+              <button 
+                onClick={() => setStatusFilter(InstrumentStatus.CALIBRATED)}
+                className={`px-3 py-1 text-[9px] font-black uppercase rounded-md transition-all ${statusFilter === InstrumentStatus.CALIBRATED ? 'bg-white dark:bg-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+              >
+                Calibrado
+              </button>
+              <button 
+                onClick={() => setStatusFilter(InstrumentStatus.DELIVERED)}
+                className={`px-3 py-1 text-[9px] font-black uppercase rounded-md transition-all ${statusFilter === InstrumentStatus.DELIVERED ? 'bg-white dark:bg-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+              >
+                Entregue
+              </button>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div className="bg-gray-50 p-6 rounded-3xl border border-gray-100 mb-10">
-          <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-6 flex items-center">
+      <div className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] shadow-sm border border-gray-200 dark:border-slate-800">
+        <div className="bg-gray-50 dark:bg-slate-800/50 p-6 rounded-3xl border border-gray-100 dark:border-slate-800 mb-10">
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-6 flex items-center">
             <Plus className="mr-2 w-4 h-4 text-indigo-600" />
             Gerar Nova O.S.
           </h3>
           <div className="flex flex-col md:flex-row items-end gap-4">
-            <div className="flex-grow space-y-1.5">
-              <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Selecione o Orçamento</label>
+            <div className="flex-grow space-y-1.5 w-full">
+              <label className="block text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider ml-1">Selecione o Orçamento</label>
               <select
                 value={selectedQuoteId}
                 onChange={(e) => setSelectedQuoteId(e.target.value)}
-                className="w-full border border-gray-200 p-2.5 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium text-sm bg-white"
+                className="w-full border border-gray-200 dark:border-slate-700 p-2.5 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium text-sm bg-white dark:bg-slate-900 dark:text-white"
               >
                 <option value="">Selecione um orçamento aprovado</option>
                 {quotes.map(quote => (
@@ -132,7 +170,7 @@ export default function ServiceOrdersSection({ clients, quotes, serviceOrders, c
                   toast.error('Selecione um orçamento primeiro.');
                 }
               }} 
-              className="bg-indigo-600 text-white px-8 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all flex items-center whitespace-nowrap"
+              className="bg-indigo-600 text-white px-8 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-indigo-100 dark:shadow-none hover:bg-indigo-700 transition-all flex items-center whitespace-nowrap active:scale-95"
             >
               Gerar O.S.
             </button>
@@ -144,7 +182,7 @@ export default function ServiceOrdersSection({ clients, quotes, serviceOrders, c
           <input 
             type="text" 
             placeholder="Pesquisar por OS, Orçamento ou Cliente..." 
-            className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium text-sm transition-all"
+            className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium text-sm transition-all dark:text-white"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />

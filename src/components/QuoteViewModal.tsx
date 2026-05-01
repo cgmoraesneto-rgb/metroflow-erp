@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, CheckCircle, FileText, Printer, Clock, User, Mail, 
-  Hash, Calendar, DollarSign, Search, Download, LayoutGrid, Loader2
+  Hash, Calendar, DollarSign, Search, Download, LayoutGrid, Loader2, XCircle
 } from 'lucide-react';
 import { Quote, Client, QuoteStatus, ServiceOrder, CertificateStatus, DocumentTemplate, InstrumentStatus } from '../types';
 import { formatDate, formatNumber } from '../utils/formatters';
@@ -30,13 +30,15 @@ interface QuoteViewModalProps {
   onSave?: (quote: Quote) => void;
 }
 
-const QuoteViewModal: React.FC<QuoteViewModalProps> = ({ quote, client, onClose, onApprove }) => {
+const QuoteViewModal: React.FC<QuoteViewModalProps> = ({ quote, client, onClose, onApprove, onSave }) => {
   const { documentTemplates, serviceOrders } = useData();
   const [confirmApprove, setConfirmApprove] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [numPages, setNumPages] = useState<number | null>(null);
+  const [certNumber, setCertNumber] = useState('');
+  const [periodicity, setPeriodicity] = useState('');
 
   const isApproved = quote.status === QuoteStatus.APPROVED;
 
@@ -46,7 +48,25 @@ const QuoteViewModal: React.FC<QuoteViewModalProps> = ({ quote, client, onClose,
 
   const handleApprove = () => {
     const newOsId = generateNextOsId(serviceOrders);
-    const newServiceOrder: ServiceOrder = {
+    
+    // Concatena observações originais com os novos campos técnicos opcionais
+    let finalObservations = quote.observacoes || '';
+    if (certNumber || periodicity) {
+      finalObservations += `\n\n--- DADOS TÉCNICOS PREVISTOS ---`;
+      if (certNumber) finalObservations += `\nCERTIFICADO: ${certNumber}`;
+      if (periodicity) finalObservations += `\nPERIODICIDADE: ${periodicity}`;
+    }
+
+    // Se for uma revisão, tentamos encontrar a O.S. original para atualizá-la
+    const existingOS = quote.parentQuoteId ? serviceOrders.find(so => so.orcamentoId === quote.parentQuoteId) : null;
+    
+    const newServiceOrder: ServiceOrder = existingOS ? {
+      ...existingOS,
+      orcamentoId: quote.id,
+      statusServico: InstrumentStatus.PENDING as unknown as any, // Reseta para pendente se necessário
+      statusCertificado: CertificateStatus.PENDING as unknown as any,
+      observacoes: (existingOS.observacoes || '') + `\n\n--- ATUALIZADO PELA REVISÃO ${quote.revision} ---` + finalObservations
+    } : {
       id: newOsId,
       orcamentoId: quote.id,
       clienteId: quote.clienteId,
@@ -58,8 +78,17 @@ const QuoteViewModal: React.FC<QuoteViewModalProps> = ({ quote, client, onClose,
       tecnicoExecutante: '',
       statusServico: InstrumentStatus.PENDING as unknown as any,
       statusCertificado: CertificateStatus.PENDING as unknown as any,
+      observacoes: finalObservations
     };
     onApprove({ ...quote, status: QuoteStatus.APPROVED }, newServiceOrder);
+  };
+
+  const handleReject = () => {
+    if (onSave) {
+      onSave({ ...quote, status: QuoteStatus.REJECTED });
+      toast.info('Orçamento marcado como reprovado.');
+      onClose();
+    }
   };
 
   React.useEffect(() => {
@@ -226,13 +255,24 @@ const QuoteViewModal: React.FC<QuoteViewModalProps> = ({ quote, client, onClose,
             <div className="pt-4 pb-10">
               {!isApproved ? (
                 !confirmApprove ? (
-                  <button
-                    onClick={() => setConfirmApprove(true)}
-                    className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[2rem] font-black flex items-center justify-center gap-3 shadow-xl shadow-indigo-500/40 transition-all hover:scale-[1.01] active:scale-[0.98] uppercase tracking-widest text-xs"
-                  >
-                    <CheckCircle className="w-6 h-6" />
-                    Aprovar Orçamento e Gerar O.S.
-                  </button>
+                  <>
+                    <button
+                      onClick={() => setConfirmApprove(true)}
+                      className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[2rem] font-black flex items-center justify-center gap-3 shadow-xl shadow-indigo-500/40 transition-all hover:scale-[1.01] active:scale-[0.98] uppercase tracking-widest text-xs"
+                    >
+                      <CheckCircle className="w-6 h-6" />
+                      Aprovar Orçamento e Gerar O.S.
+                    </button>
+                    {quote.status === QuoteStatus.PENDING && (
+                      <button
+                        onClick={handleReject}
+                        className="w-full mt-4 py-3 bg-white hover:bg-rose-50 text-rose-500 rounded-2xl font-black flex items-center justify-center gap-2 border-2 border-rose-100 transition-all uppercase tracking-widest text-[10px]"
+                      >
+                        <XCircle className="w-4 h-4" />
+                        Declinar Orçamento
+                      </button>
+                    )}
+                  </>
                 ) : (
                   <div className="p-8 bg-amber-50 dark:bg-amber-900/20 rounded-[3rem] border border-amber-200 dark:border-amber-700/50 animate-in zoom-in-95">
                     <div className="flex flex-col items-center text-center mb-6">
@@ -240,9 +280,32 @@ const QuoteViewModal: React.FC<QuoteViewModalProps> = ({ quote, client, onClose,
                         <Clock className="w-8 h-8" />
                       </div>
                       <h4 className="font-black text-amber-900 dark:text-amber-300 uppercase tracking-widest text-sm mb-2">Ação Irreversível</h4>
-                      <p className="text-sm text-amber-700 dark:text-amber-400 font-medium max-w-sm">
+                      <p className="text-sm text-amber-700 dark:text-amber-400 font-medium max-w-sm mb-6">
                         Ao confirmar, o orçamento será marcado como **APROVADO** e uma Ordem de Serviço será disparada no Módulo Logística.
                       </p>
+
+                      <div className="w-full grid grid-cols-2 gap-4 mb-6">
+                        <div className="text-left">
+                          <label className="text-[9px] font-black text-amber-900/50 uppercase tracking-widest ml-2 mb-1 block">Nº Certificado (Opcional)</label>
+                          <input 
+                            type="text" 
+                            placeholder="Prefixos, Sequências..." 
+                            value={certNumber}
+                            onChange={e => setCertNumber(e.target.value)}
+                            className="w-full px-4 py-3 bg-white dark:bg-slate-800 border-2 border-amber-200 dark:border-amber-700/30 rounded-2xl text-xs font-bold outline-none focus:border-amber-500 transition-all shadow-sm"
+                          />
+                        </div>
+                        <div className="text-left">
+                          <label className="text-[9px] font-black text-amber-900/50 uppercase tracking-widest ml-2 mb-1 block">Periodicidade (Opcional)</label>
+                          <input 
+                            type="text" 
+                            placeholder="Ex: 12 meses" 
+                            value={periodicity}
+                            onChange={e => setPeriodicity(e.target.value)}
+                            className="w-full px-4 py-3 bg-white dark:bg-slate-800 border-2 border-amber-200 dark:border-amber-700/30 rounded-2xl text-xs font-bold outline-none focus:border-amber-500 transition-all shadow-sm"
+                          />
+                        </div>
+                      </div>
                     </div>
                     <div className="flex gap-4">
                       <button onClick={() => setConfirmApprove(false)} className="flex-1 py-4 bg-white dark:bg-slate-800 text-slate-500 rounded-2xl font-black text-xs uppercase tracking-widest border border-slate-200 dark:border-slate-700 hover:bg-slate-100 transition-all">

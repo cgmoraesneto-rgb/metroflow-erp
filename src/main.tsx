@@ -12,6 +12,7 @@ import { TechnicalProvider } from './contexts/TechnicalContext';
 import { QualityProvider } from './contexts/QualityContext';
 import ErrorBoundary from './components/ErrorBoundary.tsx';
 import { initSentry } from './sentry';
+import { ThemeProvider } from './contexts/ThemeContext';
 import './index.css';
 
 initSentry();
@@ -20,7 +21,8 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
       <BrowserRouter>
-        <AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
           <AuditProvider>
             <StandardProvider>
               <InstrumentProvider>
@@ -36,7 +38,8 @@ createRoot(document.getElementById('root')!).render(
             </StandardProvider>
           </AuditProvider>
         </AuthProvider>
-      </BrowserRouter>
-    </ErrorBoundary>
+      </ThemeProvider>
+    </BrowserRouter>
+  </ErrorBoundary>
   </StrictMode>,
 );

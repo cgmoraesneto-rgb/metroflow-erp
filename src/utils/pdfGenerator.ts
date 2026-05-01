@@ -16,12 +16,109 @@ import {
   DigitalSignature,
   Employee
 } from '../types';
-import { formatDate, formatCurrency, parseNumericInput } from './formatters';
+import { formatDate, formatCurrency, parseNumericInput, formatStandardValidity } from './formatters';
 import { getMetrologyValue } from './metrologyMapper';
 import { getDefaultMetrologyField } from '../metrologyDefaults';
 import { urlToBase64 } from './imageUtils';
 import { GENERAL_LETTERHEAD, CERTIFICATE_LETTERHEAD } from './letterheads';
 import Chart from 'chart.js/auto';
+
+const findPointCalculation = (record: any, group: any, p: number, repetitions: number) => {
+    const rowIndexPoint = p * repetitions;
+    const suffixes = [`_row${rowIndexPoint}`, `-${p}`];
+    const prefixes = [group.blockId, group.name, group.groupName];
+    
+    for (const pref of prefixes) {
+        if (!pref) continue;
+        for (const suff of suffixes) {
+            const key = `${pref}${suff}`;
+            if (record.calculatedPoints?.[key]) {
+                return record.calculatedPoints[key];
+            }
+        }
+    }
+    return null;
+};
+
+/**
+ * Normalizes text for PDF generation to avoid character corruption.
+ * Standard PDF fonts (Helvetica/Times) only support WinAnsiEncoding.
+ */
+const fixPdfText = (text: any): string => {
+    if (text === undefined || text === null) return '';
+    const str = String(text);
+    return str
+        .replace(/±/g, '±') // Standard encoding usually works for this
+        .replace(/²/g, '^2')
+        .replace(/³/g, '^3')
+        .replace(/°/g, '°');
+};
+
+/**
+ * Custom renderer for cells that contain scientific symbols (like Ω).
+ * Since standard PDF fonts don't support these, we manually draw 
+ * the text switching between Helvetica and Symbol fonts.
+ */
+const drawCellWithSymbols = (data: any, doc: jsPDF) => {
+    const { cell, cursor } = data;
+    const originalText = cell.raw ? String(cell.raw) : '';
+    
+    if (!originalText.includes('Ω')) return;
+
+    // We don't clear the background because autoTable already drew it
+    // We just need to draw the text correctly since we suppressed it in willDrawCell
+    
+    const paddingLeft = cell.padding('left');
+    const paddingRight = cell.padding('right');
+    const cellWidth = cell.width - paddingLeft - paddingRight;
+    
+    // Calculate vertical position (approximate centering)
+    const fontSize = cell.styles.fontSize || 8;
+    const fontHeight = fontSize * 0.352778; // points to mm
+    const currentY = cursor.y + (cell.height / 2) + (fontHeight / 3); 
+    
+    let currentX = cursor.x + paddingLeft;
+    
+    // Handle alignment
+    if (cell.styles.halign === 'center') {
+        // We need to calculate total mixed width first
+        let totalWidth = 0;
+        const parts = originalText.split('Ω');
+        for (let i = 0; i < parts.length; i++) {
+            doc.setFont('helvetica', cell.styles.fontStyle || 'normal');
+            doc.setFontSize(fontSize);
+            totalWidth += doc.getTextWidth(parts[i]);
+            if (i < parts.length - 1) {
+                doc.setFont('Symbol');
+                totalWidth += doc.getTextWidth('W');
+            }
+        }
+        currentX = cursor.x + (cell.width / 2) - (totalWidth / 2);
+    } else if (cell.styles.halign === 'right') {
+         // Similar logic for right alignment... but center/left is enough for now
+    }
+
+    const segments = originalText.split('Ω');
+    for (let i = 0; i < segments.length; i++) {
+        // Normal text
+        if (segments[i]) {
+            doc.setFont('helvetica', cell.styles.fontStyle || 'normal');
+            doc.setFontSize(fontSize);
+            doc.setTextColor(0, 0, 0);
+            doc.text(segments[i], currentX, currentY);
+            currentX += doc.getTextWidth(segments[i]);
+        }
+        
+        // Omega symbol
+        if (i < segments.length - 1) {
+            doc.setFont('Symbol');
+            doc.setFontSize(fontSize);
+            doc.setTextColor(0, 0, 0);
+            doc.text('W', currentX, currentY); // W in Symbol font is Ω
+            currentX += doc.getTextWidth('W');
+        }
+    }
+};
 
 const generateChartImage = async (group: any, record: any, groupMask: any): Promise<string | null> => {
     return new Promise((resolve) => {
@@ -35,19 +132,59 @@ const generateChartImage = async (group: any, record: any, groupMask: any): Prom
             const errors = [];
             const uncertainties = [];
             
-            const repetitions = groupMask?.repetitions || 1;
+            const repetitions = Math.max(1, groupMask?.repetitions ?? 1);
             const numPoints = Math.ceil(group.rows.length / repetitions);
+
+            // Obter definições visíveis para saber quais colunas procurar
+            const hiddenCols = groupMask?.hiddenColumns || [];
+            const visibleDefs = (groupMask?.columnDefinitions || []).filter((d: any) => !hiddenCols.includes(d.id));
             
             for (let p = 0; p < numPoints; p++) {
-                const calc = record.calculatedPoints?.[`${group.groupName}-${p}`];
+                const calc = findPointCalculation(record, group, p, repetitions);
                 if (calc) {
                     const row = group.rows[p * repetitions];
-                    // Tentar achar VVC ou referência para o eixo X. Se não tiver, usar Ponto X
-                    const refDef = groupMask?.columnDefinitions?.find((d: any) => d.type === 'VVC' || d.behavior === 'INPUT' && d.name.toLowerCase().includes('ref'));
-                    const xLabel = (refDef && row && row[refDef.id] !== undefined) ? row[refDef.id] : `P. ${p+1}`;
+                    
+                    // 1. Identificar X (Referência/VVC) - Busca por Tipo, ID ou Nome
+                    const refDef = visibleDefs.find((d: any) => d.type === ColumnType.VVC) || 
+                                   visibleDefs.find((d: any) => d.id?.toUpperCase().includes('VVC')) ||
+                                   visibleDefs.find((d: any) => d.name?.toUpperCase().includes('VALOR VERDADEIRO')) ||
+                                   visibleDefs.find((d: any) => d.name?.toUpperCase().includes('REFERENCIA'));
+                    
+                    const xLabel = (refDef && row && row[refDef.id] !== undefined) ? row[refDef.id] : (row && row['VVC'] !== undefined ? row['VVC'] : `P. ${p+1}`);
                     labels.push(xLabel);
-                    errors.push(calc.error || 0);
-                    uncertainties.push(calc.U || 0);
+
+                    // 2. Extração Robusta de Erro e Incerteza
+                    let errorVal = 0;
+                    let uncVal = 0;
+
+                    visibleDefs.forEach(def => {
+                        const val = calc[def.id];
+                        if (val === undefined || val === null) return;
+                        
+                        const numVal = typeof val === 'number' ? val : parseFloat(String(val).replace(',', '.')) || 0;
+                        const idUpper = def.id?.toUpperCase() || '';
+                        const nameUpper = def.name?.toUpperCase() || '';
+
+                        // Busca por Tipo
+                        if (def.type === ColumnType.ERRO) errorVal = numVal;
+                        if (def.type === ColumnType.INCERTEZA) uncVal = numVal;
+                        
+                        // Busca por ID ou Nome (caso o tipo não esteja setado)
+                        if (idUpper.includes('ERRO') || nameUpper === 'ERRO') errorVal = numVal;
+                        if (idUpper.includes('INCERTEZA') || idUpper === 'U' || nameUpper.includes('INCERTEZA')) uncVal = numVal;
+                        
+                        // Fallback por campo metrológico
+                        if (def.metrologyField === 'error' || def.metrologyField === 'ERRO') errorVal = numVal;
+                        if (def.metrologyField === 'uncertainty' || def.metrologyField === 'U') uncVal = numVal;
+                    });
+
+                    // Log para debug em caso de erro (visível no console do inspetor)
+                    if (errorVal === 0 && p === 1) {
+                        console.log(`[ChartDebug] Ponto ${p} com erro zero. Objeto calc:`, calc);
+                    }
+
+                    errors.push(errorVal);
+                    uncertainties.push(uncVal);
                 }
             }
             
@@ -109,10 +246,10 @@ const generateChartImage = async (group: any, record: any, groupMask: any): Prom
                 }
             });
             
-            // Allow minimal tick for canvas to render
+            // Allow minimal tick for canvas to render (increased for reliability)
             setTimeout(() => {
                 resolve(canvas.toDataURL('image/png'));
-            }, 10);
+            }, 150);
         } catch (e) {
             console.error("Error generating chart", e);
             resolve(null);
@@ -212,14 +349,15 @@ export const addStandardHeader = ({
 
   // Header images are usually full width or positioned at top
   if (letterhead) {
-    // Note: this makes addStandardHeader technically async if we await it, 
-    // but we can just run it "fire and forget" if needed, OR better yet, we just draw what we can.
-    // For now, we will assume letterhead is already base64 because we await loadRemoteImage in the main functions.
     try {
-      const format = (typeof letterhead === 'string' && letterhead.startsWith('data:image')) ? getImageFormat(letterhead) : undefined;
-      doc.addImage(letterhead, format || 'PNG', 0, 0, 210, 297, undefined, 'FAST');
+      const format = letterhead.startsWith('data:image') ? getImageFormat(letterhead) : 'PNG';
+      // Desenha o timbrado no topo ocupando a largura total (A4: 210mm)
+      // Ajustamos a altura para 297 se for um fundo de página inteira, 
+      // ou mantemos menor se for apenas um cabeçalho.
+      // Por compatibilidade com os templates atuais, usaremos 297mm (folha cheia)
+      doc.addImage(letterhead, format, 0, 0, 210, 297, undefined, 'FAST');
     } catch (e) {
-      console.log("Soft error adding header image:", e);
+      console.error("Erro ao adicionar timbrado ao documento:", e);
     }
   }
   
@@ -228,7 +366,7 @@ export const addStandardHeader = ({
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(title.length > 30 ? 16 : 18);
   
-  const headerTitleY = 50; 
+  const headerTitleY = 48; 
   doc.text(title.toUpperCase(), pageWidth / 2, headerTitleY, { align: 'center' });
 
   if (subtitle) {
@@ -247,9 +385,11 @@ export const addStandardHeader = ({
     
     const displayDate = date || new Date().toLocaleDateString('pt-BR');
     doc.text(`Data da Emissão: ${displayDate}`, pageWidth - margin, headerTitleY + 12, { align: 'right' });
+    
+    return headerTitleY + 22;
   }
 
-  return headerTitleY + 20;
+  return headerTitleY + 10;
 };
 
 export const addStandardFooter = (doc: jsPDF, isCertificate: boolean = false, customFooter?: string, extraLegend?: string, legendStartPage: number = 1) => {
@@ -263,13 +403,11 @@ export const addStandardFooter = (doc: jsPDF, isCertificate: boolean = false, cu
 
     if (customFooter) {
       try {
-        const format = customFooter.startsWith('data:image') ? getImageFormat(customFooter) : undefined;
-        // Optimization: only add footer image if it's not going to cover the whole page opaque-ly
-        // assuming footer is actually a background if it's full page.
-        // If it's a JPEG, it might cover the header. We'll use the same A4 size but ensure it's handled carefully.
-        doc.addImage(customFooter, format || 'PNG', 0, 0, 210, 297, undefined, 'FAST');
+        const format = customFooter.startsWith('data:image') ? getImageFormat(customFooter) : 'PNG';
+        // Desenha o rodapé na base (Y=267mm, Altura=30mm)
+        doc.addImage(customFooter, format, 0, 267, 210, 30, undefined, 'FAST');
       } catch (e) {
-        console.error("Error adding footer image:", e);
+        console.error("Erro ao adicionar rodapé:", e);
       }
     }
 
@@ -280,8 +418,6 @@ export const addStandardFooter = (doc: jsPDF, isCertificate: boolean = false, cu
       ? "Os resultados apresentados referem-se exclusivamente ao instrumento calibrado nas condições especificadas."
       : "";
     
-    // Position text relative to bottom if no custom footer image, 
-    // or overlay if it's just a background
     doc.text(disclaimer, pageWidth / 2, pageHeight - 15, { align: 'center' });
 
     if (extraLegend && i >= legendStartPage) {
@@ -323,7 +459,7 @@ export const generateCertificatePdf = async (
   const marginBottom = 25; 
   const contentWidth = pageWidth - marginX * 2;
 
-  const mask = certificateMasks.find(m => m.id === record.certificateMaskId);
+  const mask = record.maskSnapshot || certificateMasks.find(m => m.id === record.certificateMaskId);
   const isTest = mask?.type === 'TEST_REPORT';
   const isMaintenance = mask?.type === 'MAINTENANCE_REPORT';
   
@@ -350,19 +486,36 @@ export const generateCertificatePdf = async (
     letterhead = template.accreditedLetterheadBase64;
   }
   
+  let footerImage = template?.footerBase64;
+  
+  // Pre-load remote images if necessary to avoid async issues
   if (letterhead?.startsWith('http')) letterhead = await loadRemoteImage(letterhead);
+  if (footerImage?.startsWith('http')) footerImage = await loadRemoteImage(footerImage);
+
+  function drawBackgrounds(d: jsPDF) {
+    if (letterhead) {
+       const format = letterhead.startsWith('data:image') ? getImageFormat(letterhead) : 'PNG';
+       d.addImage(letterhead, format, 0, 0, 210, 297, undefined, 'FAST');
+    }
+    if (footerImage) {
+       const format = footerImage.startsWith('data:image') ? getImageFormat(footerImage) : 'PNG';
+       d.addImage(footerImage, format, 0, 267, 210, 30, undefined, 'FAST');
+    }
+  }
+
+  // Draw first page background manually
+  drawBackgrounds(doc);
 
   const callHeader = (document: jsPDF) => {
-    // Escondendo metadados porque os desenharemos aqui
     currentY = addStandardHeader({
       doc: document,
-      title: '', // Evita título duplicado gerado pela função base
+      title: '', 
       isCertificate: true,
       hideMeta: true,
       customLetterhead: letterhead
     });
     
-    currentY = marginTop; // Fix header to respect our spacing instead of default from addStandardHeader
+    currentY = marginTop; 
     
     document.setFontSize(14);
     document.setFont('helvetica', 'bold');
@@ -420,17 +573,18 @@ export const generateCertificatePdf = async (
   currentY += (addrLines.length * lineSpacing) + (sectionSpacing - lineSpacing);
 
   // 2. DADOS DO INSTRUMENTO
-  if (currentY > pageHeight - marginBottom - 30) { doc.addPage(); callHeader(doc); }
+  if (currentY > pageHeight - marginBottom - 30) { doc.addPage(); drawBackgrounds(doc); callHeader(doc); }
   
   currentY = drawSectionTitle(`2. DADOS DO INSTRUMENTO${isTest ? '' : 'S'}:`, currentY);
   
   doc.setFillColor(...secondaryColor);
-  doc.rect(marginX, currentY, contentWidth, 6, 'F');
+  const tarjaHeight = 8;
+  doc.rect(marginX, currentY, contentWidth, tarjaHeight, 'F');
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
   doc.setTextColor(0, 0, 0);
-  doc.text((record.instrumentName || '').toUpperCase(), pageWidth / 2, currentY + 4, { align: 'center' });
-  currentY += lineSpacing + 2;
+  doc.text((record.instrumentName || '').toUpperCase(), pageWidth / 2, currentY + 5.5, { align: 'center' });
+  currentY += tarjaHeight + 6; // Espaço de segurança aumentado
 
   doc.setFontSize(8);
   const leftX = marginX;
@@ -454,7 +608,7 @@ export const generateCertificatePdf = async (
   doc.setFont('helvetica', 'bold'); doc.text(record.serviceOrderId || 'N/A', leftValueX, currentY);
   const nextCalibLabel = isTest ? `Próximo ${wordCalibration.toLowerCase()}:` : isMaintenance ? `Próxima ${wordCalibration.toLowerCase()}:` : `Próxima ${wordCalibration.toLowerCase()}:`;
   doc.setFont('helvetica', 'normal'); doc.text(nextCalibLabel, rightX, currentY);
-  doc.setFont('helvetica', 'bold'); doc.text(record.nextCalibrationDate ? new Date(record.nextCalibrationDate).toLocaleDateString('pt-BR') : 'N/A', rightValueX, currentY);
+  doc.setFont('helvetica', 'bold'); doc.text(record.nextCalibrationDate ? formatStandardValidity(record.nextCalibrationDate) : 'N/A', rightValueX, currentY);
   currentY += lineSpacing;
 
   doc.setFont('helvetica', 'normal'); doc.text(`Local d${isTest ? 'o ensaio' : isMaintenance ? 'o teste' : 'a calibração'}:`, leftX, currentY);
@@ -462,7 +616,7 @@ export const generateCertificatePdf = async (
   currentY += sectionSpacing;
 
   // 3. CONDIÇÕES AMBIENTAIS DURANTE A CALIBRAÇÃO
-  if (currentY > pageHeight - marginBottom - 30) { doc.addPage(); callHeader(doc); }
+  if (currentY > pageHeight - marginBottom - 30) { doc.addPage(); drawBackgrounds(doc); callHeader(doc); }
   currentY = drawSectionTitle(`3. CONDIÇÕES AMBIENTAIS DURANTE ${isTest ? 'O ENSAIO' : isMaintenance ? 'O TESTE' : 'A CALIBRAÇÃO'}:`, currentY);
   
   doc.setFontSize(8);
@@ -477,19 +631,22 @@ export const generateCertificatePdf = async (
   doc.text(`${record.humidity || 'N/A'} %UR ± 5 %UR`, rightX + 45, currentY);
   currentY += lineSpacing;
 
-  const envStandard = standardInstruments.find(si => si.id === record.envStandardInstrumentId);
+  const envStandard = record.envStandardInstrumentSnapshot || standardInstruments.find(si => si.id === record.envStandardInstrumentId);
   if (envStandard) {
     doc.setFontSize(7);
-    doc.text(`P: (Termohigrômetro, código ${envStandard.identificacao || '-'}, certificado n° ${envStandard.certificadoCalibracao || '-'} emitido por ${envStandard.orgaoCalibrador}, válido até ${new Date(envStandard.dataValidadeCalibracao).toLocaleDateString('pt-BR')})`, leftX + 5, currentY);
+    doc.text(`P: (Termohigrômetro, código ${envStandard.identificacao || '-'}, certificado n° ${envStandard.certificadoCalibracao || '-'} emitido por ${envStandard.orgaoCalibrador}, válido até ${formatStandardValidity(envStandard.dataValidadeCalibracao)})`, leftX + 5, currentY);
   }
   currentY += sectionSpacing;
 
   // 4. PROCEDIMENTO DE CALIBRAÇÃO
-  if (currentY > pageHeight - marginBottom - 20) { doc.addPage(); callHeader(doc); }
+  if (currentY > pageHeight - marginBottom - 20) { doc.addPage(); drawBackgrounds(doc); callHeader(doc); }
   currentY = drawSectionTitle(`4. PROCEDIMENTO DE ${wordCalibration}:`, currentY);
   
-  const procedure = procedures.find(p => p.id === record.procedureId);
-  const procTitle = procedure ? (`${procedure.code ? procedure.code + ' - ' : ''}${procedure.title}`) : 'Procedimento não especificado';
+  const procedure = procedures.find(p => p.id === record.procedureId || (p.code && p.code === record.procedureId));
+  
+  const procTitle = procedure 
+    ? (`${procedure.code ? procedure.code + ' - ' : ''}${procedure.title}`) 
+    : (mask?.title ? `Baseado em: ${mask.title}` : 'Procedimento não especificado');
   
   doc.setFont('helvetica', 'italic');
   doc.setFontSize(8);
@@ -498,28 +655,31 @@ export const generateCertificatePdf = async (
   currentY += (procLines.length * lineSpacing) + sectionSpacing - lineSpacing;
 
   // 5. PADRÕES UTILIZADOS
-  if (currentY > pageHeight - marginBottom - 30) { doc.addPage(); callHeader(doc); }
+  if (currentY > pageHeight - marginBottom - 30) { doc.addPage(); drawBackgrounds(doc); callHeader(doc); }
   currentY = drawSectionTitle('5. PADRÃO(ÕES) UTILIZADO(S):', currentY);
 
-  const serviceStandards = standardInstruments.filter(si => record.standardInstrumentIds?.includes(si.id));
+  const serviceStandards = record.standardInstrumentsSnapshot || standardInstruments.filter(si => record.standardInstrumentIds?.includes(si.id));
   if (serviceStandards.length > 0) {
     const tableData = serviceStandards.map(si => [
       si.identificacao || '-',
       si.nome || '-',
       si.certificadoCalibracao || '-',
       si.orgaoCalibrador || '-',
-      new Date(si.dataValidadeCalibracao).toLocaleDateString('pt-BR')
+      formatStandardValidity(si.dataValidadeCalibracao)
     ]);
-
     autoTable(doc, {
       startY: currentY,
-      head: [['Código', 'Descrição', 'Certificado n.º', 'Órgão Calibrador', 'Validade']],
+      head: [['ID', 'Descrição', 'Certificado n.º', 'Órgão Calibrador', 'Validade']],
       body: tableData,
       theme: 'plain',
       styles: { cellPadding: 2 },
       headStyles: { fillColor: false, textColor: [0,0,0], fontSize: 8, fontStyle: 'bold', halign: 'center' },
       bodyStyles: { fontSize: 8, textColor: [0,0,0], halign: 'center' },
       margin: { left: marginX, right: marginX, top: marginTop + 25, bottom: marginBottom },
+      didDrawPage: (data) => {
+        drawBackgrounds(doc);
+        if (data.pageNumber > 1) callHeader(doc);
+      }
     });
     // @ts-ignore
     currentY = doc.lastAutoTable.finalY + sectionSpacing;
@@ -530,125 +690,38 @@ export const generateCertificatePdf = async (
     currentY += sectionSpacing;
   }
 
-  // RESULTADOS
-  if (record.groups && record.groups.length > 0) {
-    if (currentY > pageHeight - marginBottom - 30) { doc.addPage(); callHeader(doc); }
-    currentY = drawSectionTitle(`RESULTADOS D${isTest ? 'O ENSAIO' : isMaintenance ? 'O TESTE' : 'A CALIBRAÇÃO'}:`, currentY);
-
-    for (const group of record.groups) {
-      if (group.rows.length === 0) continue;
-
-      const groupMask = mask?.measurementGroups.find(mg => mg.name === group.groupName);
-      let definitions = groupMask?.columnDefinitions || [];
-      if (definitions.length === 0 && groupMask?.columns && groupMask.columns.length > 0) {
-        definitions = groupMask.columns.map((colName: string) => ({ id: colName, name: colName, type: ColumnType.TEXTO, behavior: ColumnBehavior.METROLOGY }));
-      }
-
-      const hiddenCols = groupMask?.hiddenColumns || [];
-      let visibleDefs = definitions.filter(d => !hiddenCols.includes(d.name));
-      if (!isInternalMemory) {
-        const allowedTypes = [ColumnType.VVC, ColumnType.ERRO, ColumnType.INCERTEZA, ColumnType.CONFORMIDADE, ColumnType.TEXTO];
-        visibleDefs = visibleDefs.filter(d => allowedTypes.includes(d.type));
-      }
-
-      if (visibleDefs.length === 0) continue;
-
-      const head = [visibleDefs.map(d => (d.name || '').toUpperCase())];
-      const bodyData: any[] = [];
-      const repetitions = mask?.repetitions || 1;
-      const numPoints = Math.ceil(group.rows.length / repetitions);
-
-      for (let p = 0; p < numPoints; p++) {
-        const groupName = group.groupName || 'Resultados';
-        const calc = record.calculatedPoints?.[groupName + '-' + p];
-        for (let r = 0; r < repetitions; r++) {
-          const rowIndex = p * repetitions + r;
-          const row = group.rows[rowIndex];
-          
-          const rowData = visibleDefs.map(def => {
-            if (!row) return '—';
-            const isMetrology = def.behavior === ColumnBehavior.METROLOGY;
-            const isCalculated = def.behavior === ColumnBehavior.CALCULATED;
-            if (calc && r === 0) {
-              if (def.id && calc[def.id] !== undefined) {
-                const val = calc[def.id];
-                return typeof val === 'number' ? val.toFixed(4) : String(val);
-              }
-            } else if (calc && r > 0) {
-              if (isMetrology || isCalculated) return '';
-            }
-            const rawVal = row[def.id] !== undefined ? row[def.id] : (def.name ? row[def.name] : undefined);
-            return rawVal !== undefined && rawVal !== null ? String(rawVal) : '—';
-          });
-          bodyData.push(rowData);
-        }
-      }
-
-      autoTable(doc, {
-        startY: currentY + 2,
-        head: head,
-        body: bodyData,
-        theme: 'grid',
-        styles: { cellPadding: 2 },
-        headStyles: { fillColor: secondaryColor, textColor: [0,0,0], fontSize: 8, fontStyle: 'bold', halign: 'center' },
-        bodyStyles: { fontSize: 8, textColor: [0,0,0], halign: 'center' },
-        margin: { left: marginX, right: marginX, top: marginTop + 25, bottom: marginBottom },
-        didDrawPage: (data) => { if (data.pageNumber > 1) callHeader(doc); }
-      });
-
-      // @ts-ignore
-      currentY = doc.lastAutoTable.finalY + sectionSpacing;
-    }
-  }
-
   // 6. OBSERVAÇÕES
-  if (currentY > pageHeight - marginBottom - 40) { doc.addPage(); callHeader(doc); }
+  if (currentY > pageHeight - marginBottom - 40) { doc.addPage(); drawBackgrounds(doc); callHeader(doc); }
   currentY = drawSectionTitle('6. OBSERVAÇÕES:', currentY);
 
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
-  let obsCounter = 1;
-  
-  doc.text(`6.${obsCounter++} Realizado apenas ${isTest ? 'ensaio' : isMaintenance ? 'teste' : 'calibração'} do instrumento em questão.`, marginX + 5, currentY); currentY += lineSpacing;
-  doc.text(`6.${obsCounter++} Valores obtidos correspondem à média de três medições.`, marginX + 5, currentY); currentY += lineSpacing;
-  
-  if (!isTest) {
-    const incStr = `6.${obsCounter++} A incerteza declarada foi fundamentada conforme o procedimento interno para o nível de confiança de aproximadamente 95%.`;
-    const incLines = doc.splitTextToSize(incStr, contentWidth - 10);
-    doc.text(incLines, marginX + 5, currentY); currentY += (incLines.length * lineSpacing);
-    
-    const limitsStr = `6.${obsCounter++} A inclusão da informação de "Erro Máximo Admissível" no conteúdo do certificado, foram referenciados pelas normas vigentes.`;
-    const limitsLines = doc.splitTextToSize(limitsStr, contentWidth - 10);
-    doc.text(limitsLines, marginX + 5, currentY); currentY += (limitsLines.length * lineSpacing);
-  }
-  
-  if (record.observations) {
-    const defaultObs = doc.splitTextToSize(`6.${obsCounter++} ${record.observations}`, contentWidth - 10);
-    doc.text(defaultObs, marginX + 5, currentY);
-    currentY += (defaultObs.length * lineSpacing);
-  }
-  
-  const finalObs = doc.splitTextToSize(`6.${obsCounter++} Os resultados apresentados neste documento têm significância restrita e se aplicam somente ao instrumento em questão, na data d${isTest ? 'o ensaio' : isMaintenance ? 'o teste' : 'a calibração'}.`, contentWidth - 10);
-  doc.text(finalObs, marginX + 5, currentY);
-  currentY += (finalObs.length * lineSpacing) + sectionSpacing;
 
-  // FINAL SIGNATURES 
-  if (currentY > pageHeight - marginBottom - 50) { doc.addPage(); callHeader(doc); }
+  if (record.observations) {
+    const obsLines = doc.splitTextToSize(record.observations, contentWidth - 10);
+    doc.text(obsLines, marginX + 5, currentY);
+    currentY += (obsLines.length * lineSpacing) + sectionSpacing;
+  } else {
+    doc.setFont('helvetica', 'italic');
+    doc.setTextColor(150, 150, 150);
+    doc.text('Nenhuma observação registrada.', marginX + 5, currentY);
+    doc.setTextColor(0, 0, 0);
+    currentY += lineSpacing + sectionSpacing;
+  }
+
+  // 7. RESPONSÁVEIS PELA EMISSÃO
+  if (currentY > pageHeight - marginBottom - 50) { doc.addPage(); drawBackgrounds(doc); callHeader(doc); }
 
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
   const responsibleSuffix = (isTest || isMaintenance) ? 'DO RELATÓRIO' : 'DO CERTIFICADO';
-  doc.text(`RESPONSÁVEL(EIS) PELA EMISSÃO ${responsibleSuffix}`, marginX, currentY);
+  doc.text(`7. RESPONSÁVEL(EIS) PELA EMISSÃO ${responsibleSuffix}:`, marginX, currentY);
   
-  doc.setDrawColor(50, 50, 50);
-  doc.setLineWidth(0.5);
   currentY += 2;
-  doc.line(marginX, currentY, pageWidth - marginX, currentY);
+  // Linhas removidas conforme solicitado
   currentY += 1;
-  doc.setLineWidth(0.2);
-  doc.line(marginX, currentY, pageWidth - marginX, currentY);
 
-  currentY += 30; // Mais espaco para a assinatura do gerente em pe
+  currentY += 25; 
 
   const technicianEmployee = employees.find(e => e.id === record.submittedBy);
   const authorizedEmployee = 
@@ -681,40 +754,49 @@ export const generateCertificatePdf = async (
   currentY += 4;
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
-  let techName = record.technicianName || technicianEmployee?.nome || 'Não identificado';
+  let techName = 'Não identificado';
+  const techByTechField = employees.find(e => e.id === record.technicianName);
+  const techBySubmittedBy = employees.find(e => e.id === record.submittedBy);
+  if (techByTechField?.nome) {
+    techName = techByTechField.nome;
+  } else if (techBySubmittedBy?.nome) {
+    techName = techBySubmittedBy.nome;
+  } else if (record.technicianName && !record.technicianName.startsWith('emp_')) {
+    techName = record.technicianName;
+  }
   
   doc.text('Técnico Executante:', signatureX1, currentY);
   doc.setFont('helvetica', 'italic');
   doc.text(techName, signatureX1 + 35, currentY);
 
-  // Digital Approve timestamp
   if (record.approvedAt) {
     doc.setFont('helvetica', 'italic');
     doc.setFontSize(6);
     const dateApp = new Date(record.approvedAt);
-    doc.text(`Aprovado digitalmente no dia:`, signatureX2 + (signatureWidth/2) + 20, currentY - 26, { align: 'center' });
+    doc.text(`Aprovado digitalmente no dia:`, signatureX2 + (signatureWidth/2) + 20, currentY - 21, { align: 'center' });
     doc.setFont('helvetica', 'bold');
-    doc.text(`${dateApp.toLocaleDateString('pt-BR')} ${dateApp.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`, signatureX2 + (signatureWidth/2) + 20, currentY - 23, { align: 'center' });
+    doc.text(`${dateApp.toLocaleDateString('pt-BR')} ${dateApp.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`, signatureX2 + (signatureWidth/2) + 20, currentY - 18, { align: 'center' });
   }
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
-  doc.text(authorizedEmployee?.nome || 'Gerente Técnico', signatureX2 + (signatureWidth/2), currentY, { align: 'center' });
+  doc.text(authorizedEmployee?.nome || '', signatureX2 + (signatureWidth/2), currentY, { align: 'center' });
   doc.text('Gerente Técnico', signatureX2 + (signatureWidth/2), currentY + 4, { align: 'center' });
+  currentY += sectionSpacing + 2;
 
   // DIGITAL SIGNATURES COMPLIANCE
   if (signatures.length > 0) {
-    if (currentY > pageHeight - 60) { doc.addPage(); callHeader(doc); currentY = 100; }
-    currentY += 15;
+    if (currentY > pageHeight - 60) { doc.addPage(); drawBackgrounds(doc); callHeader(doc); currentY = 100; }
+    currentY += 5;
 
     doc.setFillColor(232, 245, 233);
-    doc.roundedRect(marginX, currentY, contentWidth, 25, 3, 3, 'F');
+    doc.roundedRect(marginX, currentY, contentWidth, 20, 3, 3, 'F');
     doc.setDrawColor(76, 175, 80);
     doc.setLineWidth(0.4);
-    doc.roundedRect(marginX, currentY, contentWidth, 25, 3, 3, 'D');
+    doc.roundedRect(marginX, currentY, contentWidth, 20, 3, 3, 'D');
 
     doc.setTextColor(46, 125, 50);
-    doc.setFontSize(10);
+    doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
     doc.text('DOCUMENTO ASSINADO DIGITALMENTE', marginX + 5, currentY + 7);
     
@@ -722,7 +804,188 @@ export const generateCertificatePdf = async (
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(80, 80, 80);
     doc.text(`HASH SHA-256: ${signatures[0].documentHash}`, marginX + 5, currentY + 12);
-    doc.text(`Integridade verificável via QR Code ou no portal MetroFlow ERP.`, marginX + 5, currentY + 16);
+    doc.text(`Integridade verificável via portal MetroFlow ERP.`, marginX + 5, currentY + 16);
+    currentY += 25;
+  }
+
+  // Pre-generate chart images for groups with hasGraph enabled (must be async before sync render loop)
+  const chartImageMap: Record<number, string | null> = {};
+  if (record.groups && record.groups.length > 0) {
+    for (let gi = 0; gi < record.groups.length; gi++) {
+      const grp = record.groups[gi];
+      const grpMask = mask?.measurementGroups.find(
+        mg => mg.name === grp.groupName || (grp.name && mg.name === grp.name)
+      );
+      if (grpMask?.hasGraph) {
+        chartImageMap[gi] = await generateChartImage(grp, record, grpMask);
+      }
+    }
+  }
+
+  // 8. RESULTADOS
+  if (record.groups && record.groups.length > 0) {
+    // FORCE START ON NEW PAGE (AT LEAST PAGE 2)
+    doc.addPage();
+    drawBackgrounds(doc);
+    callHeader(doc);
+    
+    currentY = drawSectionTitle(`8. RESULTADOS D${isTest ? 'O ENSAIO' : isMaintenance ? 'O TESTE' : 'A CALIBRAÇÃO'}:`, currentY);
+
+    for (let gi = 0; gi < record.groups.length; gi++) {
+      const group = record.groups[gi];
+      if (group.rows.length === 0) continue;
+
+      // Robust matching of group definition in mask (try groupName and name)
+      const groupMask = mask?.measurementGroups.find(mg => mg.name === group.groupName || (group.name && mg.name === group.name));
+      let definitions = groupMask?.columnDefinitions || [];
+      if (definitions.length === 0 && groupMask?.columns && groupMask.columns.length > 0) {
+        definitions = groupMask.columns.map((colName: string) => ({ id: colName, name: colName, type: ColumnType.TEXTO, behavior: ColumnBehavior.METROLOGY }));
+      }
+
+      const hiddenCols = groupMask?.hiddenColumns || [];
+      let visibleDefs = definitions.filter(d => !hiddenCols.includes(d.id));
+      if (!isInternalMemory) {
+        // Expandimos os tipos permitidos para incluir LEITURA e MEDIA, que são comuns em certificados
+        // Adicionamos NUMBER pois máscaras customizadas podem usar esse tipo para campos metrológicos (ex: Diâmetro, Pressão)
+        const allowedTypes = [
+          ColumnType.VVC, 
+          ColumnType.LEITURA, 
+          ColumnType.MEDIA, 
+          ColumnType.ERRO, 
+          ColumnType.INCERTEZA, 
+          ColumnType.CONFORMIDADE, 
+          ColumnType.TEXTO,
+          ColumnType.NUMBER,
+          ColumnType.DESVIO_PADRAO
+        ];
+        visibleDefs = visibleDefs.filter(d => allowedTypes.includes(d.type));
+      }
+
+      if (visibleDefs.length === 0) continue;
+
+      const head = [visibleDefs.map(d => (d.name || '').toUpperCase())];
+      const bodyData: any[] = [];
+      const repetitions = Math.max(1, groupMask?.repetitions ?? mask?.repetitions ?? 1);
+      const numPoints = Math.ceil(group.rows.length / repetitions);
+
+      for (let p = 0; p < numPoints; p++) {
+        const calc = findPointCalculation(record, group, p, repetitions);
+        
+        for (let r = 0; r < repetitions; r++) {
+          const rowIndex = p * repetitions + r;
+          const row = group.rows[rowIndex];
+          
+          const rowData = visibleDefs.map(def => {
+            if (!row) return '—';
+            
+            const isMetrology = def.behavior === ColumnBehavior.METROLOGY;
+            const isCalculated = def.behavior === ColumnBehavior.CALCULATED || def.behavior === ColumnBehavior.DERIVED;
+            
+            // Se temos cálculos realizados para este ponto
+            if (calc) {
+              // Se for a primeira linha da repetição, mostramos os resultados consolidados (médias, erros, etc.)
+              if (r === 0) {
+                // Tenta buscar pelo campo metrológico explícito
+                if (def.metrologyField) {
+                  const metVal = getMetrologyValue(def.metrologyField, calc as any, def.decimalPlaces ?? 4);
+                  if (metVal.formatted) return fixPdfText(metVal.formatted);
+                }
+                
+                // Mapeamento extra por tipo de coluna (fallback caso metrologyField não esteja setado)
+                if (def.type === ColumnType.MEDIA && (calc as any).mean !== undefined) return fixPdfText((calc as any).mean.toFixed(def.decimalPlaces ?? 4));
+                if (def.type === ColumnType.ERRO && (calc as any).error !== undefined) return fixPdfText((calc as any).error.toFixed(def.decimalPlaces ?? 4));
+                if (def.type === ColumnType.INCERTEZA && (calc as any).U !== undefined) return fixPdfText((calc as any).U.toFixed(def.decimalPlaces ?? 4));
+                if (def.type === ColumnType.DESVIO_PADRAO && (calc as any).stdDev !== undefined) return fixPdfText((calc as any).stdDev.toFixed(def.decimalPlaces ?? 6));
+                if (def.type === ColumnType.CONFORMIDADE) return fixPdfText((calc as any).conformity || '');
+                if (def.type === ColumnType.VVC && (calc as any).vvc !== undefined) return fixPdfText((calc as any).vvc.toFixed(def.decimalPlaces ?? 4));
+                
+                // Se a coluna for por ID e existir no calc (caso de colunas customizadas calculadas)
+                if (def.id && (calc as any)[def.id] !== undefined) {
+                  const val = (calc as any)[def.id];
+                  return typeof val === 'number' ? val.toFixed(def.decimalPlaces ?? 4) : String(val);
+                }
+              } else {
+                // Para linhas de repetição (r > 0), limpamos colunas que são resumos do ponto (Erro, U, etc)
+                // mas MANTEMOS a leitura se a coluna for do tipo LEITURA.
+                const isPointSummary = [ColumnType.MEDIA, ColumnType.ERRO, ColumnType.INCERTEZA, ColumnType.CONFORMIDADE].includes(def.type) || 
+                                       (isCalculated && def.type !== ColumnType.LEITURA) ||
+                                       (isMetrology && !['LEITURA', 'readings'].includes(def.metrologyField || ''));
+
+                if (isPointSummary) return '';
+              }
+            }
+
+            // Fallback para os dados crus da linha
+            const rawVal = row[def.id] !== undefined ? row[def.id] : (def.name ? row[def.name] : undefined);
+            return fixPdfText(rawVal !== undefined && rawVal !== null ? String(rawVal) : (r === 0 ? '—' : ''));
+          });
+          bodyData.push(rowData);
+        }
+      }
+
+      const estimatedHeaderHeight = 12;
+      const estimatedMinRows = Math.min(3, bodyData.length) * 6;
+      if (currentY + estimatedHeaderHeight + estimatedMinRows > pageHeight - marginBottom) {
+        doc.addPage();
+        drawBackgrounds(doc);
+        callHeader(doc);
+      }
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(0, 0, 0);
+      doc.text((group.groupName || '').toUpperCase(), marginX, currentY);
+      currentY += 4;
+
+      autoTable(doc, {
+        startY: currentY,
+        head: head,
+        body: bodyData,
+        theme: 'grid',
+        showHead: 'firstPage', // Evita duplicidade em quebras conforme pedido
+        styles: { cellPadding: 2, overflow: 'linebreak' },
+        headStyles: { fillColor: secondaryColor, textColor: [0,0,0], fontSize: 8, fontStyle: 'bold', halign: 'center' },
+        bodyStyles: { fontSize: 8, textColor: [0,0,0], halign: 'center' },
+        margin: { left: marginX, right: marginX, top: marginTop + 25, bottom: marginBottom },
+        willDrawCell: (data) => {
+          // If cell contains Ω, we suppress autoTable's text drawing
+          // and handle it manually in didDrawCell
+          if (data.section === 'body' && data.cell.raw && String(data.cell.raw).includes('Ω')) {
+            data.cell.text = []; 
+          }
+        },
+        didDrawCell: (data) => {
+          drawBackgrounds(doc);
+          if (data.pageNumber > 1) callHeader(doc);
+          
+          // Manual render for symbols
+          if (data.section === 'body' && data.cell.raw && String(data.cell.raw).includes('Ω')) {
+            drawCellWithSymbols(data, doc);
+          }
+        }
+      });
+
+      // @ts-ignore
+      currentY = doc.lastAutoTable.finalY + sectionSpacing;
+
+      // GRÁFICO: inserir imagem pré-gerada caso o grupo tenha hasGraph ativado
+      const chartImg = chartImageMap[gi];
+      if (chartImg) {
+        const chartH = 60; // altura em mm
+        const chartW = contentWidth;
+        if (currentY + chartH > pageHeight - marginBottom) {
+          doc.addPage();
+          drawBackgrounds(doc);
+          callHeader(doc);
+        }
+        try {
+          doc.addImage(chartImg, 'PNG', marginX, currentY, chartW, chartH);
+          currentY += chartH + sectionSpacing;
+        } catch (e) {
+          console.error('Erro ao inserir gráfico no PDF:', e);
+        }
+      }
+    }
   }
 
   
@@ -730,6 +993,7 @@ export const generateCertificatePdf = async (
   if (record.attachments && record.attachments.length > 0) {
     for (let i = 0; i < record.attachments.length; i++) {
         doc.addPage();
+        drawBackgrounds(doc);
         callHeader(doc);
         const yTop = currentY;
         doc.setFontSize(10);
@@ -751,10 +1015,13 @@ export const generateCertificatePdf = async (
     }
   }
   
-  let footerImage = template?.footerBase64;
-  if (footerImage?.startsWith('http')) footerImage = await loadRemoteImage(footerImage);
-  
-  addStandardFooter(doc, true, footerImage);
+  if (footerImage?.startsWith('http')) {
+     const loaded = await loadRemoteImage(footerImage);
+     if (loaded) addStandardFooter(doc, true, loaded);
+     else addStandardFooter(doc, true, footerImage);
+  } else {
+     addStandardFooter(doc, true, footerImage);
+  }
 
   if (typeof doc.putTotalPages === 'function') {
     doc.putTotalPages(totalPagesExp);
@@ -847,8 +1114,8 @@ export const generateQuotePdf = async (quote: Quote, client: Client | undefined,
 
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
-  const marginLeft = 20; 
-  const marginRight = 20;
+  const marginLeft = 12; 
+  const marginRight = 12;
   const marginTop = 45; 
   const marginBottom = 20;
   const contentWidth = pageWidth - marginLeft - marginRight;
@@ -895,10 +1162,10 @@ export const generateQuotePdf = async (quote: Quote, client: Client | undefined,
     theme: 'plain', 
     styles: { fontSize: 9, cellPadding: { top: 2, bottom: 2, left: 1, right: 1 }, textColor: [0, 0, 0] },
     columnStyles: {
-      0: { fontStyle: 'bold', fillColor: [240, 240, 240], cellWidth: 22 },
-      1: { cellWidth: 'auto' }, // Permite que a Razão Social/Endereço ocupe o máximo de espaço
-      2: { fontStyle: 'bold', fillColor: [240, 240, 240], cellWidth: 20 }, // Reduzido (Válido até, CNPJ, Telefone)
-      3: { cellWidth: 35 } // Reduzido para encaixar exato a data ou o CNPJ
+      0: { fontStyle: 'bold', fillColor: [240, 240, 240], cellWidth: 25 },
+      1: { cellWidth: 'auto' }, 
+      2: { fontStyle: 'bold', fillColor: [240, 240, 240], cellWidth: 25 }, 
+      3: { cellWidth: 40 } 
     },
     body: [
       ['Emitido em:', formatDate(quote.dataEmissao), 'Válido até:', formatDate(quote.validade)],
@@ -985,6 +1252,7 @@ export const generateQuotePdf = async (quote: Quote, client: Client | undefined,
       { content: 'Valor Total:', styles: { halign: 'center', fontStyle: 'bold' } },
       { content: formatQuoteCurrency(totalGeral), styles: { halign: 'right', fontStyle: 'bold' } }
     ]],
+    showFoot: 'lastPage',
     theme: 'grid',
     headStyles: { fillColor: [255, 255, 255], textColor: [0,0,0], fontSize: 9, fontStyle: 'bold', lineColor: [0,0,0], lineWidth: 0.1, halign: 'center' },
     bodyStyles: { fontSize: 8, textColor: [0, 0, 0], lineColor: [0,0,0], lineWidth: 0.1, cellPadding: 2 },
@@ -1175,14 +1443,16 @@ export const generateQuotePdf = async (quote: Quote, client: Client | undefined,
   }
   doc.setFont('helvetica', 'bold'); doc.setTextColor(0, 0, 0); doc.setFontSize(10);
   doc.text('Colocamo-nos ao seu dispor, para os eventuais esclarecimentos adicionais que se fizerem necessários.', pageWidth / 2, lineY, { align: 'center' });
-
-  if (quote.criadoPor) {
-    lineY += 10;
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(50, 50, 50);
-    doc.text(`Orçamento confeccionado por ${quote.criadoPor} ${quote.criadoEm ? 'em ' + quote.criadoEm : ''}`, marginLeft, lineY);
-  }
+  
+  // Nota de Rodapé (Preparador)
+  lineY += 12;
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const footnoteY = pageHeight - marginBottom - 5; 
+  
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(7);
+  doc.setTextColor(100, 100, 100);
+  doc.text(`Documento ${quote.id} confeccionado por ${quote.criadoPor || 'Sistema'} ${quote.criadoEm ? 'em ' + quote.criadoEm : ''}`, marginLeft, footnoteY);
 
   addStandardFooter(doc, false, template?.footerBase64);
   
@@ -1259,11 +1529,12 @@ export const generateServiceOrderPdf = async (
   currentY = doc.lastAutoTable.finalY + 5;
 
   // Conteúdo Técnico
-  if (quote?.observacoes) {
+  const observationsToShow = os.observacoes || quote?.observacoes;
+  if (observationsToShow) {
     doc.setFontSize(8); doc.setFont('helvetica', 'bold');
     doc.text('OBSERVAÇÕES TÉCNICAS:', margin, currentY);
     doc.setFont('helvetica', 'normal');
-    const splitObs = doc.splitTextToSize(quote.observacoes, pageWidth - margin * 2);
+    const splitObs = doc.splitTextToSize(observationsToShow, pageWidth - margin * 2);
     doc.text(splitObs, margin, currentY + 4);
     currentY += (splitObs.length * 4) + 8;
   }
@@ -1359,12 +1630,20 @@ export const generateServiceOrderPdf = async (
   if (quote) {
     const decomposedData: any[][] = [];
     let globalCounter = 1;
+
+    // Tenta extrair o número do certificado das observações (se houver)
+    let certPlaceholder = '';
+    if (os.observacoes) {
+      const match = os.observacoes.match(/CERTIFICADO:\s*(.*)/);
+      if (match && match[1]) certPlaceholder = match[1].trim();
+    }
+
     quote.items.forEach((item, itemIdx) => {
       const qty = item.quantidade || 1;
       for (let i = 0; i < qty; i++) {
         decomposedData.push([
-          `${globalCounter}.${itemIdx + 1}`, // Pattern: GlobalCounter.OSItemIndex (ex: 1.1, 2.1, 3.2...)
-          '',
+          `${globalCounter}.${itemIdx + 1}`, 
+          certPlaceholder, // Injeta o certificado previsto
           item.descricao,
           '',
           '', '', '', '', ''
@@ -1440,7 +1719,7 @@ export const generateProtocolPdf = async (
   autoTable(doc, {
     startY: currentY,
     theme: 'plain',
-    styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0] },
+    styles: { fontSize: 9, cellPadding: 3, textColor: [0, 0, 0] },
     columnStyles: {
       0: { fontStyle: 'bold', fillColor: [240, 240, 240], cellWidth: 35 },
       1: { cellWidth: 'auto' },
@@ -1457,7 +1736,7 @@ export const generateProtocolPdf = async (
   });
 
   // @ts-ignore
-  currentY = doc.lastAutoTable.finalY + 10;
+  currentY = doc.lastAutoTable.finalY + 5;
 
   // 3. Tabela Retilínea de Movimentação
   const tableData = items.map((item, i) => [
@@ -1482,7 +1761,7 @@ export const generateProtocolPdf = async (
   });
 
   // @ts-ignore
-  currentY = doc.lastAutoTable.finalY + 10;
+  currentY = doc.lastAutoTable.finalY + 5;
 
   doc.setFontSize(8); doc.setFont('helvetica', 'bold');
   doc.text(`DATA DA ${opLabel}/DADOS COMPLEMENTARES:`, margin, currentY);
@@ -1532,7 +1811,7 @@ export const generateProtocolPdf = async (
 };
 
 
-export const generateCautelaPdf = async (custody: StandardCustody, resolvedItems: { nome: string; identificacao: string; quantidade: number }[], employeeName: string, documentTemplates: DocumentTemplate[] = []) => {
+export const generateCautelaPdf = async (custody: StandardCustody, resolvedItems: { nome: string; identificacao: string; quantidade: number }[], respOrigemName: string, respDestinoName: string, documentTemplates: DocumentTemplate[] = []) => {
   const template = documentTemplates.find(t => t.id === 'CAUTELA' || t.applyTo === 'CAUTELA') || documentTemplates.find(t => t.applyTo === 'ALL');
   
   let letterhead = template?.letterheadBase64;
@@ -1550,10 +1829,9 @@ export const generateCautelaPdf = async (custody: StandardCustody, resolvedItems
   // 1. Cabeçalho e Identificação de Fluxo
   const currentY = addStandardHeader({
     doc,
-    title: 'CAUTELA DE EQUIPAMENTOS',
-    documentNumber: custody.id,
-    date: custody.dataSaida,
+    title: `CAUTELA DE EQUIPAMENTOS Nº ${custody.id}`,
     isCertificate: false,
+    hideMeta: true,
     customLetterhead: letterhead
   });
 
@@ -1561,24 +1839,24 @@ export const generateCautelaPdf = async (custody: StandardCustody, resolvedItems
   doc.setTextColor(20, 20, 20);
 
   autoTable(doc, {
-    startY: currentY + 5,
+    startY: currentY,
     theme: 'plain',
-    styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0] },
+    styles: { fontSize: 9, cellPadding: 3, textColor: [0, 0, 0] },
     columnStyles: {
-      0: { fontStyle: 'bold', fillColor: [240, 240, 240], cellWidth: 45 },
+      0: { fontStyle: 'bold', fillColor: [240, 240, 240], cellWidth: 55 },
       1: { cellWidth: 'auto' }
     },
     body: [
-      ['Origem:', 'Laboratório Central'],
-      ['Responsável pela Emissão/Saída:', employeeName],
-      ['Destino:', custody.destino || '—'],
-      ['Responsável pelo Recebimento:', custody.responsavel || '—']
+      ['ORIGEM:', custody.origem || '—'],
+      ['RESPONSÁVEL ORIGEM:', respOrigemName || '—'],
+      ['DESTINO:', custody.destino || '—'],
+      ['RESPONSÁVEL DESTINO:', respDestinoName || '—']
     ],
     margin: { left: margin, right: margin }
   });
 
   // @ts-ignore
-  let y = doc.lastAutoTable.finalY + 8;
+  let y = doc.lastAutoTable.finalY + 5;
 
   // 2. Corpo do Documento (Tabela de Ativos)
   const tableData = resolvedItems.map((item, i) => [
@@ -1605,7 +1883,7 @@ export const generateCautelaPdf = async (custody: StandardCustody, resolvedItems
   });
 
   // @ts-ignore
-  y = doc.lastAutoTable.finalY + 10;
+  y = doc.lastAutoTable.finalY + 5;
 
   // 3. Termo de Responsabilidade
   if (y > pageHeight - 60) { doc.addPage(); y = 60; }
@@ -1636,8 +1914,8 @@ export const generateCautelaPdf = async (custody: StandardCustody, resolvedItems
     doc.text(label, x + sigWidth / 2, y + 4, { align: 'center' });
   };
 
-  drawSig(margin, 'Responsável Almoxarifado');
-  drawSig(margin + sigWidth + spacing, 'Responsável de Origem');
+  drawSig(margin, 'Responsável Origem');
+  drawSig(margin + sigWidth + spacing, 'Responsável Saída');
   drawSig(pageWidth - margin - sigWidth, 'Portaria / Recebedor Destino');
 
   addStandardFooter(doc, false, footerImage);

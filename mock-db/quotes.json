@@ -8,11 +8,43 @@
       {
         "descricao": "Micrômetro Externo 0-25mm",
         "quantidade": 1,
-        "valorUnitario": 150.0,
+        "valorUnitario": 150,
         "identificacao": "MIC-01"
       }
     ],
-    "valorTotal": 150.0,
+    "valorTotal": 150,
     "validadeDias": 30
+  },
+  {
+    "id": "OCW041026",
+    "clienteId": "002",
+    "dataEmissao": "2026-04-21",
+    "validade": "2026-05-21",
+    "comissaoVendedor": false,
+    "tabelaPrecos": "2026",
+    "formaPagamento": "10",
+    "items": [
+      {
+        "item": 1,
+        "descricao": "Paq",
+        "quantidade": 1,
+        "tipoServico": "Rastreável",
+        "local": "Laboratório",
+        "valorUnitario": 100,
+        "valorTotal": 100,
+        "desconto": 0,
+        "valorUnitarioFinal": 100
+      }
+    ],
+    "status": "Aprovado",
+    "clienteCnpj": "00.000.000/0000-00",
+    "clienteEndereco": "RUA RAUL BOOP, 37, COMPENSA, MANAUS - AM",
+    "clienteSolicitanteNome": "",
+    "clienteSolicitanteEmail": "",
+    "clienteSolicitanteContato": "9292135116",
+    "clienteEmailFinanceiro": "",
+    "clienteRetencaoImpostoFonte": false,
+    "observacoes": "",
+    "revision": 0
   }
 ]

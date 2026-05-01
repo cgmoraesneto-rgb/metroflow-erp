@@ -6,6 +6,7 @@ import { ClientSchema, ClientFormData } from '../schemas';
 import { X, Save, Building2, MapPin, Phone, Mail, FileText, CheckCircle2, User, HelpCircle, Activity, Globe, Download, Camera, Loader2, ArrowRight, Trash2, ShieldAlert, AlertCircle, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import { isValidCNPJ } from '../utils/formatters';
 
 interface ClientEditModalProps {
   client: Client | null;
@@ -70,6 +71,7 @@ export default function ClientEditModal({ client, isOpen, onClose, onSave, onDel
   }, [client, reset]);
 
   const onSubmit = (data: ClientFormData) => {
+    console.log("[ClientEditModal] Submitting data:", data);
     onSave({ ...data, id: client?.id || '' } as Client);
     onClose();
   };
@@ -80,35 +82,64 @@ export default function ClientEditModal({ client, isOpen, onClose, onSave, onDel
   const fetchCnpjData = async (cnpjValue: string) => {
     const endpoints = [
       'https://brasilapi.com.br/api/cnpj/v1',
-      'https://brasilapi.dev/api/cnpj/v1'
+      'https://minhareceita.org'
     ];
 
     let lastError: Error | null = null;
 
     for (const endpoint of endpoints) {
       try {
-        const response = await fetch(`${endpoint}/${cnpjValue}`);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
+
+        const response = await fetch(`${endpoint}/${cnpjValue}`, { 
+          signal: controller.signal,
+          headers: { 'Accept': 'application/json' }
+        });
+        
+        clearTimeout(timeoutId);
+
         if (!response.ok) {
           if (response.status === 404) {
             throw new Error('CNPJ não encontrado');
           }
-          throw new Error(`Falha ao buscar CNPJ (${response.status})`);
+          if (response.status === 429) {
+            throw new Error('Limite de consultas excedido. Aguarde um momento.');
+          }
+          throw new Error(`Falha no serviço (${response.status})`);
         }
 
-        return await response.json();
+        const data = await response.json();
+        if (data && (data.razao_social || data.nome_fantasia)) {
+          return data;
+        }
+        
+        throw new Error('Resposta inválida do servidor');
       } catch (error: any) {
         lastError = error;
         console.warn(`CNPJ lookup failed for ${endpoint}:`, error);
+        
+        if (error.name === 'AbortError') {
+          lastError = new Error('O servidor demorou muito para responder');
+        }
+
+        // Se for 404, não adianta tentar outros (geralmente)
+        if (error.message === 'CNPJ não encontrado') throw error;
       }
     }
 
-    throw lastError || new Error('Falha ao buscar CNPJ');
+    throw lastError || new Error('Não foi possível conectar aos serviços de consulta');
   };
 
   const handleSearchCnpj = async () => {
     const cnpjValue = watch('cnpj')?.replace(/\D/g, '');
     if (!cnpjValue || cnpjValue.length !== 14) {
-      toast.error('Por favor, informe um CNPJ válido com 14 dígitos (apenas números).');
+      toast.error('Informe um CNPJ válido com 14 dígitos.');
+      return;
+    }
+
+    if (!isValidCNPJ(cnpjValue)) {
+      toast.error('O CNPJ informado é inválido (dígitos verificadores incorretos).');
       return;
     }
 
@@ -118,6 +149,8 @@ export default function ClientEditModal({ client, isOpen, onClose, onSave, onDel
 
       if (data.razao_social) {
         setValue('razaoSocial', data.razao_social, { shouldDirty: true, shouldValidate: true });
+      } else if (data.nome_fantasia) {
+        setValue('razaoSocial', data.nome_fantasia, { shouldDirty: true, shouldValidate: true });
       }
 
       const addressParts = [];
@@ -132,13 +165,19 @@ export default function ClientEditModal({ client, isOpen, onClose, onSave, onDel
 
       if (data.ddd_telefone_1) {
         setValue('solicitanteContato', data.ddd_telefone_1, { shouldDirty: true });
+      } else if (data.telefone) {
+        setValue('solicitanteContato', data.telefone, { shouldDirty: true });
       }
     } catch (error: any) {
       console.error(error);
-      if (error?.message === 'CNPJ não encontrado') {
-        toast.error('CNPJ não encontrado. Verifique se o número está correto.');
+      const errorMessage = error?.message || 'Erro desconhecido';
+      
+      if (errorMessage === 'CNPJ não encontrado') {
+        toast.error('CNPJ não encontrado na base de dados da Receita Federal.');
+      } else if (errorMessage.includes('Limite de consultas')) {
+        toast.error('Limite de consultas atingido. Por favor, aguarde alguns minutos.');
       } else {
-        toast.error('Não foi possível buscar as informações do CNPJ. Verifique a conexão ou se o CNPJ é válido.');
+        toast.error(`Não foi possível buscar as informações: ${errorMessage}. Verifique sua conexão.`);
       }
     } finally {
       setIsFetchingCnpj(false);
@@ -241,7 +280,7 @@ export default function ClientEditModal({ client, isOpen, onClose, onSave, onDel
                       </div>
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 mt-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 mt-6">
                     <div className="space-y-2">
                       <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Inscrição Municipal</label>
                       <input
@@ -256,6 +295,14 @@ export default function ClientEditModal({ client, isOpen, onClose, onSave, onDel
                         {...register('inscricaoEstadual')}
                         className="w-full px-5 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-8 focus:ring-indigo-500/5 focus:border-indigo-500/30 outline-none font-bold text-sm transition-all dark:text-white"
                         placeholder="Caso possua"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Data Limite NF</label>
+                      <input
+                        {...register('dataLimiteNF')}
+                        className="w-full px-5 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl focus:ring-8 focus:ring-indigo-500/5 focus:border-indigo-500/30 outline-none font-bold text-sm transition-all dark:text-white"
+                        placeholder="Ex: 31/12/2026"
                       />
                     </div>
                   </div>

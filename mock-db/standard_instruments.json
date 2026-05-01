@@ -24,5 +24,21 @@
     "dataValidadeCalibracao": "2025-06-15",
     "uncertainty": 0.01,
     "statusMovimentacao": "Disponível"
+  },
+  {
+    "nome": "LRM",
+    "identificacao": "LRM",
+    "certificadoCalibracao": "LRM",
+    "certificadoPdf": "",
+    "dataCalibracao": "2025-12-12",
+    "dataValidadeCalibracao": "2026-12-12",
+    "periodicidade": "12",
+    "orgaoCalibrador": "LRM",
+    "resolucao": "0,001",
+    "uncertainty": 0,
+    "kFactor": 2,
+    "unidadeMedida": "mm",
+    "statusMovimentacao": "Disponível",
+    "id": "1776778493237hnvav1"
   }
 ]
