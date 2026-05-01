@@ -420,6 +420,30 @@ export interface FinancialControl {
   serviceOrderId: string;
 }
 
+export enum ExpenseCategory {
+  OPERACIONAL = "Operacional (Aluguel, Luz, Água, Internet)",
+  PESSOAL = "Pessoal (Salários, Encargos, Benefícios)",
+  IMPOSTOS = "Impostos e Taxas",
+  FORNECEDORES = "Fornecedores e Insumos",
+  MARKETING = "Marketing e Vendas",
+  LOGISTICA = "Logística e Frota",
+  OUTROS = "Outros"
+}
+
+export interface FinancialExpense {
+  id?: string;
+  descricao: string;
+  valor: number;
+  dataVencimento: string;
+  dataPagamento?: string;
+  categoria: ExpenseCategory;
+  bancoId?: string;
+  status: PaymentStatus;
+  observacoes?: string;
+  criadoPor?: string;
+  criadoEm?: string;
+}
+
 export interface PriceTableItem {
   id: string;
   nomeInstrumento: string; // Nome do Instrumento

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { FinancialControl, PaymentStatus, Quote, ServiceOrder, Client, PaymentMethod, InstrumentStatus, Bank } from '../types';
 import InvoiceModal from './InvoiceModal';
-import { Plus, Edit2, Trash2, CreditCard, Receipt, CircleDollarSign, Calendar, Download, ChevronRight, ArrowUpRight, CheckCircle, Clock, DollarSign, Search, Building2, Smartphone, X, Filter } from 'lucide-react';
+import ExpenseModal from './ExpenseModal';
+import { Plus, Edit2, Trash2, CreditCard, Receipt, CircleDollarSign, Calendar, Download, ChevronRight, ArrowUpRight, CheckCircle, Clock, DollarSign, Search, Building2, Smartphone, X, Filter, Tag } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatNumber } from '../utils/formatters';
@@ -11,6 +12,7 @@ interface FinanceModuleProps {
   serviceOrders: ServiceOrder[];
   clients: Client[];
   financialControls: FinancialControl[];
+  financialExpenses: FinancialExpense[];
   paymentMethods: PaymentMethod[];
   banks: Bank[];
   onFinancialControlsChange: (financials: FinancialControl[]) => void;
@@ -18,6 +20,8 @@ interface FinanceModuleProps {
   onSavePaymentMethod: (pm: PaymentMethod) => void;
   onDeletePaymentMethod: (id: string) => void;
   onDeleteFinancialControl: (id: string) => void;
+  onSaveExpense: (expense: Partial<FinancialExpense>) => void;
+  onDeleteExpense: (id: string) => void;
   onSaveQuote?: (quote: Quote) => void;
   searchQuery?: string;
 }
@@ -27,6 +31,7 @@ export default function FinanceModule({
   serviceOrders,
   clients,
   financialControls,
+  financialExpenses,
   paymentMethods,
   banks,
   onFinancialControlsChange,
@@ -34,22 +39,30 @@ export default function FinanceModule({
   onSavePaymentMethod,
   onDeletePaymentMethod,
   onDeleteFinancialControl,
+  onSaveExpense,
+  onDeleteExpense,
   onSaveQuote,
   searchQuery
 }: FinanceModuleProps) {
 
   const [activeSubTab, setActiveSubTab] = useState<'dashboard' | 'services' | 'billing' | 'expenses' | 'commissions'>('dashboard');
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+  const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [selectedServiceOrder, setSelectedServiceOrder] = useState<ServiceOrder | null>(null);
   const [invoiceData, setInvoiceData] = useState<Partial<FinancialControl> | null>(null);
-  const [paymentDates, setPaymentDates] = useState<{ [key: string]: string }>({});
-  const [selectedMonth, setSelectedMonth] = useState<string>(new Date().toISOString().substring(0, 7)); // YYYY-MM
-  const [reportStartDate, setReportStartDate] = useState<string>(new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().substring(0, 10));
-  const [reportEndDate, setReportEndDate] = useState<string>(new Date().toISOString().substring(0, 10));
-  const [statusFilter, setStatusFilter] = useState<InstrumentStatus | 'ALL'>('ALL');
+  const [expenseData, setExpenseData] = useState<Partial<FinancialExpense> | null>(null);
+
+  // Contextual Filters
+  const [filters, setFilters] = useState({
+    dashboard: { month: new Date().toISOString().substring(0, 7) },
+    services: { status: 'ALL' as InstrumentStatus | 'ALL' },
+    billing: { start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().substring(0, 10), end: new Date().toISOString().substring(0, 10) },
+    expenses: { start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().substring(0, 10), end: new Date().toISOString().substring(0, 10), category: 'ALL' },
+    commissions: { start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().substring(0, 10), end: new Date().toISOString().substring(0, 10) }
+  });
 
   const filteredFinancials = financialControls.filter(f => {
-    const matchesMonth = f.dataEmissao.startsWith(selectedMonth);
+    const matchesMonth = f.dataEmissao.startsWith(filters.dashboard.month);
     if (!searchQuery) return matchesMonth;
 
     const client = clients.find(c => c.id === f.clienteId);
@@ -77,11 +90,22 @@ export default function FinanceModule({
   const totalToReceive = filteredFinancials.filter(f => f.statusPagamento === PaymentStatus.PENDING).reduce((acc, curr) => acc + (curr.valorLiquido || 0), 0);
   const totalOverdue = filteredFinancials.filter(f => f.statusPagamento === PaymentStatus.OVERDUE).reduce((acc, curr) => acc + (curr.valorLiquido || 0), 0);
 
-  const handleDownloadReport = (type: 'billing' | 'commissions') => {
-    const start = new Date(reportStartDate);
-    const end = new Date(reportEndDate);
-    
-    if (type === 'billing') {
+  const handleDownloadReport = () => {
+    if (activeSubTab === 'services') {
+        const data = serviceOrders.filter(order => {
+          if (filters.services.status !== 'ALL' && order.statusServico !== filters.services.status) return false;
+          return true;
+        });
+        const headers = ['O.S.', 'Orçamento', 'Cliente', 'Data Limite NF', 'Status'];
+        const rows = data.map(order => {
+            const quote = quotes.find(q => q.id === order.orcamentoId);
+            const client = clients.find(c => c.id === quote?.clienteId);
+            return [order.id, order.orcamentoId, client?.razaoSocial || '—', client?.dataLimiteNF || '—', order.statusServico];
+        });
+        triggerCsvDownload(headers, rows, `Relatorio_OS_${new Date().toISOString().substring(0,10)}.csv`);
+    } else if (activeSubTab === 'billing') {
+        const start = new Date(filters.billing.start);
+        const end = new Date(filters.billing.end);
         const data = financialControls.filter(f => {
             const date = new Date(f.dataEmissao);
             return date >= start && date <= end;
@@ -101,18 +125,30 @@ export default function FinanceModule({
                 f.dataPagamentoReal || '—'
             ];
         });
+        triggerCsvDownload(headers, rows, `Relatorio_Faturamento_${filters.billing.start}_a_${filters.billing.end}.csv`);
+    } else if (activeSubTab === 'expenses') {
+        const start = new Date(filters.expenses.start);
+        const end = new Date(filters.expenses.end);
+        const data = financialExpenses.filter(e => {
+            const date = new Date(e.dataVencimento);
+            const inPeriod = date >= start && date <= end;
+            const matchesCat = filters.expenses.category === 'ALL' || e.categoria === filters.expenses.category;
+            return inPeriod && matchesCat;
+        });
 
-        const csvContent = [headers, ...rows].map(e => e.join(";")).join("\n");
-        const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", `Relatorio_Faturamento_${reportStartDate}_a_${reportEndDate}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    } else {
+        const headers = ['Descrição', 'Categoria', 'Vencimento', 'Valor', 'Status', 'Data Pagamento'];
+        const rows = data.map(e => [
+            e.descricao,
+            e.categoria,
+            e.dataVencimento,
+            e.valor.toFixed(2),
+            e.status,
+            e.dataPagamento || '—'
+        ]);
+        triggerCsvDownload(headers, rows, `Relatorio_Despesas_${filters.expenses.start}_a_${filters.expenses.end}.csv`);
+    } else if (activeSubTab === 'commissions') {
+        const start = new Date(filters.commissions.start);
+        const end = new Date(filters.commissions.end);
         const data = financialControls.filter(fc => {
             const quote = quotes.find(q => q.id === fc.orcamentoId);
             const date = new Date(fc.dataEmissao);
@@ -134,18 +170,23 @@ export default function FinanceModule({
                 f.statusComissao || 'Pendente'
             ];
         });
-
-        const csvContent = [headers, ...rows].map(e => e.join(";")).join("\n");
-        const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", `Relatorio_Comissoes_${reportStartDate}_a_${reportEndDate}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        triggerCsvDownload(headers, rows, `Relatorio_Comissoes_${filters.commissions.start}_a_${filters.commissions.end}.csv`);
+    } else {
+        toast.info('Não há relatório disponível para a aba Dashboard.');
     }
+  };
+
+  const triggerCsvDownload = (headers: string[], rows: any[][], filename: string) => {
+    const csvContent = [headers, ...rows].map(e => e.join(";")).join("\n");
+    const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleOpenInvoiceModal = (serviceOrder: ServiceOrder) => {
@@ -162,9 +203,9 @@ export default function FinanceModule({
 
   const handleSaveInvoice = (invoiceData: FinancialControl) => {
     onSaveFinancialControl(invoiceData);
-    // Auto-switch the month filter to the new invoice's emission month so it shows up immediately
+    // Auto-switch the dashboard filter to the new invoice's emission month so it shows up immediately
     if (invoiceData.dataEmissao) {
-      setSelectedMonth(invoiceData.dataEmissao.substring(0, 7));
+      setFilters(prev => ({ ...prev, dashboard: { month: invoiceData.dataEmissao.substring(0, 7) } }));
     }
     setActiveSubTab('billing');
     handleCloseInvoiceModal();
@@ -187,6 +228,22 @@ export default function FinanceModule({
         setSelectedServiceOrder(serviceOrder);
         setInvoiceData(fc); // We need a way to pass initial data to InvoiceModal
         setIsInvoiceModalOpen(true);
+    }
+  };
+
+  const handleSaveExpenseModal = (expenseData: Partial<FinancialExpense>) => {
+    onSaveExpense(expenseData);
+    setIsExpenseModalOpen(false);
+  };
+
+  const handleEditExpense = (expense: FinancialExpense) => {
+    setExpenseData(expense);
+    setIsExpenseModalOpen(true);
+  };
+
+  const handleDeleteExpenseModal = (expense: FinancialExpense) => {
+    if (window.confirm(`Excluir permanentemente a despesa: ${expense.descricao}?`)) {
+      if (expense.id) onDeleteExpense(expense.id);
     }
   };
 
@@ -252,43 +309,18 @@ export default function FinanceModule({
             ))}
           </div>
 
-          {/* Reports & Period Controls */}
-          <div className="flex flex-wrap items-center gap-2 bg-slate-50/50 dark:bg-slate-800/30 p-1.5 rounded-2xl border border-slate-100 dark:border-slate-800/50">
-            <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
-              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Inicial</span>
-              <input
-                type="date"
-                value={reportStartDate}
-                onChange={(e) => setReportStartDate(e.target.value)}
-                className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[85px]"
-              />
-              <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-1"></div>
-              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Final</span>
-              <input
-                type="date"
-                value={reportEndDate}
-                onChange={(e) => setReportEndDate(e.target.value)}
-                className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[85px]"
-              />
-            </div>
-
-            <div className="flex gap-1.5">
+          {/* Contextual Reports Button (only shows if not dashboard) */}
+          {activeSubTab !== 'dashboard' && (
+            <div className="flex">
               <button
-                onClick={() => handleDownloadReport('billing')}
-                className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-xl transition-all shadow-md shadow-indigo-200 dark:shadow-none font-black text-[9px] uppercase tracking-wider active:scale-95 whitespace-nowrap"
+                onClick={handleDownloadReport}
+                className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 px-6 py-2.5 rounded-xl transition-all shadow-xl dark:shadow-none font-black text-[10px] uppercase tracking-widest active:scale-95 whitespace-nowrap"
               >
-                <Download className="w-3.5 h-3.5" />
-                <span>Faturamento</span>
-              </button>
-              <button
-                onClick={() => handleDownloadReport('commissions')}
-                className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded-xl transition-all shadow-md shadow-emerald-200 dark:shadow-none font-black text-[9px] uppercase tracking-wider active:scale-95 whitespace-nowrap"
-              >
-                <DollarSign className="w-3.5 h-3.5" />
-                <span>Comissões</span>
+                <Download className="w-4 h-4" />
+                <span>Exportar Relatório</span>
               </button>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
@@ -296,7 +328,19 @@ export default function FinanceModule({
 
       <div className="mt-8 transition-all duration-300">
           {activeSubTab === 'dashboard' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="space-y-6">
+              <div className="flex items-center justify-end">
+                <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Mês de Referência</span>
+                  <input
+                    type="month"
+                    value={filters.dashboard.month}
+                    onChange={(e) => setFilters(prev => ({ ...prev, dashboard: { month: e.target.value } }))}
+                    className="bg-transparent border-none text-xs font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[120px]"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
                 { label: 'Total Faturado (Bruto)', value: totalBilled, lightBg: 'bg-indigo-50', darkBg: 'dark:bg-indigo-900/20', iconColor: 'text-indigo-600', icon: Receipt },
                 { label: 'Total Recebido (Líquido)', value: totalReceived, lightBg: 'bg-emerald-50', darkBg: 'dark:bg-emerald-900/20', iconColor: 'text-emerald-600', icon: CheckCircle },
@@ -335,8 +379,8 @@ export default function FinanceModule({
                   <div className="flex items-center gap-3 bg-white dark:bg-slate-900 p-1.5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
                     <Filter className="w-4 h-4 text-indigo-500 ml-2" />
                     <select
-                      value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value as any)}
+                      value={filters.services.status}
+                      onChange={(e) => setFilters(prev => ({ ...prev, services: { status: e.target.value as InstrumentStatus | 'ALL' } }))}
                       className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer uppercase tracking-widest"
                     >
                       <option value="ALL">TODOS OS STATUS</option>
@@ -361,7 +405,7 @@ export default function FinanceModule({
                     <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
                       {serviceOrders
                         .filter(order => {
-                          if (statusFilter !== 'ALL' && order.statusServico !== statusFilter) return false;
+                          if (filters.services.status !== 'ALL' && order.statusServico !== filters.services.status) return false;
                           if (!searchQuery) return true;
                           const quote = quotes.find(q => q.id === order.orcamentoId);
                           const client = clients.find(c => c.id === quote?.clienteId);
@@ -428,6 +472,25 @@ export default function FinanceModule({
                     <div className="w-2 h-8 bg-emerald-500 rounded-full mr-4"></div>
                     Resumo do Faturamento
                   </h3>
+                  
+                  {/* Faturamento Period Filter */}
+                  <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Emissão de</span>
+                    <input
+                      type="date"
+                      value={filters.billing.start}
+                      onChange={(e) => setFilters(prev => ({ ...prev, billing: { ...prev.billing, start: e.target.value } }))}
+                      className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[85px]"
+                    />
+                    <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-1"></div>
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Até</span>
+                    <input
+                      type="date"
+                      value={filters.billing.end}
+                      onChange={(e) => setFilters(prev => ({ ...prev, billing: { ...prev.billing, end: e.target.value } }))}
+                      className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[85px]"
+                    />
+                  </div>
                 </div>
 
                 <div className="rectilinear-container custom-scrollbar shadow-sm">
@@ -444,7 +507,10 @@ export default function FinanceModule({
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
-                      {filteredFinancials.map((fc) => {
+                      {financialControls.filter(f => {
+                         if (f.dataEmissao < filters.billing.start || f.dataEmissao > filters.billing.end) return false;
+                         return true;
+                      }).map((fc) => {
                         const client = clients.find(c => c.id === fc.clienteId);
                         return (
                           <tr key={fc.numeroNF} className="rectilinear-tr group">
@@ -522,13 +588,88 @@ export default function FinanceModule({
                        <div className="w-2 h-8 bg-rose-500 rounded-full mr-4"></div>
                        Gestão de Despesas
                      </h3>
-                     <button onClick={() => toast.info('Em desenvolvimento: Abertura do modal de nova despesa')} className="px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-rose-500/20 transition-all active:scale-95 flex items-center gap-2">
-                       <Plus className="w-5 h-5" /> Nova Despesa
-                     </button>
+                     
+                     <div className="flex items-center gap-3">
+                       <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+                         <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Vencimento de</span>
+                         <input
+                           type="date"
+                           value={filters.expenses.start}
+                           onChange={(e) => setFilters(prev => ({ ...prev, expenses: { ...prev.expenses, start: e.target.value } }))}
+                           className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[85px]"
+                         />
+                         <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-1"></div>
+                         <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Até</span>
+                         <input
+                           type="date"
+                           value={filters.expenses.end}
+                           onChange={(e) => setFilters(prev => ({ ...prev, expenses: { ...prev.expenses, end: e.target.value } }))}
+                           className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[85px]"
+                         />
+                       </div>
+
+                       <button onClick={() => { setExpenseData(null); setIsExpenseModalOpen(true); }} className="px-6 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-rose-500/20 transition-all active:scale-95 flex items-center gap-2">
+                         <Plus className="w-4 h-4" /> Nova Despesa
+                       </button>
+                     </div>
                   </div>
-                  <div className="bg-slate-50 dark:bg-slate-800/50 rounded-3xl p-10 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-700">
-                     <CircleDollarSign className="w-12 h-12 text-slate-300 mb-4" />
-                     <p className="text-slate-500 font-medium">O módulo de despesas está em implantação.</p>
+
+                  <div className="rectilinear-container custom-scrollbar shadow-sm">
+                    <table className="rectilinear-table">
+                      <thead>
+                        <tr>
+                          <th className="rectilinear-th col-lg text-left pl-8">Descrição / Fornecedor</th>
+                          <th className="rectilinear-th col-md text-left">Categoria</th>
+                          <th className="rectilinear-th col-sm text-center">Vencimento</th>
+                          <th className="rectilinear-th col-sm text-center">Valor (R$)</th>
+                          <th className="rectilinear-th col-sm text-center">Status</th>
+                          <th className="rectilinear-th col-sm text-center">Data Pagam.</th>
+                          <th className="rectilinear-th col-sm text-center pr-8">Ações</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
+                        {financialExpenses.filter(e => {
+                           if (e.dataVencimento < filters.expenses.start || e.dataVencimento > filters.expenses.end) return false;
+                           if (filters.expenses.category !== 'ALL' && e.categoria !== filters.expenses.category) return false;
+                           return true;
+                        }).map((exp) => (
+                          <tr key={exp.id} className="rectilinear-tr group">
+                            <td className="rectilinear-td text-left pl-8 font-bold text-slate-700 dark:text-slate-300 truncate">
+                              {exp.descricao}
+                            </td>
+                            <td className="rectilinear-td text-left">
+                              <span className="flex items-center gap-1 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                                <Tag className="w-3 h-3 opacity-50" /> {exp.categoria.split(' ')[0]}
+                              </span>
+                            </td>
+                            <td className="rectilinear-td text-center text-[10px] font-bold uppercase tracking-wider text-slate-400 tabular-nums">
+                              {exp.dataVencimento.split('-').reverse().join('/')}
+                            </td>
+                            <td className="rectilinear-td text-center font-black text-rose-600 tabular-nums">
+                              R$ {formatNumber(exp.valor)}
+                            </td>
+                            <td className="rectilinear-td text-center">
+                              <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-sm border ${
+                                exp.status === PaymentStatus.PAID ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
+                                exp.status === PaymentStatus.OVERDUE ? 'bg-rose-100 text-rose-700 border-rose-200' :
+                                'bg-amber-100 text-amber-700 border-amber-200'
+                              }`}>
+                                {exp.status}
+                              </span>
+                            </td>
+                            <td className="rectilinear-td text-center text-[10px] font-bold text-slate-400 tabular-nums">
+                              {exp.dataPagamento ? exp.dataPagamento.split('-').reverse().join('/') : '—'}
+                            </td>
+                            <td className="rectilinear-td text-center pr-8">
+                              <div className="flex items-center justify-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+                                <button onClick={() => handleEditExpense(exp)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-slate-50 rounded-lg transition-all"><Edit2 className="w-4 h-4" /></button>
+                                <button onClick={() => handleDeleteExpenseModal(exp)} className="p-2 text-slate-400 hover:text-rose-500 hover:bg-slate-50 rounded-lg transition-all"><Trash2 className="w-4 h-4" /></button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                </section>
              </div>
@@ -540,6 +681,23 @@ export default function FinanceModule({
                     <div className="w-2 h-8 bg-amber-500 rounded-full mr-4"></div>
                     Gestão de Comissões
                   </h3>
+                  <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Emissão de</span>
+                    <input
+                      type="date"
+                      value={filters.commissions.start}
+                      onChange={(e) => setFilters(prev => ({ ...prev, commissions: { ...prev.commissions, start: e.target.value } }))}
+                      className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[85px]"
+                    />
+                    <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-1"></div>
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Até</span>
+                    <input
+                      type="date"
+                      value={filters.commissions.end}
+                      onChange={(e) => setFilters(prev => ({ ...prev, commissions: { ...prev.commissions, end: e.target.value } }))}
+                      className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[85px]"
+                    />
+                  </div>
                 </div>
 
                 <div className="rectilinear-container custom-scrollbar shadow-sm">
@@ -558,7 +716,9 @@ export default function FinanceModule({
                     <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
                       {financialControls.filter(fc => {
                         const quote = quotes.find(q => q.id === fc.orcamentoId);
-                        return quote?.comissaoVendedor;
+                        if (!quote?.comissaoVendedor) return false;
+                        if (fc.dataEmissao < filters.commissions.start || fc.dataEmissao > filters.commissions.end) return false;
+                        return true;
                       }).map((fc) => {
                         const quote = quotes.find(q => q.id === fc.orcamentoId);
                         const comissaoPerc = fc.percentualComissao || 0;
@@ -629,6 +789,14 @@ export default function FinanceModule({
         quotes={quotes}
         clients={clients}
         paymentMethods={paymentMethods}
+        banks={banks}
+      />
+
+      <ExpenseModal
+        isOpen={isExpenseModalOpen}
+        onClose={() => setIsExpenseModalOpen(false)}
+        onSave={handleSaveExpenseModal}
+        initialData={expenseData}
         banks={banks}
       />
     </div>

@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { db, auth } from '../firebaseConfig';
 import {
   Client, Quote, ServiceOrder, StandardInstrument, CalibrationRecord, CalibrationResult,
-  FinancialControl, Employee, InstrumentType, CertificateMask, Procedure,
+  FinancialControl, FinancialExpense, Employee, InstrumentType, CertificateMask, Procedure,
   PaymentMethod, Bank, UnitOfMeasure, ClientStatus, CertificateStatus, Module,
   StandardCustody, FleetLog, Vehicle, DocumentTemplate
 } from '../types';
@@ -27,6 +27,7 @@ interface DataContextType {
   calibrationRecords: CalibrationRecord[];
   calibrationResults: CalibrationResult[];
   financialControls: FinancialControl[];
+  financialExpenses: FinancialExpense[];
   employees: Employee[];
   priceTables: any[];
   instrumentTypes: InstrumentType[];
@@ -72,6 +73,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [calibrationRecords, setCalibrationRecords] = useState<CalibrationRecord[]>([]);
   const [calibrationResults, setCalibrationResults] = useState<CalibrationResult[]>([]);
   const [financialControls, setFinancialControls] = useState<FinancialControl[]>([]);
+  const [financialExpenses, setFinancialExpenses] = useState<FinancialExpense[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [priceTables, setPriceTables] = useState<any[]>([]);
   const [instrumentTypes, setInstrumentTypes] = useState<InstrumentType[]>([]);
@@ -106,6 +108,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       case 'calibration_records': return { state: calibrationRecords, setter: setCalibrationRecords, save: tecnicoService.saveCalibrationRecord };
       case 'calibration_results': return { state: calibrationResults, setter: setCalibrationResults, save: tecnicoService.saveCalibrationResult };
       case 'financial_controls': return { state: financialControls, setter: setFinancialControls, save: financeiroService.saveFinancialControl };
+      case 'financial_expenses': return { state: financialExpenses, setter: setFinancialExpenses, save: financeiroService.saveFinancialExpense };
       case 'fleet_logs': return { state: fleetLogs, setter: setFleetLogs, save: logisticaService.saveFleetLog };
       case 'standard_custodies': return { state: standardCustodies, setter: setStandardCustodies, save: logisticaService.saveStandardCustody };
       case 'procedures': return { state: procedures, setter: setProcedures, save: tecnicoService.saveProcedure };
@@ -257,6 +260,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         tecnicoService.getCalibrationRecords(),
         tecnicoService.getCalibrationResults(),
         financeiroService.getFinancialControls(),
+        financeiroService.getFinancialExpenses(),
         apiClient.fetch<Employee>('/api/mock/employees'),
         logisticaService.getFleetLogs(),
         logisticaService.getVehicles(),
@@ -269,7 +273,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return fallback;
       };
 
-      const [clientsData, quotesData, soData, stdData, calData, resData, finData, empData, fleetData, vehData, custodyData] = results;
+      const [clientsData, quotesData, soData, stdData, calData, resData, finData, expData, empData, fleetData, vehData, custodyData] = results;
 
       setClients(safeGet(clientsData));
       setQuotes(safeGet(quotesData));
@@ -278,6 +282,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setCalibrationRecords(safeGet(calData));
       setCalibrationResults(safeGet(resData));
       setFinancialControls(safeGet(finData));
+      setFinancialExpenses(safeGet(expData));
       setEmployees(safeGet(empData));
       setFleetLogs(safeGet(fleetData));
       setVehicles(safeGet(vehData));
@@ -369,7 +374,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <DataContext.Provider value={{
       clients, quotes, serviceOrders, standardInstruments, calibrationRecords, calibrationResults,
-      financialControls, employees, priceTables, instrumentTypes, certificateMasks,
+      financialControls, financialExpenses, employees, priceTables, instrumentTypes, certificateMasks,
       procedures, paymentMethods, banks, unitsOfMeasure,
       standardCustodies, fleetLogs, vehicles, documentTemplates,
       loading, isSyncing, saveItem, deleteItem, hasPermission, addClient,

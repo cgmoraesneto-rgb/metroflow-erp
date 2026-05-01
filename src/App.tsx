@@ -472,7 +472,7 @@ function TechnicalWrapper() {
 }
 
 function FinanceWrapper() {
-  const { searchQuery, quotes, serviceOrders, clients, financialControls, paymentMethods, banks, saveItem, deleteItem } = useData();
+  const { searchQuery, quotes, serviceOrders, clients, financialControls, financialExpenses, paymentMethods, banks, saveItem, deleteItem } = useData();
   return (
     <FinanceModule
       searchQuery={searchQuery}
@@ -480,6 +480,7 @@ function FinanceWrapper() {
       serviceOrders={serviceOrders}
       clients={clients}
       financialControls={financialControls}
+      financialExpenses={financialExpenses}
       paymentMethods={paymentMethods}
       banks={banks}
       onFinancialControlsChange={async (newFc) => {
@@ -487,6 +488,8 @@ function FinanceWrapper() {
       }}
       onSaveFinancialControl={(fc) => saveItem('financial_controls', fc)}
       onDeleteFinancialControl={(id) => deleteItem('financial_controls', id)}
+      onSaveExpense={(exp) => saveItem('financial_expenses', exp)}
+      onDeleteExpense={(id) => deleteItem('financial_expenses', id)}
       onSavePaymentMethod={(pm) => saveItem('payment_methods', pm)}
       onDeletePaymentMethod={(id) => deleteItem('payment_methods', id)}
       onSaveQuote={(quote) => saveItem('quotes', quote)}
