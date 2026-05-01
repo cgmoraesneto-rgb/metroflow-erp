@@ -38,7 +38,7 @@ export default function FinanceModule({
   searchQuery
 }: FinanceModuleProps) {
 
-  const [activeSubTab, setActiveSubTab] = useState<'dashboard' | 'billing' | 'commissions'>('dashboard');
+  const [activeSubTab, setActiveSubTab] = useState<'dashboard' | 'services' | 'billing' | 'expenses' | 'commissions'>('dashboard');
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [selectedServiceOrder, setSelectedServiceOrder] = useState<ServiceOrder | null>(null);
   const [invoiceData, setInvoiceData] = useState<Partial<FinancialControl> | null>(null);
@@ -233,7 +233,9 @@ export default function FinanceModule({
           <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl gap-1">
             {[
               { id: 'dashboard', label: 'Dashboard', icon: CircleDollarSign },
+              { id: 'services', label: 'Serviços', icon: Receipt },
               { id: 'billing', label: 'Faturamento', icon: Receipt },
+              { id: 'expenses', label: 'Despesas', icon: CircleDollarSign },
               { id: 'commissions', label: 'Comissões', icon: DollarSign }
             ].map((tab) => (
               <button
@@ -321,7 +323,7 @@ export default function FinanceModule({
                 </motion.div>
               ))}
             </div>
-          ) : activeSubTab === 'billing' ? (
+          ) : activeSubTab === 'services' ? (
             <div className="space-y-12">
               <section>
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
@@ -417,7 +419,9 @@ export default function FinanceModule({
                   </table>
                 </div>
               </section>
-
+            </div>
+          ) : activeSubTab === 'billing' ? (
+            <div className="space-y-12">
               <section>
                 <div className="flex items-center justify-between mb-8">
                   <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center">
@@ -510,7 +514,25 @@ export default function FinanceModule({
                 </div>
               </section>
             </div>
-          ) : (
+          ) : activeSubTab === 'expenses' ? (
+             <div className="space-y-12">
+               <section>
+                  <div className="flex items-center justify-between mb-8">
+                     <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center">
+                       <div className="w-2 h-8 bg-rose-500 rounded-full mr-4"></div>
+                       Gestão de Despesas
+                     </h3>
+                     <button onClick={() => toast.info('Em desenvolvimento: Abertura do modal de nova despesa')} className="px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-rose-500/20 transition-all active:scale-95 flex items-center gap-2">
+                       <Plus className="w-5 h-5" /> Nova Despesa
+                     </button>
+                  </div>
+                  <div className="bg-slate-50 dark:bg-slate-800/50 rounded-3xl p-10 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-700">
+                     <CircleDollarSign className="w-12 h-12 text-slate-300 mb-4" />
+                     <p className="text-slate-500 font-medium">O módulo de despesas está em implantação.</p>
+                  </div>
+               </section>
+             </div>
+          ) : activeSubTab === 'commissions' ? (
             <div className="space-y-12">
               <section>
                 <div className="flex items-center justify-between mb-8">

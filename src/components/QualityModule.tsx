@@ -49,14 +49,14 @@ export default function QualityModule({
   documentTemplates = [],
   searchQuery
 }: QualityModuleProps) {
-  const [activeSubTab, setActiveSubTab] = useState<SubTab>('masks');
+  const [activeSubTab, setActiveSubTab] = useState<SubTab>('standards');
 
   const TAB_CONFIG = [
-    { id: 'masks', label: 'Máscaras de Certificados', icon: FileText, color: 'blue' },
-    { id: 'procedures', label: 'Procedimentos', icon: BookOpen, color: 'emerald' },
     { id: 'standards', label: 'Instrumentos Padrão', icon: Wrench, color: 'amber' },
-    { id: 'issued', label: 'Certificados Emitidos', icon: History, color: 'blue' },
+    { id: 'procedures', label: 'Procedimentos', icon: BookOpen, color: 'emerald' },
+    { id: 'masks', label: 'Máscaras de Certificados', icon: FileText, color: 'blue' },
     { id: 'approvals', label: 'Aprovação de Certificados', icon: CheckCircle, color: 'indigo' },
+    { id: 'issued', label: 'Certificados Emitidos', icon: History, color: 'blue' },
   ];
 
   return (

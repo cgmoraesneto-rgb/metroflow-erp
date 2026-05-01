@@ -158,17 +158,27 @@ export default function LogisticsModule({
   });
 
   // --- Cautelas Logic ---
-  const newEmptyCustody = (): StandardCustody => ({
-    id: `CAUT-${Date.now().toString().slice(-6)}`,
-    items: [{ standardInstrumentId: '', quantidade: 1 }],
-    origem: 'Laboratório Central',
-    responsavelOrigem: '',
-    destino: '',
-    responsavelDestino: '',
-    dataSaida: new Date().toISOString().split('T')[0],
-    dataRetorno: '',
-    responsavel: ''
-  });
+  const newEmptyCustody = (): StandardCustody => {
+    let maxId = 26000;
+    standardCustodies.forEach(c => {
+      const match = c.id.match(/\d+/);
+      if (match) {
+        const num = parseInt(match[0], 10);
+        if (num > maxId) maxId = num;
+      }
+    });
+    return {
+      id: `${maxId + 1}`,
+      items: [{ standardInstrumentId: '', quantidade: 1 }],
+      origem: 'Laboratório Central',
+      responsavelOrigem: '',
+      destino: '',
+      responsavelDestino: '',
+      dataSaida: new Date().toISOString().split('T')[0],
+      dataRetorno: '',
+      responsavel: ''
+    };
+  };
 
   const handleEditCustody = (custody?: StandardCustody) => {
     setEditingCustody(custody ? { ...custody } : newEmptyCustody());
@@ -224,16 +234,28 @@ export default function LogisticsModule({
 
   // --- Frota Logic ---
   const handleEditFleet = (fleet?: FleetLog) => {
-    setEditingFleet(fleet ? { ...fleet } : {
-      id: `FROTA-${Date.now().toString().slice(-6)}`,
-      motorista: '',
-      veiculoId: '',
-      trajetoDescricao: '',
-      dataSaida: new Date().toISOString().split('T')[0],
-      dataRetorno: '',
-      kmInicial: 0,
-      kmFinal: 0
-    });
+    if (fleet) {
+      setEditingFleet({ ...fleet });
+    } else {
+      let maxId = 26000;
+      fleetLogs.forEach(f => {
+        const match = f.id?.match(/\d+/);
+        if (match) {
+          const num = parseInt(match[0], 10);
+          if (num > maxId) maxId = num;
+        }
+      });
+      setEditingFleet({
+        id: `${maxId + 1}`,
+        motorista: '',
+        veiculoId: '',
+        trajetoDescricao: '',
+        dataSaida: new Date().toISOString().split('T')[0],
+        dataRetorno: '',
+        kmInicial: 0,
+        kmFinal: 0
+      });
+    }
   };
 
   const handleSaveFleet = async (e: React.FormEvent) => {
@@ -255,7 +277,7 @@ export default function LogisticsModule({
         <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl gap-1">
           {[
             { id: 'os', label: 'Ordens de Serviço', icon: ClipboardList },
-            { id: 'standards', label: 'Cautelas (Padrões)', icon: Key },
+            { id: 'standards', label: 'Cautelas', icon: Key },
             { id: 'fleet', label: 'Controle de Frota', icon: CarFront }
           ].map((tab) => {
             const Icon = tab.icon;
@@ -450,16 +472,16 @@ export default function LogisticsModule({
                   <Plus className="w-5 h-5" /> Nova Cautela
                 </button>
               </div>
-              <div className="rectilinear-container custom-scrollbar shadow-sm">
-                <table className="rectilinear-table">
+              <div className="rectilinear-container custom-scrollbar shadow-sm overflow-x-hidden">
+                <table className="rectilinear-table !min-w-0 !table-auto w-full">
                   <thead>
                     <tr>
-                      <th className="rectilinear-th col-md text-center pl-8">ID Cautela</th>
-                      <th className="rectilinear-th col-lg text-center">Destino / Finalidade</th>
-                      <th className="rectilinear-th col-md text-center">Padrão Mobilizado</th>
-                      <th className="rectilinear-th col-md text-center">Cronograma S/R</th>
-                      <th className="rectilinear-th col-md text-center">Responsável</th>
-                      <th className="rectilinear-th col-md text-center pr-8">Ações</th>
+                      <th className="rectilinear-th w-[100px] text-center pl-8">ID Cautela</th>
+                      <th className="rectilinear-th text-left">Destino / Finalidade</th>
+                      <th className="rectilinear-th w-[20%] text-left">Padrão Mobilizado</th>
+                      <th className="rectilinear-th w-[150px] text-center">Cronograma S/R</th>
+                      <th className="rectilinear-th w-[150px] text-center">Responsável</th>
+                      <th className="rectilinear-th w-[100px] text-center pr-8">Ações</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
@@ -514,17 +536,16 @@ export default function LogisticsModule({
                    <CarFront className="w-5 h-5" /> Registrar Saída
                  </button>
                </div>
-               <div className="rectilinear-container custom-scrollbar shadow-sm">
-                 <table className="rectilinear-table">
+               <div className="rectilinear-container custom-scrollbar shadow-sm overflow-x-hidden">
+                 <table className="rectilinear-table !min-w-0 !table-auto w-full">
                    <thead>
                      <tr>
-                        <th className="rectilinear-th col-sm text-center pl-8">ID Viagem</th>
-                        <th className="rectilinear-th col-md text-center">Motorista</th>
-                        <th className="rectilinear-th col-md text-center">Veículo / Placa</th>
-                        <th className="rectilinear-th col-md text-center">Saída / Retorno</th>
-                        <th className="rectilinear-th col-sm text-center">Km Perc.</th>
-                        <th className="rectilinear-th col-lg text-center">Trajeto / Ocorrências</th>
-                        <th className="rectilinear-th col-sm text-center pr-8">Ações</th>
+                        <th className="rectilinear-th w-[100px] text-center pl-8">ID Viagem</th>
+                        <th className="rectilinear-th text-left">Motorista</th>
+                        <th className="rectilinear-th w-[25%] text-left">Veículo / Placa</th>
+                        <th className="rectilinear-th w-[180px] text-center">Saída / Retorno</th>
+                        <th className="rectilinear-th w-[150px] text-center">Trajeto</th>
+                        <th className="rectilinear-th w-[100px] text-center pr-8">Ações</th>
                       </tr>
                    </thead>
                    <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">

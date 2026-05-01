@@ -250,18 +250,18 @@ export default function GeneralRegistersModule({
           <h2 className="text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Configurações</h2>
         </div>
 
-        <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl gap-1 overflow-x-auto no-scrollbar">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl gap-1 w-full lg:w-auto">
           {TAB_CONFIG.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveSubTab(tab.id as SubTab)}
-              className={`flex items-center px-6 py-2.5 rounded-xl font-black text-xs transition-all duration-300 whitespace-nowrap ${activeSubTab === tab.id
+              className={`flex items-center justify-center px-6 py-2.5 rounded-xl font-black text-xs transition-all duration-300 ${activeSubTab === tab.id
                 ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm'
                 : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                 }`}
             >
-              <tab.icon className="w-4 h-4 mr-2" />
-              <span>{tab.label}</span>
+              <tab.icon className="w-4 h-4 mr-2 hidden sm:block" />
+              <span className="truncate">{tab.label}</span>
             </button>
           ))}
         </div>
