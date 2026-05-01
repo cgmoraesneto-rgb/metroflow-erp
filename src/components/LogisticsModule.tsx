@@ -93,6 +93,8 @@ export default function LogisticsModule({
       let newStatus = InstrumentStatus.PENDING;
       if (editForm.dataSaida) {
         newStatus = InstrumentStatus.DELIVERED;
+      } else if (editForm.calibracaoConcluida && editForm.certificadosEnviados) {
+        newStatus = InstrumentStatus.COMPLETED;
       } else if (editForm.calibracaoConcluida) {
         newStatus = InstrumentStatus.CALIBRATED;
       } else if (editForm.dataEntrada) {
@@ -586,71 +588,77 @@ export default function LogisticsModule({
 
                 <div className="grid grid-cols-1 gap-4">
                   <div className="space-y-3">
-                    <button 
-                      onClick={() => {
-                        const nextVal = !editForm.calibracaoConcluida;
-                        setEditForm(p => ({ 
-                          ...p, 
-                          calibracaoConcluida: nextVal,
-                          dataCalibracaoFim: (nextVal && !p.dataCalibracaoFim) ? new Date().toISOString().split('T')[0] : p.dataCalibracaoFim
-                        }));
-                      }} 
-                      className={`w-full flex items-center gap-4 p-5 rounded-[2rem] border-2 transition-all group ${editForm.calibracaoConcluida ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 text-slate-500 hover:border-indigo-200'}`}
-                    >
+                    <div className={`w-full flex items-center justify-between p-5 rounded-[2rem] border-2 transition-all group ${editForm.calibracaoConcluida ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 text-slate-500 hover:border-indigo-200'}`}>
+                      <div 
+                        className="flex items-center gap-4 cursor-pointer flex-1" 
+                        onClick={() => {
+                          const nextVal = !editForm.calibracaoConcluida;
+                          setEditForm(p => ({ 
+                            ...p, 
+                            calibracaoConcluida: nextVal,
+                            dataCalibracaoFim: (nextVal && !p.dataCalibracaoFim) ? new Date().toISOString().split('T')[0] : p.dataCalibracaoFim
+                          }));
+                        }}
+                      >
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${editForm.calibracaoConcluida ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-800 group-hover:bg-indigo-50'}`}>
-                            <Activity className={`w-5 h-5 ${editForm.calibracaoConcluida ? 'text-white' : ''}`} />
+                          <Activity className={`w-5 h-5 ${editForm.calibracaoConcluida ? 'text-white' : ''}`} />
                         </div>
-                        <div className="text-left">
-                            <p className="text-sm font-black uppercase tracking-tight">Calibração</p>
-                            <p className={`text-[10px] font-bold ${editForm.calibracaoConcluida ? 'text-indigo-100' : 'text-slate-400'}`}>{editForm.calibracaoConcluida ? 'Marco Concluído' : 'Aguardando Técnico'}</p>
+                        <div className="text-left flex-1">
+                          <p className="text-sm font-black uppercase tracking-tight">Calibração</p>
+                          {editForm.calibracaoConcluida ? (
+                            <div className="flex items-center gap-1 mt-0.5" onClick={(e) => e.stopPropagation()}>
+                              <span className="text-[10px] font-bold text-indigo-100 uppercase tracking-widest">Calibrado em</span>
+                              <input 
+                                type="date" 
+                                value={editForm.dataCalibracaoFim} 
+                                onChange={e => setEditForm(p => ({ ...p, dataCalibracaoFim: e.target.value }))} 
+                                className="bg-white/10 text-[10px] font-bold text-white outline-none cursor-pointer hover:bg-white/20 px-2 py-0.5 rounded-lg transition-colors border border-white/10"
+                              />
+                            </div>
+                          ) : (
+                            <p className="text-[10px] font-bold text-slate-400">Aguardando Técnico</p>
+                          )}
                         </div>
-                        {editForm.calibracaoConcluida && <CheckCircle2 className="w-6 h-6 ml-auto" />}
-                    </button>
-                    {editForm.calibracaoConcluida && (
-                      <div className="px-6 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Data da Calibração</label>
-                        <input 
-                          type="date" 
-                          value={editForm.dataCalibracaoFim} 
-                          onChange={e => setEditForm(p => ({ ...p, dataCalibracaoFim: e.target.value }))} 
-                          className="w-full px-4 py-3 bg-indigo-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-400 rounded-2xl font-bold text-xs outline-none transition-all"
-                        />
                       </div>
-                    )}
+                      {editForm.calibracaoConcluida && <CheckCircle2 className="w-6 h-6 ml-4 opacity-80" />}
+                    </div>
                   </div>
 
                   <div className="space-y-3">
-                    <button 
-                      onClick={() => {
-                        const nextVal = !editForm.certificadosEnviados;
-                        setEditForm(p => ({ 
-                          ...p, 
-                          certificadosEnviados: nextVal,
-                          dataEnvioCertificado: (nextVal && !p.dataEnvioCertificado) ? new Date().toISOString().split('T')[0] : p.dataEnvioCertificado
-                        }));
-                      }} 
-                      className={`w-full flex items-center gap-4 p-5 rounded-[2rem] border-2 transition-all group ${editForm.certificadosEnviados ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 text-slate-500 hover:border-emerald-200'}`}
-                    >
-                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${editForm.certificadosEnviados ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-800 group-hover:bg-emerald-50'}`}>
-                            <FileText className={`w-5 h-5 ${editForm.certificadosEnviados ? 'text-white' : ''}`} />
+                    <div className={`w-full flex items-center justify-between p-5 rounded-[2rem] border-2 transition-all group ${editForm.certificadosEnviados ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 text-slate-500 hover:border-emerald-200'}`}>
+                      <div 
+                        className="flex items-center gap-4 cursor-pointer flex-1"
+                        onClick={() => {
+                          const nextVal = !editForm.certificadosEnviados;
+                          setEditForm(p => ({ 
+                            ...p, 
+                            certificadosEnviados: nextVal,
+                            dataEnvioCertificado: (nextVal && !p.dataEnvioCertificado) ? new Date().toISOString().split('T')[0] : p.dataEnvioCertificado
+                          }));
+                        }}
+                      >
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${editForm.certificadosEnviados ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-800 group-hover:bg-emerald-50'}`}>
+                          <FileText className={`w-5 h-5 ${editForm.certificadosEnviados ? 'text-white' : ''}`} />
                         </div>
-                        <div className="text-left">
-                            <p className="text-sm font-black uppercase tracking-tight">Certificados</p>
-                            <p className={`text-[10px] font-bold ${editForm.certificadosEnviados ? 'text-emerald-100' : 'text-slate-400'}`}>{editForm.certificadosEnviados ? 'Emitidos e Enviados' : 'Pendente Revisão'}</p>
+                        <div className="text-left flex-1">
+                          <p className="text-sm font-black uppercase tracking-tight">Certificados</p>
+                          {editForm.certificadosEnviados ? (
+                            <div className="flex items-center gap-1 mt-0.5" onClick={(e) => e.stopPropagation()}>
+                              <span className="text-[10px] font-bold text-emerald-100 uppercase tracking-widest">Enviado em</span>
+                              <input 
+                                type="date" 
+                                value={editForm.dataEnvioCertificado} 
+                                onChange={e => setEditForm(p => ({ ...p, dataEnvioCertificado: e.target.value }))} 
+                                className="bg-white/10 text-[10px] font-bold text-white outline-none cursor-pointer hover:bg-white/20 px-2 py-0.5 rounded-lg transition-colors border border-white/10"
+                              />
+                            </div>
+                          ) : (
+                            <p className="text-[10px] font-bold text-slate-400">Pendente Revisão</p>
+                          )}
                         </div>
-                        {editForm.certificadosEnviados && <CheckCircle2 className="w-6 h-6 ml-auto" />}
-                    </button>
-                    {editForm.certificadosEnviados && (
-                      <div className="px-6 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Data de Envio</label>
-                        <input 
-                          type="date" 
-                          value={editForm.dataEnvioCertificado} 
-                          onChange={e => setEditForm(p => ({ ...p, dataEnvioCertificado: e.target.value }))} 
-                          className="w-full px-4 py-3 bg-emerald-50 dark:bg-slate-800 border-2 border-transparent focus:border-emerald-400 rounded-2xl font-bold text-xs outline-none transition-all"
-                        />
                       </div>
-                    )}
+                      {editForm.certificadosEnviados && <CheckCircle2 className="w-6 h-6 ml-4 opacity-80" />}
+                    </div>
                   </div>
                 </div>
 
