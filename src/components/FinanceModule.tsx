@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { FinancialControl, FinancialExpense, ExpenseCategory, PaymentStatus, Quote, ServiceOrder, Client, PaymentMethod, InstrumentStatus, Bank } from '../types';
 import InvoiceModal from './InvoiceModal';
 import ExpenseModal from './ExpenseModal';
-import { Plus, Edit2, Trash2, CreditCard, Receipt, CircleDollarSign, Calendar, Download, ChevronRight, ArrowUpRight, CheckCircle, Clock, DollarSign, Search, Building2, Smartphone, X, Filter, Tag } from 'lucide-react';
+import { Plus, Edit2, Trash2, CreditCard, Receipt, CircleDollarSign, Download, CheckCircle, Clock, DollarSign, Filter, Tag } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatNumber } from '../utils/formatters';
@@ -508,6 +508,7 @@ export default function FinanceModule({
                     </thead>
                     <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
                       {financialControls.filter(f => {
+                         if (!f.dataEmissao) return false;
                          if (f.dataEmissao < filters.billing.start || f.dataEmissao > filters.billing.end) return false;
                          return true;
                       }).map((fc) => {
@@ -629,6 +630,7 @@ export default function FinanceModule({
                       </thead>
                       <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
                         {financialExpenses.filter(e => {
+                           if (!e.dataVencimento) return false;
                            if (e.dataVencimento < filters.expenses.start || e.dataVencimento > filters.expenses.end) return false;
                            if (filters.expenses.category !== 'ALL' && e.categoria !== filters.expenses.category) return false;
                            return true;
@@ -639,7 +641,7 @@ export default function FinanceModule({
                             </td>
                             <td className="rectilinear-td text-left">
                               <span className="flex items-center gap-1 text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                                <Tag className="w-3 h-3 opacity-50" /> {exp.categoria.split(' ')[0]}
+                                <Tag className="w-3 h-3 opacity-50" /> {String(exp.categoria).split(' ')[0]}
                               </span>
                             </td>
                             <td className="rectilinear-td text-center text-[10px] font-bold uppercase tracking-wider text-slate-400 tabular-nums">
@@ -717,6 +719,7 @@ export default function FinanceModule({
                       {financialControls.filter(fc => {
                         const quote = quotes.find(q => q.id === fc.orcamentoId);
                         if (!quote?.comissaoVendedor) return false;
+                        if (!fc.dataEmissao) return false;
                         if (fc.dataEmissao < filters.commissions.start || fc.dataEmissao > filters.commissions.end) return false;
                         return true;
                       }).map((fc) => {
