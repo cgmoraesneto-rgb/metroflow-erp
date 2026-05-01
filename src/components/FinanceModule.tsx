@@ -617,7 +617,7 @@ export default function FinanceModule({
                 </div>
               </section>
             </div>
-          )}
+          ) : null}
         </div>
 
       <InvoiceModal
