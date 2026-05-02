@@ -2,10 +2,20 @@ import { useState } from 'react';
 import { FinancialControl, FinancialExpense, ExpenseCategory, PaymentStatus, Quote, ServiceOrder, Client, PaymentMethod, InstrumentStatus, Bank } from '../types';
 import InvoiceModal from './InvoiceModal';
 import ExpenseModal from './ExpenseModal';
-import { Plus, Edit2, Trash2, CreditCard, Receipt, CircleDollarSign, Download, CheckCircle, Clock, DollarSign, Filter, Tag } from 'lucide-react';
+import { Plus, Edit2, Trash2, Receipt, CircleDollarSign, Download, CheckCircle, Clock, DollarSign, Filter, Tag, Package, ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { formatNumber } from '../utils/formatters';
+
+interface InventoryItem {
+  id: string;
+  descricao: string;
+  categoria: string;
+  quantidade: number;
+  unidade: string;
+  valorUnitario: number;
+  localizacao?: string;
+}
 
 interface FinanceModuleProps {
   quotes: Quote[];
@@ -45,21 +55,42 @@ export default function FinanceModule({
   searchQuery
 }: FinanceModuleProps) {
 
-  const [activeSubTab, setActiveSubTab] = useState<'dashboard' | 'services' | 'billing' | 'expenses' | 'commissions'>('dashboard');
+  const [activeSubTab, setActiveSubTab] = useState<'dashboard' | 'services' | 'billing' | 'expenses' | 'commissions' | 'inventory'>('dashboard');
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [selectedServiceOrder, setSelectedServiceOrder] = useState<ServiceOrder | null>(null);
   const [invoiceData, setInvoiceData] = useState<Partial<FinancialControl> | null>(null);
   const [expenseData, setExpenseData] = useState<Partial<FinancialExpense> | null>(null);
+  const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const [inventorySearch, setInventorySearch] = useState('');
+
+  const today = new Date().toISOString().substring(0, 10);
+  const firstOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().substring(0, 10);
 
   // Contextual Filters
   const [filters, setFilters] = useState({
     dashboard: { month: new Date().toISOString().substring(0, 7) },
     services: { status: 'ALL' as InstrumentStatus | 'ALL' },
-    billing: { start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().substring(0, 10), end: new Date().toISOString().substring(0, 10) },
-    expenses: { start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().substring(0, 10), end: new Date().toISOString().substring(0, 10), category: 'ALL' as ExpenseCategory | 'ALL' },
-    commissions: { start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().substring(0, 10), end: new Date().toISOString().substring(0, 10) }
+    billing: { start: firstOfMonth, end: today, status: 'ALL' as PaymentStatus | 'ALL' },
+    expenses: { start: firstOfMonth, end: today, category: 'ALL' as ExpenseCategory | 'ALL', status: 'ALL' as PaymentStatus | 'ALL' },
+    commissions: { start: firstOfMonth, end: today, status: 'ALL' as 'ALL' | 'Pendente' | 'Pago' }
   });
+
+  // Helper: get date range for active tab (used by export button)
+  const getActiveTabDates = () => {
+    if (activeSubTab === 'billing') return { start: filters.billing.start, end: filters.billing.end };
+    if (activeSubTab === 'expenses') return { start: filters.expenses.start, end: filters.expenses.end };
+    if (activeSubTab === 'commissions') return { start: filters.commissions.start, end: filters.commissions.end };
+    return { start: firstOfMonth, end: today };
+  };
+
+  const setActiveTabDates = (start: string, end: string) => {
+    if (activeSubTab === 'billing') setFilters(p => ({ ...p, billing: { ...p.billing, start, end } }));
+    else if (activeSubTab === 'expenses') setFilters(p => ({ ...p, expenses: { ...p.expenses, start, end } }));
+    else if (activeSubTab === 'commissions') setFilters(p => ({ ...p, commissions: { ...p.commissions, start, end } }));
+  };
+
+  const activeDates = getActiveTabDates();
 
   const filteredFinancials = financialControls.filter(f => {
     const matchesMonth = f.dataEmissao.startsWith(filters.dashboard.month);
@@ -276,7 +307,7 @@ export default function FinanceModule({
   return (
     <div className="space-y-10">
       {/* --- Main Module Header --- */}
-      <div className="flex flex-col lg:flex-row justify-between gap-8 pb-8 border-b border-slate-100 dark:border-slate-800">
+      <div className="flex flex-col lg:flex-row justify-between gap-6 pb-8 border-b border-slate-100 dark:border-slate-800">
         <div className="pt-2">
           <span className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.3em] mb-2 block">Gestão Estratégica</span>
           <h2 className="text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Financeiro</h2>
@@ -284,37 +315,72 @@ export default function FinanceModule({
 
         <div className="flex flex-col items-start lg:items-end gap-3">
           {/* Tabs */}
-          <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl gap-1">
+          <div className="flex flex-wrap bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl gap-1">
             {[
               { id: 'dashboard', label: 'Dashboard', icon: CircleDollarSign },
               { id: 'services', label: 'Serviços', icon: Receipt },
               { id: 'billing', label: 'Faturamento', icon: Receipt },
               { id: 'expenses', label: 'Despesas', icon: CircleDollarSign },
-              { id: 'commissions', label: 'Comissões', icon: DollarSign }
+              { id: 'commissions', label: 'Comissões', icon: DollarSign },
+              { id: 'inventory', label: 'Inventário', icon: Package },
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveSubTab(tab.id as any)}
-                className={`flex items-center px-6 py-2.5 rounded-xl font-black text-xs transition-all duration-300 ${activeSubTab === tab.id
+                className={`flex items-center px-5 py-2.5 rounded-xl font-black text-xs transition-all duration-300 ${activeSubTab === tab.id
                   ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm'
                   : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                   }`}
               >
-                <tab.icon className="w-4 h-4 mr-2" />
+                <tab.icon className="w-3.5 h-3.5 mr-1.5" />
                 <span>{tab.label}</span>
               </button>
             ))}
           </div>
 
-          {/* Contextual Reports Button (only shows if not dashboard) */}
-          {activeSubTab !== 'dashboard' && (
-            <div className="flex">
+          {/* Date filters + Export — only for tabs that have date range */}
+          {(activeSubTab === 'billing' || activeSubTab === 'expenses' || activeSubTab === 'commissions') && (
+            <div className="flex items-center gap-2">
+              {/* Date Inicial */}
+              <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 rounded-xl shadow-sm">
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Data Inicial</span>
+                <input
+                  type="date"
+                  value={activeDates.start}
+                  onChange={(e) => setActiveTabDates(e.target.value, activeDates.end)}
+                  className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[95px]"
+                />
+              </div>
+              {/* Date Final */}
+              <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 rounded-xl shadow-sm">
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Data Final</span>
+                <input
+                  type="date"
+                  value={activeDates.end}
+                  onChange={(e) => setActiveTabDates(activeDates.start, e.target.value)}
+                  className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[95px]"
+                />
+              </div>
+              {/* Export Button */}
               <button
                 onClick={handleDownloadReport}
-                className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 px-6 py-2.5 rounded-xl transition-all shadow-xl dark:shadow-none font-black text-[10px] uppercase tracking-widest active:scale-95 whitespace-nowrap"
+                className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 px-5 py-2.5 rounded-xl transition-all shadow-xl dark:shadow-none font-black text-[10px] uppercase tracking-widest active:scale-95 whitespace-nowrap"
               >
                 <Download className="w-4 h-4" />
-                <span>Exportar Relatório</span>
+                <span>Exportar</span>
+              </button>
+            </div>
+          )}
+
+          {/* Services tab: only export (no date range) */}
+          {activeSubTab === 'services' && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleDownloadReport}
+                className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 px-5 py-2.5 rounded-xl transition-all shadow-xl dark:shadow-none font-black text-[10px] uppercase tracking-widest active:scale-95 whitespace-nowrap"
+              >
+                <Download className="w-4 h-4" />
+                <span>Exportar</span>
               </button>
             </div>
           )}
@@ -325,13 +391,13 @@ export default function FinanceModule({
         {activeSubTab === 'dashboard' ? (
           <div className="space-y-6">
             <div className="flex items-center justify-end">
-              <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+              <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 rounded-xl shadow-sm">
                 <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Mês de Referência</span>
                 <input
                   type="month"
                   value={filters.dashboard.month}
                   onChange={(e) => setFilters(prev => ({ ...prev, dashboard: { month: e.target.value } }))}
-                  className="bg-transparent border-none text-xs font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[120px]"
+                  className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[105px]"
                 />
               </div>
             </div>
@@ -366,22 +432,22 @@ export default function FinanceModule({
         ) : activeSubTab === 'services' ? (
           <div className="space-y-12">
             <section>
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center">
                   <div className="w-2 h-8 bg-indigo-600 rounded-full mr-4"></div>
                   Status Financeiro das Ordens de Serviço
                 </h3>
-
-                <div className="flex items-center gap-3 bg-white dark:bg-slate-900 p-1.5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
-                  <Filter className="w-4 h-4 text-indigo-500 ml-2" />
+                {/* Status filter — where dates used to be */}
+                <div className="flex items-center gap-2 bg-white dark:bg-slate-900 p-1.5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+                  <Filter className="w-4 h-4 text-indigo-500 ml-1" />
                   <select
                     value={filters.services.status}
                     onChange={(e) => setFilters(prev => ({ ...prev, services: { status: e.target.value as InstrumentStatus | 'ALL' } }))}
-                    className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer uppercase tracking-widest"
+                    className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer uppercase tracking-widest pr-1"
                   >
-                    <option value="ALL">TODOS OS STATUS</option>
-                    {Object.values(InstrumentStatus).map(status => (
-                      <option key={status} value={status}>{status.toUpperCase()}</option>
+                    <option value="ALL">Todos os Status</option>
+                    {Object.values(InstrumentStatus).map(s => (
+                      <option key={s} value={s}>{s}</option>
                     ))}
                   </select>
                 </div>
@@ -468,23 +534,17 @@ export default function FinanceModule({
                   <div className="w-2 h-8 bg-emerald-500 rounded-full mr-4"></div>
                   Resumo do Faturamento
                 </h3>
-                
-                <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
-                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Emissão de</span>
-                  <input
-                    type="date"
-                    value={filters.billing.start}
-                    onChange={(e) => setFilters(prev => ({ ...prev, billing: { ...prev.billing, start: e.target.value } }))}
-                    className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[85px]"
-                  />
-                  <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-1"></div>
-                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Até</span>
-                  <input
-                    type="date"
-                    value={filters.billing.end}
-                    onChange={(e) => setFilters(prev => ({ ...prev, billing: { ...prev.billing, end: e.target.value } }))}
-                    className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[85px]"
-                  />
+                {/* Status filter for billing */}
+                <div className="flex items-center gap-2 bg-white dark:bg-slate-900 p-1.5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+                  <Filter className="w-4 h-4 text-emerald-500 ml-1" />
+                  <select
+                    value={filters.billing.status}
+                    onChange={(e) => setFilters(p => ({ ...p, billing: { ...p.billing, status: e.target.value as PaymentStatus | 'ALL' } }))}
+                    className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer uppercase tracking-widest pr-1"
+                  >
+                    <option value="ALL">Todos os Status</option>
+                    {Object.values(PaymentStatus).map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
                 </div>
               </div>
 
@@ -503,9 +563,15 @@ export default function FinanceModule({
                   </thead>
                   <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
                     {financialControls.filter(f => {
-                       if (!f.dataEmissao) return false;
-                       if (f.dataEmissao < filters.billing.start || f.dataEmissao > filters.billing.end) return false;
-                       return true;
+                      if (!f.dataEmissao) return false;
+                      if (f.dataEmissao < filters.billing.start || f.dataEmissao > filters.billing.end) return false;
+                      if (filters.billing.status !== 'ALL') {
+                        const isPaid = !!f.dataPagamentoReal;
+                        const isOverdue = !isPaid && f.dataPagamento && today > f.dataPagamento;
+                        const computedStatus = isPaid ? PaymentStatus.PAID : (isOverdue ? PaymentStatus.OVERDUE : PaymentStatus.PENDING);
+                        if (computedStatus !== filters.billing.status) return false;
+                      }
+                      return true;
                     }).map((fc) => {
                       const client = clients.find(c => c.id === fc.clienteId);
                       return (
@@ -577,38 +643,43 @@ export default function FinanceModule({
             </section>
           </div>
         ) : activeSubTab === 'expenses' ? (
-             <div className="space-y-12">
-               <section>
-                  <div className="flex items-center justify-between mb-8">
-                     <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center">
-                       <div className="w-2 h-8 bg-rose-500 rounded-full mr-4"></div>
-                       Gestão de Despesas
-                     </h3>
-                     
-                     <div className="flex items-center gap-3">
-                       <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
-                         <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Vencimento de</span>
-                         <input
-                           type="date"
-                           value={filters.expenses.start}
-                           onChange={(e) => setFilters(prev => ({ ...prev, expenses: { ...prev.expenses, start: e.target.value } }))}
-                           className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[85px]"
-                         />
-                         <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-1"></div>
-                         <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Até</span>
-                         <input
-                           type="date"
-                           value={filters.expenses.end}
-                           onChange={(e) => setFilters(prev => ({ ...prev, expenses: { ...prev.expenses, end: e.target.value } }))}
-                           className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[85px]"
-                         />
-                       </div>
-
-                       <button onClick={() => { setExpenseData(null); setIsExpenseModalOpen(true); }} className="px-6 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-rose-500/20 transition-all active:scale-95 flex items-center gap-2">
-                         <Plus className="w-4 h-4" /> Nova Despesa
-                       </button>
-                     </div>
+          <div className="space-y-12">
+            <section>
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center">
+                  <div className="w-2 h-8 bg-rose-500 rounded-full mr-4"></div>
+                  Gestão de Despesas
+                </h3>
+                <div className="flex items-center gap-2">
+                  {/* Category filter */}
+                  <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 p-1.5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+                    <Tag className="w-3.5 h-3.5 text-rose-400 ml-1" />
+                    <select
+                      value={filters.expenses.category}
+                      onChange={(e) => setFilters(p => ({ ...p, expenses: { ...p.expenses, category: e.target.value as ExpenseCategory | 'ALL' } }))}
+                      className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer uppercase tracking-widest pr-1"
+                    >
+                      <option value="ALL">Todas as Categorias</option>
+                      {Object.values(ExpenseCategory).map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
                   </div>
+                  {/* Status filter */}
+                  <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 p-1.5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+                    <Filter className="w-3.5 h-3.5 text-rose-400 ml-1" />
+                    <select
+                      value={filters.expenses.status}
+                      onChange={(e) => setFilters(p => ({ ...p, expenses: { ...p.expenses, status: e.target.value as PaymentStatus | 'ALL' } }))}
+                      className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer uppercase tracking-widest pr-1"
+                    >
+                      <option value="ALL">Todos os Status</option>
+                      {Object.values(PaymentStatus).map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
+                  <button onClick={() => { setExpenseData(null); setIsExpenseModalOpen(true); }} className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-rose-500/20 transition-all active:scale-95 flex items-center gap-1.5">
+                    <Plus className="w-3.5 h-3.5" /> Nova Despesa
+                  </button>
+                </div>
+              </div>
 
                   <div className="rectilinear-container custom-scrollbar shadow-sm">
                     <table className="rectilinear-table">
@@ -628,6 +699,7 @@ export default function FinanceModule({
                            if (!e.dataVencimento) return false;
                            if (e.dataVencimento < filters.expenses.start || e.dataVencimento > filters.expenses.end) return false;
                            if (filters.expenses.category !== 'ALL' && e.categoria !== filters.expenses.category) return false;
+                           if (filters.expenses.status !== 'ALL' && e.status !== filters.expenses.status) return false;
                            return true;
                         }).map((exp) => (
                           <tr key={exp.id} className="rectilinear-tr group">
@@ -670,32 +742,28 @@ export default function FinanceModule({
                   </div>
                </section>
              </div>
-          ) : activeSubTab === 'commissions' ? (
-            <div className="space-y-12">
-              <section>
-                <div className="flex items-center justify-between mb-8">
-                  <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center">
-                    <div className="w-2 h-8 bg-amber-500 rounded-full mr-4"></div>
-                    Gestão de Comissões
-                  </h3>
-                  <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
-                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Emissão de</span>
-                    <input
-                      type="date"
-                      value={filters.commissions.start}
-                      onChange={(e) => setFilters(prev => ({ ...prev, commissions: { ...prev.commissions, start: e.target.value } }))}
-                      className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[85px]"
-                    />
-                    <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-1"></div>
-                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Até</span>
-                    <input
-                      type="date"
-                      value={filters.commissions.end}
-                      onChange={(e) => setFilters(prev => ({ ...prev, commissions: { ...prev.commissions, end: e.target.value } }))}
-                      className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[85px]"
-                    />
-                  </div>
+        ) : activeSubTab === 'commissions' ? (
+          <div className="space-y-12">
+            <section>
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center">
+                  <div className="w-2 h-8 bg-amber-500 rounded-full mr-4"></div>
+                  Gestão de Comissões
+                </h3>
+                {/* Status filter for commissions */}
+                <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 p-1.5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+                  <Filter className="w-4 h-4 text-amber-500 ml-1" />
+                  <select
+                    value={filters.commissions.status}
+                    onChange={(e) => setFilters(p => ({ ...p, commissions: { ...p.commissions, status: e.target.value as 'ALL' | 'Pendente' | 'Pago' } }))}
+                    className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer uppercase tracking-widest pr-1"
+                  >
+                    <option value="ALL">Todos os Status</option>
+                    <option value="Pendente">Pendente</option>
+                    <option value="Pago">Pago</option>
+                  </select>
                 </div>
+              </div>
 
                 <div className="rectilinear-container custom-scrollbar shadow-sm">
                   <table className="rectilinear-table">
@@ -716,6 +784,7 @@ export default function FinanceModule({
                         if (!quote?.comissaoVendedor) return false;
                         if (!fc.dataEmissao) return false;
                         if (fc.dataEmissao < filters.commissions.start || fc.dataEmissao > filters.commissions.end) return false;
+                        if (filters.commissions.status !== 'ALL' && (fc.statusComissao || 'Pendente') !== filters.commissions.status) return false;
                         return true;
                       }).map((fc) => {
                         const quote = quotes.find(q => q.id === fc.orcamentoId);
@@ -775,7 +844,136 @@ export default function FinanceModule({
                 </div>
               </section>
             </div>
-          ) : null}
+          ) : activeSubTab === 'inventory' ? (
+          <div className="space-y-8">
+            <div className="flex items-center justify-between">
+              <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center">
+                <div className="w-2 h-8 bg-violet-500 rounded-full mr-4"></div>
+                Inventário de Materiais
+              </h3>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="Buscar item..."
+                  value={inventorySearch}
+                  onChange={(e) => setInventorySearch(e.target.value)}
+                  className="text-sm border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-200 font-medium focus:ring-2 focus:ring-violet-500 outline-none transition-all w-48"
+                />
+                <button
+                  onClick={() => {
+                    const id = `INV-${Date.now()}`;
+                    const newItem: InventoryItem = { id, descricao: 'Novo Item', categoria: 'Geral', quantidade: 0, unidade: 'un', valorUnitario: 0 };
+                    setInventory(p => [...p, newItem]);
+                  }}
+                  className="flex items-center gap-1.5 px-5 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-violet-500/20 transition-all active:scale-95"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Novo Item
+                </button>
+              </div>
+            </div>
+
+            {/* Summary cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[
+                { label: 'Total de Itens', value: inventory.length.toString(), icon: Package, color: 'text-violet-600', bg: 'bg-violet-50 dark:bg-violet-900/20' },
+                { label: 'Valor em Estoque', value: `R$ ${formatNumber(inventory.reduce((a, i) => a + i.quantidade * i.valorUnitario, 0))}`, icon: CircleDollarSign, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
+                { label: 'It. com Estoque Baixo', value: inventory.filter(i => i.quantidade <= 2).length.toString(), icon: ArrowDownCircle, color: 'text-rose-600', bg: 'bg-rose-50 dark:bg-rose-900/20' },
+              ].map((c, i) => (
+                <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="premium-card p-6 flex items-center gap-4">
+                  <div className={`${c.bg} w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0`}>
+                    <c.icon className={`${c.color} w-6 h-6`} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">{c.label}</p>
+                    <p className="text-xl font-black text-slate-900 dark:text-white">{c.value}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="rectilinear-container custom-scrollbar shadow-sm">
+              <table className="rectilinear-table">
+                <thead>
+                  <tr>
+                    <th className="rectilinear-th col-lg text-left pl-8">Descrição</th>
+                    <th className="rectilinear-th col-sm text-center">Categoria</th>
+                    <th className="rectilinear-th col-sm text-center">Qtd.</th>
+                    <th className="rectilinear-th col-sm text-center">Unidade</th>
+                    <th className="rectilinear-th col-sm text-center">Valor Unit.</th>
+                    <th className="rectilinear-th col-sm text-center">Total</th>
+                    <th className="rectilinear-th col-sm text-center">Localização</th>
+                    <th className="rectilinear-th col-sm text-center pr-8">Ações</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
+                  {inventory.filter(item =>
+                    !inventorySearch || item.descricao.toLowerCase().includes(inventorySearch.toLowerCase()) || item.categoria.toLowerCase().includes(inventorySearch.toLowerCase())
+                  ).map((item) => (
+                    <tr key={item.id} className="rectilinear-tr group">
+                      <td className="rectilinear-td text-left pl-8">
+                        <input
+                          type="text"
+                          value={item.descricao}
+                          onChange={(e) => setInventory(p => p.map(x => x.id === item.id ? { ...x, descricao: e.target.value } : x))}
+                          className="w-full bg-transparent border-none font-bold text-slate-700 dark:text-slate-300 outline-none hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-violet-500 rounded px-2 py-1 transition-all"
+                        />
+                      </td>
+                      <td className="rectilinear-td text-center">
+                        <input
+                          type="text"
+                          value={item.categoria}
+                          onChange={(e) => setInventory(p => p.map(x => x.id === item.id ? { ...x, categoria: e.target.value } : x))}
+                          className="w-full text-center bg-transparent border-none text-[10px] font-black uppercase text-slate-500 outline-none hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-white dark:focus:bg-slate-800 focus:ring-1 focus:ring-violet-500 rounded px-1 py-1 transition-all"
+                        />
+                      </td>
+                      <td className="rectilinear-td text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <button onClick={() => setInventory(p => p.map(x => x.id === item.id ? { ...x, quantidade: Math.max(0, x.quantidade - 1) } : x))} className="p-0.5 text-slate-400 hover:text-rose-500 transition-all"><ArrowDownCircle className="w-4 h-4" /></button>
+                          <span className={`font-black text-sm w-8 text-center tabular-nums ${item.quantidade <= 2 ? 'text-rose-600' : 'text-slate-900 dark:text-white'}`}>{item.quantidade}</span>
+                          <button onClick={() => setInventory(p => p.map(x => x.id === item.id ? { ...x, quantidade: x.quantidade + 1 } : x))} className="p-0.5 text-slate-400 hover:text-emerald-500 transition-all"><ArrowUpCircle className="w-4 h-4" /></button>
+                        </div>
+                      </td>
+                      <td className="rectilinear-td text-center">
+                        <input
+                          type="text"
+                          value={item.unidade}
+                          onChange={(e) => setInventory(p => p.map(x => x.id === item.id ? { ...x, unidade: e.target.value } : x))}
+                          className="w-12 text-center bg-transparent border-none text-xs font-bold text-slate-500 outline-none hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:ring-1 focus:ring-violet-500 rounded px-1 py-1 transition-all"
+                        />
+                      </td>
+                      <td className="rectilinear-td text-center">
+                        <input
+                          type="number"
+                          value={item.valorUnitario}
+                          onChange={(e) => setInventory(p => p.map(x => x.id === item.id ? { ...x, valorUnitario: Number(e.target.value) } : x))}
+                          className="w-20 text-center bg-transparent border-none font-bold text-slate-700 dark:text-slate-300 outline-none hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:ring-1 focus:ring-violet-500 rounded px-1 py-1 transition-all"
+                        />
+                      </td>
+                      <td className="rectilinear-td text-center font-black text-violet-600 tabular-nums">
+                        R$ {formatNumber(item.quantidade * item.valorUnitario)}
+                      </td>
+                      <td className="rectilinear-td text-center">
+                        <input
+                          type="text"
+                          value={item.localizacao || ''}
+                          placeholder="—"
+                          onChange={(e) => setInventory(p => p.map(x => x.id === item.id ? { ...x, localizacao: e.target.value } : x))}
+                          className="w-full text-center bg-transparent border-none text-xs font-bold text-slate-500 outline-none hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:ring-1 focus:ring-violet-500 rounded px-1 py-1 transition-all"
+                        />
+                      </td>
+                      <td className="rectilinear-td text-center pr-8">
+                        <button onClick={() => setInventory(p => p.filter(x => x.id !== item.id))} className="p-2 text-slate-400 hover:text-rose-500 hover:bg-slate-50 rounded-lg transition-all opacity-60 group-hover:opacity-100"><Trash2 className="w-4 h-4" /></button>
+                      </td>
+                    </tr>
+                  ))}
+                  {inventory.length === 0 && (
+                    <tr><td colSpan={8} className="py-16 text-center text-slate-400 font-bold">Nenhum item cadastrado. Clique em "Novo Item" para começar.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ) : null}
         </div>
 
       <InvoiceModal
