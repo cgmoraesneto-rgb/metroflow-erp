@@ -211,9 +211,6 @@ export default function FinanceModule({
     handleCloseInvoiceModal();
   };
 
-  const handlePaymentDateChange = (nfNumber: string, date: string) => {
-    setPaymentDates(prev => ({ ...prev, [nfNumber]: date }));
-  };
 
   const handleDeleteInvoice = (fc: FinancialControl) => {
     if (window.confirm(`Excluir permanentemente o faturamento da NF ${fc.numeroNF}?`)) {
@@ -324,23 +321,21 @@ export default function FinanceModule({
         </div>
       </div>
 
-
-
       <div className="mt-8 transition-all duration-300">
-          {activeSubTab === 'dashboard' ? (
-            <div className="space-y-6">
-              <div className="flex items-center justify-end">
-                <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
-                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Mês de Referência</span>
-                  <input
-                    type="month"
-                    value={filters.dashboard.month}
-                    onChange={(e) => setFilters(prev => ({ ...prev, dashboard: { month: e.target.value } }))}
-                    className="bg-transparent border-none text-xs font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[120px]"
-                  />
-                </div>
+        {activeSubTab === 'dashboard' ? (
+          <div className="space-y-6">
+            <div className="flex items-center justify-end">
+              <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Mês de Referência</span>
+                <input
+                  type="month"
+                  value={filters.dashboard.month}
+                  onChange={(e) => setFilters(prev => ({ ...prev, dashboard: { month: e.target.value } }))}
+                  className="bg-transparent border-none text-xs font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[120px]"
+                />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
                 { label: 'Total Faturado (Bruto)', value: totalBilled, lightBg: 'bg-indigo-50', darkBg: 'dark:bg-indigo-900/20', iconColor: 'text-indigo-600', icon: Receipt },
                 { label: 'Total Recebido (Líquido)', value: totalReceived, lightBg: 'bg-emerald-50', darkBg: 'dark:bg-emerald-900/20', iconColor: 'text-emerald-600', icon: CheckCircle },
@@ -367,221 +362,221 @@ export default function FinanceModule({
                 </motion.div>
               ))}
             </div>
-          ) : activeSubTab === 'services' ? (
-            <div className="space-y-12">
-              <section>
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-                  <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center">
-                    <div className="w-2 h-8 bg-indigo-600 rounded-full mr-4"></div>
-                    Status Financeiro das Ordens de Serviço
-                  </h3>
+          </div>
+        ) : activeSubTab === 'services' ? (
+          <div className="space-y-12">
+            <section>
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center">
+                  <div className="w-2 h-8 bg-indigo-600 rounded-full mr-4"></div>
+                  Status Financeiro das Ordens de Serviço
+                </h3>
 
-                  <div className="flex items-center gap-3 bg-white dark:bg-slate-900 p-1.5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
-                    <Filter className="w-4 h-4 text-indigo-500 ml-2" />
-                    <select
-                      value={filters.services.status}
-                      onChange={(e) => setFilters(prev => ({ ...prev, services: { status: e.target.value as InstrumentStatus | 'ALL' } }))}
-                      className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer uppercase tracking-widest"
-                    >
-                      <option value="ALL">TODOS OS STATUS</option>
-                      {Object.values(InstrumentStatus).map(status => (
-                        <option key={status} value={status}>{status.toUpperCase()}</option>
-                      ))}
-                    </select>
-                  </div>
+                <div className="flex items-center gap-3 bg-white dark:bg-slate-900 p-1.5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+                  <Filter className="w-4 h-4 text-indigo-500 ml-2" />
+                  <select
+                    value={filters.services.status}
+                    onChange={(e) => setFilters(prev => ({ ...prev, services: { status: e.target.value as InstrumentStatus | 'ALL' } }))}
+                    className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer uppercase tracking-widest"
+                  >
+                    <option value="ALL">TODOS OS STATUS</option>
+                    {Object.values(InstrumentStatus).map(status => (
+                      <option key={status} value={status}>{status.toUpperCase()}</option>
+                    ))}
+                  </select>
                 </div>
+              </div>
 
-                <div className="rectilinear-container custom-scrollbar shadow-sm">
-                  <table className="rectilinear-table">
-                    <thead>
-                      <tr>
-                        <th className="rectilinear-th col-md text-center pl-8">O.S. / Orç.</th>
-                        <th className="rectilinear-th col-lg text-center">Cliente / Empresa Solicitante</th>
-                        <th className="rectilinear-th col-sm text-center">Data Limite NF</th>
-                        <th className="rectilinear-th col-md text-center">Status Interno</th>
-                        <th className="rectilinear-th col-md text-center pr-8">Ações</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
-                      {serviceOrders
-                        .filter(order => {
-                          if (filters.services.status !== 'ALL' && order.statusServico !== filters.services.status) return false;
-                          if (!searchQuery) return true;
-                          const quote = quotes.find(q => q.id === order.orcamentoId);
-                          const client = clients.find(c => c.id === quote?.clienteId);
-                          const term = searchQuery.toLowerCase().trim();
-                          const digits = term.replace(/\D/g, '');
+              <div className="rectilinear-container custom-scrollbar shadow-sm">
+                <table className="rectilinear-table">
+                  <thead>
+                    <tr>
+                      <th className="rectilinear-th col-md text-center pl-8">O.S. / Orç.</th>
+                      <th className="rectilinear-th col-lg text-center">Cliente / Empresa Solicitante</th>
+                      <th className="rectilinear-th col-sm text-center">Data Limite NF</th>
+                      <th className="rectilinear-th col-md text-center">Status Interno</th>
+                      <th className="rectilinear-th col-md text-center pr-8">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
+                    {serviceOrders
+                      .filter(order => {
+                        if (filters.services.status !== 'ALL' && order.statusServico !== filters.services.status) return false;
+                        if (!searchQuery) return true;
+                        const quote = quotes.find(q => q.id === order.orcamentoId);
+                        const client = clients.find(c => c.id === quote?.clienteId);
+                        const term = searchQuery.toLowerCase().trim();
+                        const digits = term.replace(/\D/g, '');
 
-                          const matchesText = (order.id || "").toLowerCase().includes(term) ||
-                                             (order.orcamentoId || "").toLowerCase().includes(term) ||
-                                             client?.razaoSocial?.toLowerCase().includes(term);
-                          if (matchesText) return true;
+                        const matchesText = (order.id || "").toLowerCase().includes(term) ||
+                                           (order.orcamentoId || "").toLowerCase().includes(term) ||
+                                           client?.razaoSocial?.toLowerCase().includes(term);
+                        if (matchesText) return true;
 
-                          if (digits && digits.length >= 3) {
-                              const osDigits = (order.id || "").replace(/\D/g, '');
-                              const quoteDigits = (order.orcamentoId || "").replace(/\D/g, '');
-                              const cnpjDigits = (client?.cnpj || "").replace(/\D/g, '');
-                              if (osDigits.includes(digits) || quoteDigits.includes(digits) || cnpjDigits.includes(digits)) return true;
-                          }
-                          return false;
-                        })
-                        .map((order) => {
-                          const quote = quotes.find(q => q.id === order.orcamentoId);
-                          const client = clients.find(c => c.id === quote?.clienteId);
-                          const isBilled = financialControls.some(fc => fc.serviceOrderId === order.id);
+                        if (digits && digits.length >= 3) {
+                            const osDigits = (order.id || "").replace(/\D/g, '');
+                            const quoteDigits = (order.orcamentoId || "").replace(/\D/g, '');
+                            const cnpjDigits = (client?.cnpj || "").replace(/\D/g, '');
+                            if (osDigits.includes(digits) || quoteDigits.includes(digits) || cnpjDigits.includes(digits)) return true;
+                        }
+                        return false;
+                      })
+                      .map((order) => {
+                        const quote = quotes.find(q => q.id === order.orcamentoId);
+                        const client = clients.find(c => c.id === quote?.clienteId);
+                        const isBilled = financialControls.some(fc => fc.serviceOrderId === order.id);
 
-                          return (
-                            <tr key={order.id} className="rectilinear-tr group">
-                              <td className="rectilinear-td text-center pl-8 font-black text-slate-900 dark:text-white uppercase tabular-nums">
-                                {order.id} <span className="text-[10px] text-slate-400 font-bold ml-1 opacity-50">Ref: {order.orcamentoId}</span>
-                              </td>
-                              <td className="rectilinear-td text-left font-bold text-slate-700 dark:text-slate-300 truncate" title={client?.razaoSocial}>
-                                {client?.razaoSocial || '—'}
-                              </td>
-                              <td className="rectilinear-td text-center font-bold text-slate-500 tabular-nums text-xs">
-                                {client?.dataLimiteNF || '—'}
-                              </td>
-                              <td className="rectilinear-td text-center">
-                                {getInternalStatusBadge(order.statusServico)}
-                              </td>
-                              <td className="rectilinear-td text-center pr-8">
-                                <button
-                                  onClick={() => handleOpenInvoiceModal(order)}
-                                  className={`px-4 py-1.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 shadow-sm ${isBilled
-                                      ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-default'
-                                      : 'bg-indigo-600 text-white hover:bg-slate-900'
-                                    }`}
-                                  disabled={isBilled}
-                                >
-                                  {isBilled ? 'Faturado' : 'Faturar O.S.'}
-                                </button>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-            </div>
-          ) : activeSubTab === 'billing' ? (
-            <div className="space-y-12">
-              <section>
-                <div className="flex items-center justify-between mb-8">
-                  <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center">
-                    <div className="w-2 h-8 bg-emerald-500 rounded-full mr-4"></div>
-                    Resumo do Faturamento
-                  </h3>
-                  
-                  {/* Faturamento Period Filter */}
-                  <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
-                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Emissão de</span>
-                    <input
-                      type="date"
-                      value={filters.billing.start}
-                      onChange={(e) => setFilters(prev => ({ ...prev, billing: { ...prev.billing, start: e.target.value } }))}
-                      className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[85px]"
-                    />
-                    <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-1"></div>
-                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Até</span>
-                    <input
-                      type="date"
-                      value={filters.billing.end}
-                      onChange={(e) => setFilters(prev => ({ ...prev, billing: { ...prev.billing, end: e.target.value } }))}
-                      className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[85px]"
-                    />
-                  </div>
-                </div>
-
-                <div className="rectilinear-container custom-scrollbar shadow-sm">
-                  <table className="rectilinear-table">
-                    <thead>
-                      <tr>
-                        <th className="rectilinear-th col-md text-center pl-8">NF / Doc</th>
-                        <th className="rectilinear-th col-lg text-center">Cliente Pagador</th>
-                        <th className="rectilinear-th col-md text-center">Valores (L / B)</th>
-                        <th className="rectilinear-th col-md text-center">Referência O.S.</th>
-                        <th className="rectilinear-th col-md text-center">Status</th>
-                        <th className="rectilinear-th col-md text-center">Data Pagam.</th>
-                        <th className="rectilinear-th col-sm text-center pr-8">Ações</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
-                      {financialControls.filter(f => {
-                         if (!f.dataEmissao) return false;
-                         if (f.dataEmissao < filters.billing.start || f.dataEmissao > filters.billing.end) return false;
-                         return true;
-                      }).map((fc) => {
-                        const client = clients.find(c => c.id === fc.clienteId);
                         return (
-                          <tr key={fc.numeroNF} className="rectilinear-tr group">
-                            <td className="rectilinear-td text-center pl-8">
-                              <div className="font-black text-slate-900 dark:text-white tabular-nums">{fc.numeroNF}</div>
-                              <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">
-                                {fc.dataEmissao.split('-').reverse().join('/')}
-                              </div>
+                          <tr key={order.id} className="rectilinear-tr group">
+                            <td className="rectilinear-td text-center pl-8 font-black text-slate-900 dark:text-white uppercase tabular-nums">
+                              {order.id} <span className="text-[10px] text-slate-400 font-bold ml-1 opacity-50">Ref: {order.orcamentoId}</span>
                             </td>
                             <td className="rectilinear-td text-left font-bold text-slate-700 dark:text-slate-300 truncate" title={client?.razaoSocial}>
                               {client?.razaoSocial || '—'}
                             </td>
-                            <td className="rectilinear-td text-center">
-                              <div className="flex flex-col items-center">
-                                <span className="text-xs font-black text-indigo-600 tabular-nums">L: {formatNumber(fc.valorLiquido ?? 0)}</span>
-                                <span className="text-[9px] text-slate-400 font-bold tabular-nums">B: {formatNumber(fc.valorBruto ?? 0)}</span>
-                              </div>
-                            </td>
-                            <td className="rectilinear-td text-center text-xs font-black text-slate-500 uppercase tabular-nums">
-                                {fc.serviceOrderId}
+                            <td className="rectilinear-td text-center font-bold text-slate-500 tabular-nums text-xs">
+                              {client?.dataLimiteNF || '—'}
                             </td>
                             <td className="rectilinear-td text-center">
-                                <div className="flex justify-center min-w-[100px]">
-                                    {(() => {
-                                        const isPaid = !!fc.dataPagamentoReal;
-                                        const isOverdue = !isPaid && fc.dataPagamento && new Date().toISOString().substring(0, 10) > fc.dataPagamento;
-                                        const status = isPaid ? PaymentStatus.PAID : (isOverdue ? PaymentStatus.OVERDUE : PaymentStatus.PENDING);
-                                        
-                                        return (
-                                            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm border ${
-                                                status === PaymentStatus.PAID ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
-                                                status === PaymentStatus.OVERDUE ? 'bg-rose-100 text-rose-700 border-rose-200' :
-                                                'bg-amber-100 text-amber-700 border-amber-200'
-                                            }`}>
-                                                {status}
-                                            </span>
-                                        );
-                                    })()}
-                                </div>
-                            </td>
-                            <td className="rectilinear-td text-center">
-                                <div className="flex flex-col items-center">
-                                    <input 
-                                        type="date"
-                                        className="text-xs border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1.5 rounded-lg text-slate-700 dark:text-slate-200 font-bold focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer transition-all"
-                                        value={fc.dataPagamentoReal || ''}
-                                        onChange={(e) => onSaveFinancialControl({ 
-                                            ...fc, 
-                                            dataPagamentoReal: e.target.value || undefined,
-                                            statusPagamento: e.target.value ? PaymentStatus.PAID : (fc.dataPagamento && new Date().toISOString().substring(0, 10) > fc.dataPagamento ? PaymentStatus.OVERDUE : PaymentStatus.PENDING) 
-                                        })}
-                                        title="Clique para definir a data de pagamento"
-                                    />
-                                </div>
+                              {getInternalStatusBadge(order.statusServico)}
                             </td>
                             <td className="rectilinear-td text-center pr-8">
-                              <div className="flex items-center justify-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
-                                <button onClick={() => handleEditInvoice(fc)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-slate-50 rounded-lg transition-all"><Edit2 className="w-4 h-4" /></button>
-                                <button onClick={() => handleDeleteInvoice(fc)} className="p-2 text-slate-400 hover:text-rose-500 hover:bg-slate-50 rounded-lg transition-all"><Trash2 className="w-4 h-4" /></button>
-                              </div>
+                              <button
+                                onClick={() => handleOpenInvoiceModal(order)}
+                                className={`px-4 py-1.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 shadow-sm ${isBilled
+                                    ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-default'
+                                    : 'bg-indigo-600 text-white hover:bg-slate-900'
+                                  }`}
+                                disabled={isBilled}
+                              >
+                                {isBilled ? 'Faturado' : 'Faturar O.S.'}
+                              </button>
                             </td>
                           </tr>
                         );
                       })}
-                    </tbody>
-                  </table>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        ) : activeSubTab === 'billing' ? (
+          <div className="space-y-12">
+            <section>
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center">
+                  <div className="w-2 h-8 bg-emerald-500 rounded-full mr-4"></div>
+                  Resumo do Faturamento
+                </h3>
+                
+                <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Emissão de</span>
+                  <input
+                    type="date"
+                    value={filters.billing.start}
+                    onChange={(e) => setFilters(prev => ({ ...prev, billing: { ...prev.billing, start: e.target.value } }))}
+                    className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[85px]"
+                  />
+                  <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-1"></div>
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Até</span>
+                  <input
+                    type="date"
+                    value={filters.billing.end}
+                    onChange={(e) => setFilters(prev => ({ ...prev, billing: { ...prev.billing, end: e.target.value } }))}
+                    className="bg-transparent border-none text-[10px] font-black text-slate-700 dark:text-slate-300 focus:ring-0 cursor-pointer p-0 w-[85px]"
+                  />
                 </div>
-              </section>
-            </div>
-          ) : activeSubTab === 'expenses' ? (
+              </div>
+
+              <div className="rectilinear-container custom-scrollbar shadow-sm">
+                <table className="rectilinear-table">
+                  <thead>
+                    <tr>
+                      <th className="rectilinear-th col-md text-center pl-8">NF / Doc</th>
+                      <th className="rectilinear-th col-lg text-center">Cliente Pagador</th>
+                      <th className="rectilinear-th col-md text-center">Valores (L / B)</th>
+                      <th className="rectilinear-th col-md text-center">Referência O.S.</th>
+                      <th className="rectilinear-th col-md text-center">Status</th>
+                      <th className="rectilinear-th col-md text-center">Data Pagam.</th>
+                      <th className="rectilinear-th col-sm text-center pr-8">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
+                    {financialControls.filter(f => {
+                       if (!f.dataEmissao) return false;
+                       if (f.dataEmissao < filters.billing.start || f.dataEmissao > filters.billing.end) return false;
+                       return true;
+                    }).map((fc) => {
+                      const client = clients.find(c => c.id === fc.clienteId);
+                      return (
+                        <tr key={fc.numeroNF} className="rectilinear-tr group">
+                          <td className="rectilinear-td text-center pl-8">
+                            <div className="font-black text-slate-900 dark:text-white tabular-nums">{fc.numeroNF}</div>
+                            <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">
+                              {fc.dataEmissao.split('-').reverse().join('/')}
+                            </div>
+                          </td>
+                          <td className="rectilinear-td text-left font-bold text-slate-700 dark:text-slate-300 truncate" title={client?.razaoSocial}>
+                            {client?.razaoSocial || '—'}
+                          </td>
+                          <td className="rectilinear-td text-center">
+                            <div className="flex flex-col items-center">
+                              <span className="text-xs font-black text-indigo-600 tabular-nums">L: {formatNumber(fc.valorLiquido ?? 0)}</span>
+                              <span className="text-[9px] text-slate-400 font-bold tabular-nums">B: {formatNumber(fc.valorBruto ?? 0)}</span>
+                            </div>
+                          </td>
+                          <td className="rectilinear-td text-center text-xs font-black text-slate-500 uppercase tabular-nums">
+                              {fc.serviceOrderId}
+                          </td>
+                          <td className="rectilinear-td text-center">
+                              <div className="flex justify-center min-w-[100px]">
+                                  {(() => {
+                                      const isPaid = !!fc.dataPagamentoReal;
+                                      const isOverdue = !isPaid && fc.dataPagamento && new Date().toISOString().substring(0, 10) > fc.dataPagamento;
+                                      const status = isPaid ? PaymentStatus.PAID : (isOverdue ? PaymentStatus.OVERDUE : PaymentStatus.PENDING);
+                                      
+                                      return (
+                                          <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm border ${
+                                              status === PaymentStatus.PAID ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
+                                              status === PaymentStatus.OVERDUE ? 'bg-rose-100 text-rose-700 border-rose-200' :
+                                              'bg-amber-100 text-amber-700 border-amber-200'
+                                          }`}>
+                                              {status}
+                                          </span>
+                                      );
+                                  })()}
+                              </div>
+                          </td>
+                          <td className="rectilinear-td text-center">
+                              <div className="flex flex-col items-center">
+                                  <input 
+                                      type="date"
+                                      className="text-xs border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1.5 rounded-lg text-slate-700 dark:text-slate-200 font-bold focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer transition-all"
+                                      value={fc.dataPagamentoReal || ''}
+                                      onChange={(e) => onSaveFinancialControl({ 
+                                          ...fc, 
+                                          dataPagamentoReal: e.target.value || undefined,
+                                          statusPagamento: e.target.value ? PaymentStatus.PAID : (fc.dataPagamento && new Date().toISOString().substring(0, 10) > fc.dataPagamento ? PaymentStatus.OVERDUE : PaymentStatus.PENDING) 
+                                      })}
+                                      title="Clique para definir a data de pagamento"
+                                  />
+                              </div>
+                          </td>
+                          <td className="rectilinear-td text-center pr-8">
+                            <div className="flex items-center justify-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+                              <button onClick={() => handleEditInvoice(fc)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-slate-50 rounded-lg transition-all"><Edit2 className="w-4 h-4" /></button>
+                              <button onClick={() => handleDeleteInvoice(fc)} className="p-2 text-slate-400 hover:text-rose-500 hover:bg-slate-50 rounded-lg transition-all"><Trash2 className="w-4 h-4" /></button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        ) : activeSubTab === 'expenses' ? (
              <div className="space-y-12">
                <section>
                   <div className="flex items-center justify-between mb-8">
