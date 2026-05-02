@@ -57,7 +57,7 @@ export default function FinanceModule({
     dashboard: { month: new Date().toISOString().substring(0, 7) },
     services: { status: 'ALL' as InstrumentStatus | 'ALL' },
     billing: { start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().substring(0, 10), end: new Date().toISOString().substring(0, 10) },
-    expenses: { start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().substring(0, 10), end: new Date().toISOString().substring(0, 10), category: 'ALL' },
+    expenses: { start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().substring(0, 10), end: new Date().toISOString().substring(0, 10), category: 'ALL' as ExpenseCategory | 'ALL' },
     commissions: { start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().substring(0, 10), end: new Date().toISOString().substring(0, 10) }
   });
 
