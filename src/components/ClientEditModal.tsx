@@ -14,9 +14,10 @@ interface ClientEditModalProps {
   onClose: () => void;
   onSave: (updatedClient: Client) => void;
   onDelete: (id: string) => void;
+  existingClients?: Client[];
 }
 
-export default function ClientEditModal({ client, isOpen, onClose, onSave, onDelete }: ClientEditModalProps) {
+export default function ClientEditModal({ client, isOpen, onClose, onSave, onDelete, existingClients = [] }: ClientEditModalProps) {
   const {
     register,
     handleSubmit,
@@ -72,6 +73,22 @@ export default function ClientEditModal({ client, isOpen, onClose, onSave, onDel
 
   const onSubmit = (data: ClientFormData) => {
     console.log("[ClientEditModal] Submitting data:", data);
+    
+    // CNPJ Duplication Check
+    const cleanCnpj = data.cnpj.replace(/\D/g, '');
+    const duplicate = existingClients.find(c => 
+      c.id !== client?.id && 
+      (c.cnpj || '').replace(/\D/g, '') === cleanCnpj
+    );
+
+    if (duplicate && cleanCnpj !== '') {
+      toast.error(`Este CNPJ já está cadastrado para o cliente: ${duplicate.razaoSocial} (ID: ${duplicate.id}).`, {
+        duration: 5000,
+        icon: <ShieldAlert className="w-5 h-5 text-rose-500" />
+      });
+      return;
+    }
+
     onSave({ ...data, id: client?.id || '' } as Client);
     onClose();
   };

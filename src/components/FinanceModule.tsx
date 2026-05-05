@@ -1,21 +1,11 @@
-import { useState } from 'react';
-import { FinancialControl, FinancialExpense, ExpenseCategory, PaymentStatus, Quote, ServiceOrder, Client, PaymentMethod, InstrumentStatus, Bank } from '../types';
+import { useState, useMemo } from 'react';
+import { FinancialControl, FinancialExpense, ExpenseCategory, PaymentStatus, Quote, ServiceOrder, Client, PaymentMethod, InstrumentStatus, Bank, InventoryItem, InventoryMovement, InventoryMovementType, StandardInstrument } from '../types';
 import InvoiceModal from './InvoiceModal';
 import ExpenseModal from './ExpenseModal';
-import { Plus, Edit2, Trash2, Receipt, CircleDollarSign, Download, CheckCircle, Clock, DollarSign, Filter, Tag, Package, ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
+import { Plus, Edit2, Trash2, Receipt, CircleDollarSign, Download, CheckCircle, Clock, DollarSign, Filter, Tag, Package, ArrowDownCircle, ArrowUpCircle, History, X, Link, Pencil, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { formatNumber } from '../utils/formatters';
-
-interface InventoryItem {
-  id: string;
-  descricao: string;
-  categoria: string;
-  quantidade: number;
-  unidade: string;
-  valorUnitario: number;
-  localizacao?: string;
-}
 
 interface FinanceModuleProps {
   quotes: Quote[];
@@ -25,6 +15,9 @@ interface FinanceModuleProps {
   financialExpenses: FinancialExpense[];
   paymentMethods: PaymentMethod[];
   banks: Bank[];
+  inventoryItems: InventoryItem[];
+  inventoryMovements: InventoryMovement[];
+  standardInstruments: StandardInstrument[];
   onFinancialControlsChange: (financials: FinancialControl[]) => void;
   onSaveFinancialControl: (fc: FinancialControl) => void;
   onSavePaymentMethod: (pm: PaymentMethod) => void;
@@ -33,6 +26,9 @@ interface FinanceModuleProps {
   onSaveExpense: (expense: Partial<FinancialExpense>) => void;
   onDeleteExpense: (id: string) => void;
   onSaveQuote?: (quote: Quote) => void;
+  onSaveInventoryItem: (item: InventoryItem) => void;
+  onDeleteInventoryItem: (id: string) => void;
+  onSaveInventoryMovement: (mov: InventoryMovement) => void;
   searchQuery?: string;
 }
 
@@ -44,6 +40,9 @@ export default function FinanceModule({
   financialExpenses,
   paymentMethods,
   banks,
+  inventoryItems,
+  inventoryMovements,
+  standardInstruments,
   onFinancialControlsChange,
   onSaveFinancialControl,
   onSavePaymentMethod,
@@ -52,6 +51,9 @@ export default function FinanceModule({
   onSaveExpense,
   onDeleteExpense,
   onSaveQuote,
+  onSaveInventoryItem,
+  onDeleteInventoryItem,
+  onSaveInventoryMovement,
   searchQuery
 }: FinanceModuleProps) {
 
@@ -61,8 +63,10 @@ export default function FinanceModule({
   const [selectedServiceOrder, setSelectedServiceOrder] = useState<ServiceOrder | null>(null);
   const [invoiceData, setInvoiceData] = useState<Partial<FinancialControl> | null>(null);
   const [expenseData, setExpenseData] = useState<Partial<FinancialExpense> | null>(null);
-  const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [inventorySearch, setInventorySearch] = useState('');
+  const [editingInventoryItem, setEditingInventoryItem] = useState<InventoryItem | null>(null);
+  const [historyItem, setHistoryItem] = useState<InventoryItem | null>(null);
+  const [newMovement, setNewMovement] = useState<Partial<InventoryMovement> | null>(null);
 
   const today = new Date().toISOString().substring(0, 10);
   const firstOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().substring(0, 10);
@@ -860,14 +864,57 @@ export default function FinanceModule({
                   className="text-sm border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-200 font-medium focus:ring-2 focus:ring-violet-500 outline-none transition-all w-48"
                 />
                 <button
+                  onClick={async () => {
+                    const missing = standardInstruments.filter(inst => !inventoryItems.some(inv => inv.standardInstrumentId === inst.id));
+                    if (missing.length === 0) {
+                      toast.info('Tudo sincronizado!');
+                      return;
+                    }
+                    toast.loading(`Sincronizando ${missing.length} itens...`);
+                    for (const inst of missing) {
+                      const newItem: InventoryItem = {
+                        id: `INV-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+                        descricao: inst.nome,
+                        categoria: 'Instrumento',
+                        quantidade: 1,
+                        unidade: 'un',
+                        valorUnitario: 0,
+                        statusMovimentacao: 'Disponível',
+                        instrumentoId: inst.identificacao,
+                        standardInstrumentId: inst.id
+                      };
+                      await onSaveInventoryItem(newItem);
+                    }
+                    toast.dismiss();
+                    toast.success('Sincronização concluída!');
+                  }}
+                  className="flex items-center gap-1.5 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all active:scale-95"
+                  title="Sincronizar com Instrumentos Padrão"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" /> Sincronizar
+                </button>
+                <button
                   onClick={() => {
                     const id = `INV-${Date.now()}`;
-                    const newItem: InventoryItem = { id, descricao: 'Novo Item', categoria: 'Geral', quantidade: 0, unidade: 'un', valorUnitario: 0 };
-                    setInventory(p => [...p, newItem]);
+                    const newItem: InventoryItem = { id, descricao: '', categoria: 'Geral', quantidade: 0, unidade: 'un', valorUnitario: 0, statusMovimentacao: 'Disponível' };
+                    setEditingInventoryItem(newItem);
                   }}
                   className="flex items-center gap-1.5 px-5 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-violet-500/20 transition-all active:scale-95"
                 >
                   <Plus className="w-3.5 h-3.5" /> Novo Item
+                </button>
+                <button
+                  onClick={() => {
+                    const headers = ['ID', 'Ativo Fixo', 'ID Instrumento', 'Descrição', 'Categoria', 'Qtd', 'Unidade', 'Valor Unit.', 'Total', 'Localização', 'Status'];
+                    const rows = inventoryItems.map(i => [i.id, i.ativoFixo||'—', i.instrumentoId||'—', i.descricao, i.categoria, i.quantidade, i.unidade, i.valorUnitario.toFixed(2), (i.quantidade*i.valorUnitario).toFixed(2), i.localizacao||'—', i.statusMovimentacao||'Disponível']);
+                    const csv = [headers, ...rows].map(r => r.join(';')).join('\n');
+                    const blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8;'});
+                    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Inventario_${today}.csv`; a.click();
+                    toast.success('Relatório exportado!');
+                  }}
+                  className="flex items-center gap-1.5 px-4 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl transition-all active:scale-95"
+                >
+                  <Download className="w-3.5 h-3.5" /> Exportar
                 </button>
               </div>
             </div>
@@ -875,18 +922,13 @@ export default function FinanceModule({
             {/* Summary cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
-                { label: 'Total de Itens', value: inventory.length.toString(), icon: Package, color: 'text-violet-600', bg: 'bg-violet-50 dark:bg-violet-900/20' },
-                { label: 'Valor em Estoque', value: `R$ ${formatNumber(inventory.reduce((a, i) => a + i.quantidade * i.valorUnitario, 0))}`, icon: CircleDollarSign, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
-                { label: 'It. com Estoque Baixo', value: inventory.filter(i => i.quantidade <= 2).length.toString(), icon: ArrowDownCircle, color: 'text-rose-600', bg: 'bg-rose-50 dark:bg-rose-900/20' },
-              ].map((c, i) => (
-                <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="premium-card p-6 flex items-center gap-4">
-                  <div className={`${c.bg} w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0`}>
-                    <c.icon className={`${c.color} w-6 h-6`} />
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">{c.label}</p>
-                    <p className="text-xl font-black text-slate-900 dark:text-white">{c.value}</p>
-                  </div>
+                { label: 'Total de Itens', value: inventoryItems.length.toString(), icon: Package, color: 'text-violet-600', bg: 'bg-violet-50 dark:bg-violet-900/20' },
+                { label: 'Valor em Estoque', value: `R$ ${formatNumber(inventoryItems.reduce((a, i) => a + i.quantidade * i.valorUnitario, 0))}`, icon: CircleDollarSign, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
+                { label: 'Em Cautela', value: inventoryItems.filter(i => i.statusMovimentacao === 'Em Cautela').length.toString(), icon: ArrowUpCircle, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-900/20' },
+              ].map((c, idx) => (
+                <motion.div key={idx} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.08 }} className="premium-card p-5 flex items-center gap-4">
+                  <div className={`${c.bg} w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0`}><c.icon className={`${c.color} w-5 h-5`} /></div>
+                  <div><p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">{c.label}</p><p className="text-lg font-black text-slate-900 dark:text-white">{c.value}</p></div>
                 </motion.div>
               ))}
             </div>
@@ -895,86 +937,215 @@ export default function FinanceModule({
               <table className="rectilinear-table">
                 <thead>
                   <tr>
-                    <th className="rectilinear-th col-lg text-left pl-8">Descrição</th>
-                    <th className="rectilinear-th col-sm text-center">Categoria</th>
-                    <th className="rectilinear-th col-sm text-center">Qtd.</th>
-                    <th className="rectilinear-th col-sm text-center">Unidade</th>
-                    <th className="rectilinear-th col-sm text-center">Valor Unit.</th>
-                    <th className="rectilinear-th col-sm text-center">Total</th>
-                    <th className="rectilinear-th col-sm text-center">Localização</th>
-                    <th className="rectilinear-th col-sm text-center pr-8">Ações</th>
+                    <th className="rectilinear-th text-left pl-8 w-[45%]">Descrição</th>
+                    <th className="rectilinear-th text-center w-[15%]">Categoria</th>
+                    <th className="rectilinear-th text-center w-[10%]">Qtd.</th>
+                    <th className="rectilinear-th text-center w-[10%]">Valor Total</th>
+                    <th className="rectilinear-th text-center w-[10%]">Status</th>
+                    <th className="rectilinear-th text-center pr-8 w-[10%]">Ações</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
-                  {inventory.filter(item =>
-                    !inventorySearch || item.descricao.toLowerCase().includes(inventorySearch.toLowerCase()) || item.categoria.toLowerCase().includes(inventorySearch.toLowerCase())
-                  ).map((item) => (
-                    <tr key={item.id} className="rectilinear-tr group">
-                      <td className="rectilinear-td text-left pl-8">
-                        <input
-                          type="text"
-                          value={item.descricao}
-                          onChange={(e) => setInventory(p => p.map(x => x.id === item.id ? { ...x, descricao: e.target.value } : x))}
-                          className="w-full bg-transparent border-none font-bold text-slate-700 dark:text-slate-300 outline-none hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-violet-500 rounded px-2 py-1 transition-all"
-                        />
-                      </td>
-                      <td className="rectilinear-td text-center">
-                        <input
-                          type="text"
-                          value={item.categoria}
-                          onChange={(e) => setInventory(p => p.map(x => x.id === item.id ? { ...x, categoria: e.target.value } : x))}
-                          className="w-full text-center bg-transparent border-none text-[10px] font-black uppercase text-slate-500 outline-none hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-white dark:focus:bg-slate-800 focus:ring-1 focus:ring-violet-500 rounded px-1 py-1 transition-all"
-                        />
-                      </td>
-                      <td className="rectilinear-td text-center">
-                        <div className="flex items-center justify-center gap-1">
-                          <button onClick={() => setInventory(p => p.map(x => x.id === item.id ? { ...x, quantidade: Math.max(0, x.quantidade - 1) } : x))} className="p-0.5 text-slate-400 hover:text-rose-500 transition-all"><ArrowDownCircle className="w-4 h-4" /></button>
-                          <span className={`font-black text-sm w-8 text-center tabular-nums ${item.quantidade <= 2 ? 'text-rose-600' : 'text-slate-900 dark:text-white'}`}>{item.quantidade}</span>
-                          <button onClick={() => setInventory(p => p.map(x => x.id === item.id ? { ...x, quantidade: x.quantidade + 1 } : x))} className="p-0.5 text-slate-400 hover:text-emerald-500 transition-all"><ArrowUpCircle className="w-4 h-4" /></button>
-                        </div>
-                      </td>
-                      <td className="rectilinear-td text-center">
-                        <input
-                          type="text"
-                          value={item.unidade}
-                          onChange={(e) => setInventory(p => p.map(x => x.id === item.id ? { ...x, unidade: e.target.value } : x))}
-                          className="w-12 text-center bg-transparent border-none text-xs font-bold text-slate-500 outline-none hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:ring-1 focus:ring-violet-500 rounded px-1 py-1 transition-all"
-                        />
-                      </td>
-                      <td className="rectilinear-td text-center">
-                        <input
-                          type="number"
-                          value={item.valorUnitario}
-                          onChange={(e) => setInventory(p => p.map(x => x.id === item.id ? { ...x, valorUnitario: Number(e.target.value) } : x))}
-                          className="w-20 text-center bg-transparent border-none font-bold text-slate-700 dark:text-slate-300 outline-none hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:ring-1 focus:ring-violet-500 rounded px-1 py-1 transition-all"
-                        />
-                      </td>
-                      <td className="rectilinear-td text-center font-black text-violet-600 tabular-nums">
-                        R$ {formatNumber(item.quantidade * item.valorUnitario)}
-                      </td>
-                      <td className="rectilinear-td text-center">
-                        <input
-                          type="text"
-                          value={item.localizacao || ''}
-                          placeholder="—"
-                          onChange={(e) => setInventory(p => p.map(x => x.id === item.id ? { ...x, localizacao: e.target.value } : x))}
-                          className="w-full text-center bg-transparent border-none text-xs font-bold text-slate-500 outline-none hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:ring-1 focus:ring-violet-500 rounded px-1 py-1 transition-all"
-                        />
-                      </td>
-                      <td className="rectilinear-td text-center pr-8">
-                        <button onClick={() => setInventory(p => p.filter(x => x.id !== item.id))} className="p-2 text-slate-400 hover:text-rose-500 hover:bg-slate-50 rounded-lg transition-all opacity-60 group-hover:opacity-100"><Trash2 className="w-4 h-4" /></button>
-                      </td>
-                    </tr>
-                  ))}
-                  {inventory.length === 0 && (
-                    <tr><td colSpan={8} className="py-16 text-center text-slate-400 font-bold">Nenhum item cadastrado. Clique em "Novo Item" para começar.</td></tr>
+                  {[...inventoryItems]
+                    .sort((a, b) => (a.ativoFixo || '').localeCompare(b.ativoFixo || ''))
+                    .filter(item =>
+                    !inventorySearch ||
+                    item.descricao.toLowerCase().includes(inventorySearch.toLowerCase()) ||
+                    (item.ativoFixo||'').toLowerCase().includes(inventorySearch.toLowerCase()) ||
+                    (item.instrumentoId||'').toLowerCase().includes(inventorySearch.toLowerCase()) ||
+                    item.categoria.toLowerCase().includes(inventorySearch.toLowerCase())
+                  ).map((item) => {
+                    const linkedInstrument = standardInstruments.find(s => s.id === item.standardInstrumentId);
+                    return (
+                      <tr key={item.id} className="rectilinear-tr group">
+                        <td className="rectilinear-td text-left pl-8">
+                          <div className="flex items-center gap-2">
+                            {linkedInstrument && <span title={`Vinculado: ${linkedInstrument.nome}`}><Link className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0" /></span>}
+                            <span className="font-bold text-sm text-slate-700 dark:text-slate-300 truncate">
+                              {item.ativoFixo ? <span className="text-slate-400 font-medium mr-1.5">[{item.ativoFixo}]</span> : null}
+                              {item.descricao}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="rectilinear-td text-center text-[10px] font-black uppercase text-slate-500">{item.categoria}</td>
+                        <td className="rectilinear-td text-center">
+                          <span className={`font-black text-sm w-7 text-center tabular-nums ${item.quantidade <= 2 ? 'text-rose-600' : 'text-slate-900 dark:text-white'}`}>{item.quantidade} {item.unidade}</span>
+                        </td>
+                        <td className="rectilinear-td text-center font-black text-violet-600 tabular-nums text-xs">
+                          R$ {formatNumber(item.quantidade * item.valorUnitario)}
+                        </td>
+                        <td className="rectilinear-td text-center">
+                          <span className={`text-[10px] font-black uppercase rounded-lg px-2 py-1 ${item.statusMovimentacao === 'Disponível' ? 'bg-emerald-50 text-emerald-700' : item.statusMovimentacao === 'Em Cautela' ? 'bg-amber-50 text-amber-700' : item.statusMovimentacao === 'Em Manutenção' ? 'bg-blue-50 text-blue-700' : 'bg-slate-50 text-slate-500'}`}>
+                            {item.statusMovimentacao || 'Disponível'}
+                          </span>
+                        </td>
+                        <td className="rectilinear-td text-center pr-8">
+                          <div className="flex items-center justify-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+                            <button onClick={() => setEditingInventoryItem(item)} className="p-1.5 text-slate-400 hover:text-violet-600 hover:bg-slate-50 rounded-lg transition-all" title="Editar / Detalhes"><Pencil className="w-4 h-4" /></button>
+                            <button onClick={() => setHistoryItem(item)} className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-slate-50 rounded-lg transition-all" title="Histórico"><History className="w-4 h-4" /></button>
+                            <button onClick={() => { if(window.confirm(`Excluir "${item.descricao}"?`)) onDeleteInventoryItem(item.id); }} className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-slate-50 rounded-lg transition-all" title="Excluir"><Trash2 className="w-4 h-4" /></button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {inventoryItems.length === 0 && (
+                    <tr><td colSpan={7} className="py-16 text-center text-slate-400 font-bold">Nenhum item cadastrado. Clique em "Novo Item" para começar.</td></tr>
                   )}
                 </tbody>
               </table>
             </div>
+
+            {/* History Modal */}
+            <AnimatePresence>
+              {historyItem && (
+                <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4" onClick={() => setHistoryItem(null)}>
+                  <motion.div initial={{scale:0.9,y:20}} animate={{scale:1,y:0}} exit={{scale:0.9,y:20}} onClick={e=>e.stopPropagation()} className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl p-8 w-full max-w-2xl border border-slate-100 dark:border-slate-800 max-h-[80vh] flex flex-col">
+                    <div className="flex items-center justify-between mb-6 flex-shrink-0">
+                      <div>
+                        <h3 className="text-xl font-black text-slate-900 dark:text-white">Histórico de Movimentação</h3>
+                        <p className="text-indigo-600 font-black text-xs uppercase tracking-widest">{historyItem.descricao}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => setNewMovement({inventoryItemId: historyItem.id, data: today, tipo: InventoryMovementType.ENTRADA, quantidade: 1})}
+                          className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-1.5 transition-all">
+                          <Plus className="w-3.5 h-3.5" /> Registrar
+                        </button>
+                        <button onClick={() => setHistoryItem(null)} className="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-50 transition-all"><X className="w-5 h-5" /></button>
+                      </div>
+                    </div>
+                    {newMovement && (
+                      <div className="mb-4 p-4 bg-violet-50 dark:bg-violet-900/20 rounded-2xl border border-violet-200 dark:border-violet-800 flex flex-wrap gap-3 items-end flex-shrink-0">
+                        <div>
+                          <label className="text-[9px] font-black uppercase tracking-widest text-violet-600 block mb-1">Tipo</label>
+                          <select value={newMovement.tipo} onChange={e=>setNewMovement(p=>({...p,tipo:e.target.value as InventoryMovementType}))} className="text-xs border border-violet-200 rounded-lg px-2 py-1.5 bg-white font-bold">
+                            {Object.values(InventoryMovementType).map(t=><option key={t}>{t}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-[9px] font-black uppercase tracking-widest text-violet-600 block mb-1">Quantidade</label>
+                          <input type="number" min={1} value={newMovement.quantidade||1} onChange={e=>setNewMovement(p=>({...p,quantidade:Number(e.target.value)}))} className="w-20 text-xs border border-violet-200 rounded-lg px-2 py-1.5 bg-white font-bold" />
+                        </div>
+                        <div>
+                          <label className="text-[9px] font-black uppercase tracking-widest text-violet-600 block mb-1">Data</label>
+                          <input type="date" value={newMovement.data||today} onChange={e=>setNewMovement(p=>({...p,data:e.target.value}))} className="text-xs border border-violet-200 rounded-lg px-2 py-1.5 bg-white font-bold" />
+                        </div>
+                        <div className="flex-1 min-w-[120px]">
+                          <label className="text-[9px] font-black uppercase tracking-widest text-violet-600 block mb-1">Observação</label>
+                          <input type="text" value={newMovement.observacao||''} onChange={e=>setNewMovement(p=>({...p,observacao:e.target.value}))} placeholder="Opcional..." className="w-full text-xs border border-violet-200 rounded-lg px-2 py-1.5 bg-white font-bold" />
+                        </div>
+                        <button onClick={() => {
+                          if (!newMovement.tipo || !newMovement.quantidade) return;
+                          const mov: InventoryMovement = { id:`MOV-${Date.now()}`, inventoryItemId: historyItem.id, tipo: newMovement.tipo!, quantidade: newMovement.quantidade!, data: newMovement.data||today, observacao: newMovement.observacao };
+                          onSaveInventoryMovement(mov);
+                          const delta = [InventoryMovementType.ENTRADA, InventoryMovementType.DEVOLUCAO].includes(mov.tipo) ? mov.quantidade : -mov.quantidade;
+                          const updated = {...historyItem, quantidade: Math.max(0, historyItem.quantidade + delta)};
+                          onSaveInventoryItem(updated);
+                          setHistoryItem(updated);
+                          setNewMovement(null);
+                          toast.success('Movimentação registrada!');
+                        }} className="px-4 py-1.5 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-black text-[10px] uppercase transition-all">Salvar</button>
+                        <button onClick={()=>setNewMovement(null)} className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg font-black text-[10px] uppercase transition-all">Cancelar</button>
+                      </div>
+                    )}
+                    <div className="overflow-y-auto custom-scrollbar space-y-2">
+                      {inventoryMovements.filter(m => m.inventoryItemId === historyItem.id).length === 0
+                        ? <p className="text-center text-slate-400 py-10 font-medium">Nenhuma movimentação registrada.</p>
+                        : inventoryMovements.filter(m => m.inventoryItemId === historyItem.id).sort((a,b)=>b.data.localeCompare(a.data)).map(mov => (
+                          <div key={mov.id} className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${[InventoryMovementType.ENTRADA,InventoryMovementType.DEVOLUCAO].includes(mov.tipo)?'bg-emerald-100 text-emerald-600':'bg-rose-100 text-rose-600'}`}>
+                              {[InventoryMovementType.ENTRADA,InventoryMovementType.DEVOLUCAO].includes(mov.tipo)?<ArrowUpCircle className="w-4 h-4"/>:<ArrowDownCircle className="w-4 h-4"/>}
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2"><span className="font-black text-xs text-slate-700 dark:text-slate-200 uppercase">{mov.tipo}</span><span className="text-[10px] text-slate-400">{mov.data.split('-').reverse().join('/')}</span>{mov.cautelaId && <span className="text-[9px] text-indigo-500 font-black">Cautela #{mov.cautelaId}</span>}</div>
+                              {mov.observacao && <p className="text-[10px] text-slate-400 italic">{mov.observacao}</p>}
+                            </div>
+                            <span className={`font-black text-sm tabular-nums ${[InventoryMovementType.ENTRADA,InventoryMovementType.DEVOLUCAO].includes(mov.tipo)?'text-emerald-600':'text-rose-600'}`}>
+                              {[InventoryMovementType.ENTRADA,InventoryMovementType.DEVOLUCAO].includes(mov.tipo)?'+':'-'}{mov.quantidade}
+                            </span>
+                          </div>
+                        ))
+                      }
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         ) : null}
         </div>
+
+      {/* Modal de Inventário */}
+      <AnimatePresence>
+        {editingInventoryItem && (
+          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4" onClick={() => setEditingInventoryItem(null)}>
+            <motion.div initial={{scale:0.9,y:20}} animate={{scale:1,y:0}} exit={{scale:0.9,y:20}} onClick={e=>e.stopPropagation()} className="bg-white dark:bg-slate-900 rounded-[2.5rem] md:rounded-[3.5rem] shadow-2xl p-6 md:p-12 w-full max-w-2xl border border-slate-100 dark:border-slate-800 relative flex flex-col max-h-[95vh]">
+              <div className="flex items-center justify-between mb-8 shrink-0">
+                <div>
+                  <h3 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Detalhes do Item</h3>
+                  {editingInventoryItem.standardInstrumentId && <p className="text-[10px] font-black uppercase text-indigo-500 mt-1">Vinculado a Instrumento Padrão</p>}
+                </div>
+                <button onClick={() => setEditingInventoryItem(null)} className="p-3 text-slate-400 hover:text-slate-600 rounded-2xl transition-all"><X className="w-6 h-6" /></button>
+              </div>
+              <div className="overflow-y-auto custom-scrollbar pr-2 -mr-2 pb-2 space-y-6">
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Descrição</label>
+                  <input type="text" value={editingInventoryItem.descricao} disabled={!!editingInventoryItem.standardInstrumentId} onChange={e=>setEditingInventoryItem({...editingInventoryItem, descricao: e.target.value})} className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-500 rounded-[2rem] font-bold text-sm outline-none transition-all shadow-inner disabled:opacity-60" placeholder="Ex: Fita Crepe 50mm" />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Categoria</label>
+                    <input type="text" value={editingInventoryItem.categoria} onChange={e=>setEditingInventoryItem({...editingInventoryItem, categoria: e.target.value})} className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-500 rounded-[2rem] font-bold text-sm outline-none transition-all shadow-inner" />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Unidade</label>
+                    <input type="text" value={editingInventoryItem.unidade} onChange={e=>setEditingInventoryItem({...editingInventoryItem, unidade: e.target.value})} className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-500 rounded-[2rem] font-bold text-sm outline-none transition-all shadow-inner" placeholder="Ex: un, cx, kg" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Ativo Fixo (Patrimônio)</label>
+                    <input type="text" value={editingInventoryItem.ativoFixo || ''} onChange={e=>setEditingInventoryItem({...editingInventoryItem, ativoFixo: e.target.value})} className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-500 rounded-[2rem] font-bold text-sm outline-none transition-all shadow-inner" />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">ID Instrumento</label>
+                    <input type="text" value={editingInventoryItem.instrumentoId || ''} disabled={!!editingInventoryItem.standardInstrumentId} onChange={e=>setEditingInventoryItem({...editingInventoryItem, instrumentoId: e.target.value})} className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-500 rounded-[2rem] font-bold text-sm outline-none transition-all shadow-inner disabled:opacity-60" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Quantidade Atual</label>
+                    <input type="number" min="0" value={editingInventoryItem.quantidade} onChange={e=>setEditingInventoryItem({...editingInventoryItem, quantidade: Number(e.target.value)})} className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-500 rounded-[2rem] font-bold text-sm outline-none transition-all shadow-inner" />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Valor Unitário</label>
+                    <div className="relative">
+                      <span className="absolute left-6 top-1/2 -translate-y-1/2 font-black text-slate-400">R$</span>
+                      <input type="number" step="0.01" min="0" value={editingInventoryItem.valorUnitario} onChange={e=>setEditingInventoryItem({...editingInventoryItem, valorUnitario: Number(e.target.value)})} className="w-full pl-14 pr-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-500 rounded-[2rem] font-bold text-sm outline-none transition-all shadow-inner" />
+                    </div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Status</label>
+                    <select value={editingInventoryItem.statusMovimentacao || 'Disponível'} onChange={e=>setEditingInventoryItem({...editingInventoryItem, statusMovimentacao: e.target.value as any})} className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-500 rounded-[2rem] font-bold text-sm outline-none transition-all shadow-inner">
+                      <option>Disponível</option><option>Em Cautela</option><option>Em Manutenção</option><option>Baixado</option>
+                    </select>
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Localização</label>
+                    <input type="text" value={editingInventoryItem.localizacao || ''} onChange={e=>setEditingInventoryItem({...editingInventoryItem, localizacao: e.target.value})} className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-500 rounded-[2rem] font-bold text-sm outline-none transition-all shadow-inner" />
+                  </div>
+                </div>
+                <button type="button" onClick={() => {
+                  onSaveInventoryItem(editingInventoryItem);
+                  setEditingInventoryItem(null);
+                }} className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[2.5rem] font-black text-xs uppercase tracking-widest shadow-2xl shadow-indigo-500/30 transition-all active:scale-95 mt-4">Salvar Alterações</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <InvoiceModal
         isOpen={isInvoiceModalOpen}

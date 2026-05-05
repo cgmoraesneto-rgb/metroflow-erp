@@ -401,6 +401,7 @@ const ClientsSection: React.FC<ClientsSectionProps> = ({
             <ClientEditModal
                 client={editingClient}
                 isOpen={isModalOpen}
+                existingClients={clients}
                 onClose={() => {
                     setIsModalOpen(false);
                     setEditingClient(null);

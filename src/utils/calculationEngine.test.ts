@@ -11,7 +11,7 @@ describe('Industrial Calculation Engine - Production Audit', () => {
 
   it('should execute basic math correctly (Determinism)', () => {
     const rowData = { 'col_1': 10, 'col_2': 2.5 };
-    const { results } = executeRow(rowData, {}, columns);
+    const { results } = executeRow(rowData, {}, columns, 0);
     expect(results['col_3']).toBe(25);
   });
 
@@ -22,7 +22,7 @@ describe('Industrial Calculation Engine - Production Audit', () => {
       { id: 'col_3', name: 'Calculado', type: ColumnType.TEXTO, behavior: ColumnBehavior.CALCULATED, formula: '[col_1] * [col_2]' }
     ];
     const rowData = { 'col_1': 10, 'col_2': 2.5 };
-    const { results } = executeRow(rowData, {}, columnsRenamed);
+    const { results } = executeRow(rowData, {}, columnsRenamed, 0);
     expect(results['col_3']).toBe(25);
   });
 
@@ -31,7 +31,7 @@ describe('Industrial Calculation Engine - Production Audit', () => {
       { id: 'val', name: 'V', type: ColumnType.TEXTO, behavior: ColumnBehavior.INPUT },
       { id: 'res', name: 'R', type: ColumnType.TEXTO, behavior: ColumnBehavior.CALCULATED, formula: '10 / [val]' }
     ];
-    const { results } = executeRow({ 'val': 0 }, {}, divZeroCols);
+    const { results } = executeRow({ 'val': 0 }, {}, divZeroCols, 0);
     expect(results['res']).toBe(Infinity);
   });
 
@@ -41,7 +41,7 @@ describe('Industrial Calculation Engine - Production Audit', () => {
       { id: 'sqrt_val', name: 'Raiz', type: ColumnType.TEXTO, behavior: ColumnBehavior.CALCULATED, formula: 'RAIZ([val])' }
     ];
     const rowData = { 'val': 16 };
-    const { results } = executeRow(rowData, {}, arrayCols);
+    const { results } = executeRow(rowData, {}, arrayCols, 0);
     expect(results['sqrt_val']).toBe(4);
   });
 });

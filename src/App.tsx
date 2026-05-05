@@ -378,6 +378,10 @@ function QualityWrapper() {
           }
 
           if (justification === 'Publicado pelo portal') {
+            if (updatedRecord.status !== CertificateStatus.READY_FOR_SENDING) {
+              toast.error("Certificado não pode ser publicado sem aprovação final (L2).");
+              return;
+            }
             updatedRecord.isPublished = true;
           } else if (justification === 'Despublicado pelo portal') {
             updatedRecord.isPublished = false;
@@ -421,7 +425,13 @@ function QualityWrapper() {
 }
 
 function TechnicalWrapper() {
-  const { searchQuery, serviceOrders, clients, quotes, instrumentTypes, certificateMasks, calibrationRecords, calibrationResults, standardInstruments, procedures, documentTemplates, employees, saveItem, deleteItem } = useData();
+  const { 
+    searchQuery, serviceOrders, clients, quotes, instrumentTypes, 
+    certificateMasks, calibrationRecords, calibrationResults, 
+    standardInstruments, procedures, documentTemplates, employees, 
+    thirdPartyRecords, saveItem, deleteItem 
+  } = useData();
+  
   return (
     <TechnicalModule
       searchQuery={searchQuery}
@@ -435,6 +445,13 @@ function TechnicalWrapper() {
       procedures={procedures}
       documentTemplates={documentTemplates}
       employees={employees}
+      thirdPartyRecords={thirdPartyRecords}
+      onSaveThirdPartyRecord={async (record: any) => {
+        await saveItem('third_party_records', record);
+      }}
+      onDeleteThirdPartyRecord={async (id: string) => {
+        await deleteItem('third_party_records', id);
+      }}
       onCalibrationRecordSubmit={() => { }}
       onSaveCalibrationResult={async (result: any) => {
         await saveItem('calibration_results', result);
@@ -472,7 +489,7 @@ function TechnicalWrapper() {
 }
 
 function FinanceWrapper() {
-  const { searchQuery, quotes, serviceOrders, clients, financialControls, financialExpenses, paymentMethods, banks, saveItem, deleteItem } = useData();
+  const { searchQuery, quotes, serviceOrders, clients, financialControls, financialExpenses, paymentMethods, banks, inventoryItems, inventoryMovements, standardInstruments, saveItem, deleteItem } = useData();
   return (
     <FinanceModule
       searchQuery={searchQuery}
@@ -483,6 +500,9 @@ function FinanceWrapper() {
       financialExpenses={financialExpenses}
       paymentMethods={paymentMethods}
       banks={banks}
+      inventoryItems={inventoryItems}
+      inventoryMovements={inventoryMovements}
+      standardInstruments={standardInstruments}
       onFinancialControlsChange={async (newFc) => {
         await Promise.all(newFc.map(fc => saveItem('financial_controls', fc)));
       }}
@@ -493,6 +513,9 @@ function FinanceWrapper() {
       onSavePaymentMethod={(pm) => saveItem('payment_methods', pm)}
       onDeletePaymentMethod={(id) => deleteItem('payment_methods', id)}
       onSaveQuote={(quote) => saveItem('quotes', quote)}
+      onSaveInventoryItem={(item) => saveItem('inventory_items', item)}
+      onDeleteInventoryItem={(id) => deleteItem('inventory_items', id)}
+      onSaveInventoryMovement={(mov) => saveItem('inventory_movements', mov)}
     />
   );
 }

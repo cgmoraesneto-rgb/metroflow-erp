@@ -16,32 +16,51 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-// Interceptar Requisições de Rede (Offline-First local)
+// Interceptar Requisições de Rede
 self.addEventListener('fetch', event => {
-  // Ignora chamadas para firestore/google APIs para focar apenas em UI offline
-  if (event.request.url.includes('firestore.googleapis.com') || event.request.url.includes('identitytoolkit')) {
+  const { request } = event;
+  const url = new URL(request.url);
+
+  // 1. Ignorar chamadas para APIs externas e Firebase
+  if (url.hostname.includes('firestore.googleapis.com') || 
+      url.hostname.includes('identitytoolkit') || 
+      url.hostname.includes('google.com')) {
     return;
   }
 
+  // 2. Estratégia Network-First para Navegação (index.html)
+  // Isso garante que SEMPRE buscaremos a versão mais nova do HTML antes de usar o cache.
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+          return response;
+        })
+        .catch(() => caches.match('/index.html') || caches.match('/'))
+    );
+    return;
+  }
+
+  // 3. Estratégia Cache-First com fallback para Assets (JS, CSS, Imagens)
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Retorna o cache se houver. Se não, busca na rede.
-        return response || fetch(event.request).then(fetchRes => {
-          return caches.open(CACHE_NAME).then(cache => {
-            // Guarda em cache de forma transparente a nova requisição local (assets, js, css)
-            if (event.request.method === 'GET' && !event.request.url.includes('chrome-extension')) {
-                cache.put(event.request, fetchRes.clone());
-            }
-            return fetchRes;
+    caches.match(request).then(cachedResponse => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      return fetch(request).then(networkResponse => {
+        // Apenas faz cache de requisições GET bem sucedidas de arquivos locais
+        if (request.method === 'GET' && networkResponse.status === 200) {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(request, responseToCache);
           });
-        });
-      }).catch(() => {
-        // Fallback offline puro - direcionar pro root da SPA
-        if (event.request.mode === 'navigate') {
-          return caches.match('/');
         }
-      })
+        return networkResponse;
+      });
+    })
   );
 });
 

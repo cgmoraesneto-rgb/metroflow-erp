@@ -10,7 +10,7 @@ const columns = [
 
 console.log("--- TEST 1: Basic Execution ---");
 const rowData = { 'col_1': 10, 'col_2': 2.5 };
-const { results } = executeRow(rowData, {}, columns);
+const { results } = executeRow(rowData, {}, columns, 0);
 console.log("Result for [col_3]:", results['col_3']);
 if (results['col_3'] === 25) {
   console.log("✅ PASS");
@@ -24,7 +24,7 @@ const columnsRenamed = [
   { id: 'col_2', name: 'Fator', type: ColumnType.TEXTO, behavior: ColumnBehavior.INPUT },
   { id: 'col_3', name: 'Calculado', type: ColumnType.TEXTO, behavior: ColumnBehavior.CALCULATED, formula: '[col_1] * [col_2]' }
 ];
-const { results: results2 } = executeRow(rowData, {}, columnsRenamed);
+const { results: results2 } = executeRow(rowData, {}, columnsRenamed, 0);
 console.log("Result after rename:", results2['col_3']);
 if (results2['col_3'] === 25) {
   console.log("✅ PASS: Formula unaffected by column rename");
@@ -37,7 +37,7 @@ const divZeroCols = [
   { id: 'val', name: 'V', type: ColumnType.TEXTO, behavior: ColumnBehavior.INPUT },
   { id: 'res', name: 'R', type: ColumnType.TEXTO, behavior: ColumnBehavior.CALCULATED, formula: '10 / [val]' }
 ];
-const { results: results3 } = executeRow({ 'val': 0 }, {}, divZeroCols);
+const { results: results3 } = executeRow({ 'val': 0 }, {}, divZeroCols, 0);
 console.log("Result for 10/0:", results3['res']);
 if (results3['res'] === Infinity) {
   console.log("✅ PASS: Numerical instability handled");

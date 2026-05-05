@@ -25,7 +25,8 @@ import {
     History as HistoryIcon,
     Share2,
     CheckCircle,
-    Globe
+    Globe,
+    ShieldCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePdfGenerator } from '../hooks/usePdfGenerator';
@@ -129,9 +130,9 @@ export default function CalibrationHistoryModule({
         const map: Record<CertificateStatus, { label: string; cls: string }> = {
             [CertificateStatus.PENDING]: { label: 'Pendente', cls: 'bg-slate-100 text-slate-500 border-slate-200' },
             [CertificateStatus.BEING_MADE]: { label: 'Em Confecção', cls: 'bg-sky-100 text-sky-700 border-sky-200' },
-            [CertificateStatus.IN_ANALYSIS]: { label: 'Em Análise', cls: 'bg-amber-100 text-amber-700 border-amber-200' },
-            [CertificateStatus.APPROVED]: { label: 'Aprovado', cls: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
-            [CertificateStatus.READY_FOR_SENDING]: { label: 'Apto p/ Envio', cls: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
+            [CertificateStatus.IN_ANALYSIS]: { label: 'Em Análise', cls: 'bg-amber-50 text-amber-700 border-amber-100 shadow-sm' },
+            [CertificateStatus.APPROVED]: { label: 'Aprovado L1', cls: 'bg-emerald-50 text-emerald-700 border-emerald-100' },
+            [CertificateStatus.READY_FOR_SENDING]: { label: 'Apto p/ Envio', cls: 'bg-indigo-50 text-indigo-700 border-indigo-100' },
             [CertificateStatus.RETURNED]: { label: 'Correção', cls: 'bg-rose-100 text-rose-700 border-rose-200 animate-pulse' },
             [CertificateStatus.REJECTED]: { label: 'Rejeitado', cls: 'bg-slate-100 text-slate-600 border-slate-200' },
         };
@@ -305,22 +306,28 @@ export default function CalibrationHistoryModule({
                                                                                 >
                                                                                     <HistoryIcon className="w-3.5 h-3.5 mr-2" /> Revisionar
                                                                                 </button>
-                                                                                {!record.isPublished ? (
-                                                                                    <button 
-                                                                                        onClick={() => onUpdateCertificateStatus?.(record.id, record.status, 'Publicado pelo portal')}
-                                                                                        className="flex items-center px-4 py-2 bg-slate-50 text-slate-600 rounded-xl font-black text-[10px] border border-slate-200 hover:bg-emerald-600 hover:text-white transition-all uppercase tracking-widest" 
-                                                                                        title="Publicar no Portal"
-                                                                                    >
-                                                                                        <Globe className="w-3.5 h-3.5 mr-2" /> Publicar
-                                                                                    </button>
+                                                                                {record.status === CertificateStatus.READY_FOR_SENDING ? (
+                                                                                    !record.isPublished ? (
+                                                                                        <button 
+                                                                                            onClick={() => onUpdateCertificateStatus?.(record.id, record.status, 'Publicado pelo portal')}
+                                                                                            className="flex items-center px-4 py-2 bg-slate-50 text-slate-600 rounded-xl font-black text-[10px] border border-slate-200 hover:bg-emerald-600 hover:text-white transition-all uppercase tracking-widest" 
+                                                                                            title="Publicar no Portal"
+                                                                                        >
+                                                                                            <Globe className="w-3.5 h-3.5 mr-2" /> Publicar
+                                                                                        </button>
+                                                                                    ) : (
+                                                                                        <button 
+                                                                                            onClick={() => onUpdateCertificateStatus?.(record.id, record.status, 'Despublicado pelo portal')}
+                                                                                            className="flex items-center px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl font-black text-[10px] border border-emerald-200 hover:bg-rose-600 hover:text-white transition-all uppercase tracking-widest" 
+                                                                                            title="Remover do Portal"
+                                                                                        >
+                                                                                            <Globe className="w-3.5 h-3.5 mr-2" /> Despublicar
+                                                                                        </button>
+                                                                                    )
                                                                                 ) : (
-                                                                                    <button 
-                                                                                        onClick={() => onUpdateCertificateStatus?.(record.id, record.status, 'Despublicado pelo portal')}
-                                                                                        className="flex items-center px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl font-black text-[10px] border border-emerald-200 hover:bg-rose-600 hover:text-white transition-all uppercase tracking-widest" 
-                                                                                        title="Remover do Portal"
-                                                                                    >
-                                                                                        <Globe className="w-3.5 h-3.5 mr-2" /> Despublicar
-                                                                                    </button>
+                                                                                    <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest italic flex items-center px-4">
+                                                                                        <ShieldCheck className="w-3 h-3 mr-1" /> Aguardando L2
+                                                                                    </span>
                                                                                 )}
                                                                             </>
                                                                         )}
@@ -409,22 +416,28 @@ export default function CalibrationHistoryModule({
                                                             </div>
                                                             <button onClick={() => onRevisionRequest(record)} className="p-1.5 text-amber-500 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 transition-all" title="Revisionar"><HistoryIcon className="w-4 h-4" /></button>
                                                             
-                                                            {!record.isPublished ? (
-                                                                <button 
-                                                                    onClick={() => onUpdateCertificateStatus?.(record.id, record.status, 'Publicado pelo portal')}
-                                                                    className="p-1.5 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all" 
-                                                                    title="Publicar no Portal"
-                                                                >
-                                                                    <Globe className="w-4 h-4" />
-                                                                </button>
+                                                            {record.status === CertificateStatus.READY_FOR_SENDING ? (
+                                                                !record.isPublished ? (
+                                                                    <button 
+                                                                        onClick={() => onUpdateCertificateStatus?.(record.id, record.status, 'Publicado pelo portal')}
+                                                                        className="p-1.5 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all" 
+                                                                        title="Publicar no Portal"
+                                                                    >
+                                                                        <Globe className="w-4 h-4" />
+                                                                    </button>
+                                                                ) : (
+                                                                    <button 
+                                                                        onClick={() => onUpdateCertificateStatus?.(record.id, record.status, 'Despublicado pelo portal')}
+                                                                        className="p-1.5 text-emerald-500 hover:text-rose-500 transition-all" 
+                                                                        title="Remover do Portal"
+                                                                    >
+                                                                        <Globe className="w-4 h-4" />
+                                                                    </button>
+                                                                )
                                                             ) : (
-                                                                <button 
-                                                                    onClick={() => onUpdateCertificateStatus?.(record.id, record.status, 'Despublicado pelo portal')}
-                                                                    className="p-1.5 text-emerald-500 hover:text-rose-500 transition-all" 
-                                                                    title="Remover do Portal"
-                                                                >
+                                                                <div className="p-1.5 text-slate-200 cursor-not-allowed" title="Aguardando Aprovação L2 para publicação">
                                                                     <Globe className="w-4 h-4" />
-                                                                </button>
+                                                                </div>
                                                             )}
                                                         </>
                                                     )}

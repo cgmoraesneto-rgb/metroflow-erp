@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { CalibrationRecord, StandardInstrument, ServiceOrder, Quote, Client, InstrumentType, CertificateMask, Procedure, CertificateStatus } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, ClipboardList, Activity, Clock, CheckCircle2 } from 'lucide-react';
+import { FileText, ClipboardList, Activity, Clock, CheckCircle2, Users } from 'lucide-react';
+import { toast } from 'sonner';
+import ThirdPartyModule from './ThirdPartyModule';
+import CalibrationRecordModule from './CalibrationRecordModule';
+import CalibrationHistoryModule from './CalibrationHistoryModule';
 
 interface TechnicalModuleProps {
   searchQuery?: string;
@@ -21,15 +25,16 @@ interface TechnicalModuleProps {
   onSaveCertificateMask: (mask: any) => void;
   onDeleteCertificateMask: (id: string) => void;
   onUpdateCertificateStatus: (recordId: string, status: CertificateStatus, justification?: string) => void;
+  thirdPartyRecords?: any[];
+  onSaveThirdPartyRecord?: (record: any) => Promise<void>;
+  onDeleteThirdPartyRecord?: (id: string) => Promise<void>;
   documentTemplates?: any[];
   employees?: any[];
 }
 
-import CalibrationRecordModule from './CalibrationRecordModule';
-import CalibrationHistoryModule from './CalibrationHistoryModule';
-import { toast } from 'sonner';
 
-type SubTab = 'records' | 'history';
+
+type SubTab = 'records' | 'history' | 'third_party';
 
 export default function TechnicalModule({
   searchQuery = '',
@@ -48,6 +53,9 @@ export default function TechnicalModule({
   onSaveCertificateMask,
   onDeleteCertificateMask,
   onUpdateCertificateStatus,
+  thirdPartyRecords = [],
+  onSaveThirdPartyRecord,
+  onDeleteThirdPartyRecord,
   documentTemplates = [],
   employees = []
 }: TechnicalModuleProps) {
@@ -56,6 +64,7 @@ export default function TechnicalModule({
   const TAB_CONFIG = [
     { id: 'records', label: 'Registro de Calibração', icon: ClipboardList, color: 'emerald' },
     { id: 'history', label: 'Histórico', icon: Clock, color: 'amber' },
+    { id: 'third_party', label: 'Parceiros', icon: Users, color: 'indigo' },
   ];
 
   const handleRevisionRequest = (record: CalibrationRecord) => {
@@ -144,6 +153,17 @@ export default function TechnicalModule({
               employees={employees}
               onRevisionRequest={handleRevisionRequest}
               onUpdateCertificateStatus={onUpdateCertificateStatus}
+            />
+          )}
+          {activeSubTab === 'third_party' && (
+            <ThirdPartyModule 
+              searchQuery={searchQuery}
+              records={thirdPartyRecords}
+              onSave={onSaveThirdPartyRecord}
+              onDelete={onDeleteThirdPartyRecord}
+              inventoryItems={standardInstruments} // Or whatever instruments the user wants
+              clients={clients}
+              documentTemplates={documentTemplates}
             />
           )}
         </motion.div>

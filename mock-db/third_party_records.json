@@ -1,0 +1,95 @@
+[
+  {
+    "id": "TER-1777745760662",
+    "numeroReferencia": "26001",
+    "laboratorioNome": "LRM",
+    "clienteNome": "Boa Vista",
+    "dataEnvio": "",
+    "status": "Pendente",
+    "items": [
+      {
+        "id": "7bc91896-477e-4528-8b46-915e8dabc26d",
+        "tipoCalibracao": "Rastreável",
+        "numeroCertificado": "L26001",
+        "descricao": "Termômetro Digital",
+        "marca": "Term",
+        "modelo": "T001",
+        "serialNumber": "XYZ0051",
+        "identificacao": "TERM-001",
+        "capacidadeMinima": "1",
+        "capacidadeMaxima": "100",
+        "resolucao": "0,01",
+        "unidade": "ºC",
+        "dataCalibracao": "2026-05-02",
+        "dataProximaCalibracao": "",
+        "medicoes": [
+          {
+            "id": "449c5def-9d4e-4d6a-86c7-023feb5d31eb",
+            "padrao": "0,01",
+            "leitura1": "0,01",
+            "leitura2": "0,01",
+            "leitura3": "0,01"
+          },
+          {
+            "id": "051521ba-5c4a-4a4e-8de7-0a08d7f89471",
+            "padrao": "",
+            "leitura1": "",
+            "leitura2": "",
+            "leitura3": ""
+          },
+          {
+            "id": "a65671ba-bcd9-4e6b-a977-335bfb822c44",
+            "padrao": "",
+            "leitura1": "",
+            "leitura2": "",
+            "leitura3": ""
+          }
+        ],
+        "observacoes": "Observações",
+        "status": "N/A"
+      },
+      {
+        "id": "42c32b09-0dc3-4c0e-b558-26c6eaea8c39",
+        "tipoCalibracao": "RBC",
+        "numeroCertificado": "R26002",
+        "descricao": "Manômetro Analógico",
+        "marca": "MANTU",
+        "modelo": "M91",
+        "serialNumber": "ZYX005",
+        "identificacao": "MAN-002",
+        "capacidadeMinima": "0,1",
+        "capacidadeMaxima": "100",
+        "resolucao": "0,001",
+        "unidade": "Bar",
+        "dataCalibracao": "2026-05-03",
+        "dataProximaCalibracao": "",
+        "medicoes": [
+          {
+            "id": "34bb7941-c976-4953-b5a3-f9f6cb5498c5",
+            "padrao": "",
+            "leitura1": "",
+            "leitura2": "",
+            "leitura3": ""
+          },
+          {
+            "id": "d11d0015-ef0a-40d5-855c-4e50239cd08e",
+            "padrao": "",
+            "leitura1": "",
+            "leitura2": "",
+            "leitura3": ""
+          },
+          {
+            "id": "48e9f2cb-c2c7-4fa0-8667-4e86bce496ae",
+            "padrao": "",
+            "leitura1": "",
+            "leitura2": "",
+            "leitura3": ""
+          }
+        ],
+        "observacoes": "Teste de Observações Manômetro",
+        "status": "N/A"
+      }
+    ],
+    "criadoEm": "2026-05-02T18:16:00.662Z"
+  }
+]

@@ -202,6 +202,7 @@ export interface ServiceOrder {
 
 export interface CustodyItem {
   standardInstrumentId: string;
+  inventoryItemId?: string; // Referência ao item do inventário
   quantidade: number;
 }
 
@@ -215,6 +216,39 @@ export interface StandardCustody {
   dataSaida: string;
   dataRetorno?: string;
   responsavel: string;
+}
+
+export enum InventoryMovementType {
+  ENTRADA = 'Entrada',
+  SAIDA = 'Saída',
+  CAUTELA = 'Cautela',
+  DEVOLUCAO = 'Devolução',
+  AJUSTE = 'Ajuste',
+}
+
+export interface InventoryMovement {
+  id: string;
+  inventoryItemId: string;
+  tipo: InventoryMovementType;
+  quantidade: number;
+  data: string;
+  responsavel?: string;
+  cautelaId?: string;
+  observacao?: string;
+}
+
+export interface InventoryItem {
+  id: string;
+  descricao: string;
+  categoria: string;
+  quantidade: number;
+  unidade: string;
+  valorUnitario: number;
+  localizacao?: string;
+  ativoFixo?: string;        // Número do patrimônio / ativo fixo
+  instrumentoId?: string;    // ID do instrumento padrão vinculado
+  standardInstrumentId?: string; // Vínculo direto com StandardInstrument de Qualidade
+  statusMovimentacao?: 'Disponível' | 'Em Cautela' | 'Em Manutenção' | 'Baixado';
 }
 
 export interface Vehicle {
@@ -566,6 +600,14 @@ export interface ColumnDefinition {
   formula?: string; // Excel-like formula
   decimalPlaces?: number;
   displayFormat?: string;
+  isLocked?: boolean; // NEW: If true, technician cannot edit values in this column
+}
+
+export interface MaskSection {
+  id: string;
+  title: string;
+  description?: string;
+  groups: MeasurementGroup[];
 }
 
 export interface MeasurementGroup {
@@ -580,6 +622,7 @@ export interface MeasurementGroup {
   repetitions?: number;     // Per-group override
   blockId?: string;
   isDynamic?: boolean;
+  templateRows?: any[]; // NEW: Pre-filled rows defined in the mask
 }
 
 export interface StandardInstrumentUncertainty {
@@ -595,7 +638,8 @@ export interface CertificateMask {
   procedureId: string;
   standardInstrumentIds: string[];
   standardInstrumentUncertainties?: StandardInstrumentUncertainty[];
-  measurementGroups: MeasurementGroup[];
+  sections?: MaskSection[]; // NEW: Hierarchical structure with titles
+  measurementGroups: MeasurementGroup[]; // Keeping for backward compatibility
   instrumentType?: string;
   type?: 'CALIBRATION_CERTIFICATE' | 'TEST_REPORT' | 'MAINTENANCE_REPORT'; // NEW: Document Type
   measuredQuantity?: string;
@@ -677,4 +721,62 @@ export interface Procedure {
   code?: string;
   title: string;
   content: string;
+}
+
+export interface ThirdPartyMeasurement {
+  id: string;
+  padrao: string;
+  leitura1: string;
+  leitura2: string;
+  leitura3: string;
+}
+
+export interface ThirdPartyMeasurementTable {
+  id: string;
+  name: string;
+  measurements: ThirdPartyMeasurement[];
+}
+
+export interface ThirdPartyParameter {
+  id: string;
+  capacidadeMinima: string;
+  capacidadeMaxima: string;
+  resolucao: string;
+  unidadeMedida: string;
+}
+
+export interface ThirdPartyItem {
+  id: string;
+  tipoCalibracao: 'RBC' | 'Rastreável';
+  numeroCertificado: string;
+  descricao: string; // Nome do instrumento
+  marca: string;
+  modelo: string;
+  serialNumber: string;
+  identificacao: string;
+  capacidadeMinima: string;
+  capacidadeMaxima: string;
+  resolucao: string;
+  unidade: string;
+  dataCalibracao: string;
+  dataProximaCalibracao: string;
+  medicoes: ThirdPartyMeasurement[]; // Mantido para compatibilidade, mas moveremos para measurementTables
+  measurementTables?: ThirdPartyMeasurementTable[];
+  parameters?: ThirdPartyParameter[];
+  observacoes: string;
+  status: 'Aprovado' | 'Reprovado' | 'N/A';
+}
+
+export interface ThirdPartyRecord {
+  id: string;
+  numeroReferencia: string; // OS, etc.
+  laboratorioNome: string;
+  clienteNome: string;
+  dataEnvio: string;
+  dataRetorno?: string;
+  status: 'Pendente' | 'Enviado' | 'Concluído' | 'Cancelado';
+  items: ThirdPartyItem[];
+  observacoesGerais?: string;
+  criadoPor?: string;
+  criadoEm?: string;
 }

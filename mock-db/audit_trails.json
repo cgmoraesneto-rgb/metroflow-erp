@@ -282,5 +282,351 @@
     "timestamp": "2026-04-21T14:22:09.146Z",
     "previousState": "{\"id\":\"CAL-1776781131293\",\"serviceOrderId\":\"OS-2026-001\",\"quoteItemIndex\":0,\"unitIndex\":0,\"instrumentName\":\"Micrômetro Externo 0-25mm\",\"certificateNumber\":\"CERT-2026-3374\",\"calibrationDate\":\"2026-04-21\",\"nextCalibrationDate\":\"2026-04-21\",\"technicianName\":\"admin-1\",\"manufacturer\":\"\",\"model\":\"\",\"serialNumber\":\"\",\"identification\":\"\",\"periodicity\":\"12 meses\",\"calibrationLocation\":\"Laboratório\",\"resolution\":0,\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"unidadeMedida\":\"\",\"temperature\":20,\"humidity\":50,\"envStandardInstrumentId\":\"\",\"environmentalStandardId\":\"\",\"certificateMaskId\":\"mask-1776778687276\",\"procedureId\":\"\",\"standardInstrumentIds\":[],\"observations\":\"\",\"attachments\":[],\"groups\":[{\"name\":\"Tabela de Resultados 1\",\"blockId\":\"T1\",\"columnDefinitions\":[{\"id\":\"TAG_1\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\"},{\"id\":\"TAG_2\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\",\"displayFormat\":\"percent\"},{\"id\":\"TAG_3\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"CALCULATED\",\"formula\":\"[TAG_2]+[TAG_3]\",\"decimalPlaces\":1,\"displayFormat\":\"percent\"},{\"id\":\"TAG_4\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\"}],\"isDynamic\":true,\"rows\":[{\"_pointIdx\":\"0\",\"TAG_1\":\"10\",\"TAG_2\":\"10\",\"TAG_3\":\"\",\"TAG_4\":\"10\"}],\"groupName\":\"Tabela de Resultados 1\",\"columns\":[\"TAG_1\",\"TAG_2\",\"TAG_3\",\"TAG_4\"]}],\"status\":\"Em Análise\",\"isDraft\":false,\"headerValidated\":true,\"headerSaved\":true,\"isAccredited\":false,\"kFactorJustification\":\"Padrão (k=2 para 95.45%)\",\"calculatedPoints\":{\"T1_row0\":{\"_pointIdx\":\"0\",\"TAG_1\":\"10\",\"TAG_2\":\"10\",\"TAG_3\":10,\"TAG_4\":\"10\",\"trace\":{\"TAG_3\":{\"formula\":\"[TAG_2]+[TAG_3]\",\"output\":10}}}}}",
     "newState": "{\"id\":\"CAL-1776781131293\",\"serviceOrderId\":\"OS-2026-001\",\"quoteItemIndex\":0,\"unitIndex\":0,\"instrumentName\":\"Micrômetro Externo 0-25mm\",\"certificateNumber\":\"CERT-2026-3374\",\"calibrationDate\":\"2026-04-21\",\"nextCalibrationDate\":\"2026-04-21\",\"technicianName\":\"admin-1\",\"manufacturer\":\"\",\"model\":\"\",\"serialNumber\":\"\",\"identification\":\"\",\"periodicity\":\"12 meses\",\"calibrationLocation\":\"Laboratório\",\"resolution\":0,\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"unidadeMedida\":\"\",\"temperature\":20,\"humidity\":50,\"envStandardInstrumentId\":\"\",\"environmentalStandardId\":\"\",\"certificateMaskId\":\"mask-1776778687276\",\"procedureId\":\"\",\"standardInstrumentIds\":[],\"observations\":\"\",\"attachments\":[],\"groups\":[{\"name\":\"Tabela de Resultados 1\",\"blockId\":\"T1\",\"columnDefinitions\":[{\"id\":\"TAG_1\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\"},{\"id\":\"TAG_2\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\",\"displayFormat\":\"percent\"},{\"id\":\"TAG_3\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"CALCULATED\",\"formula\":\"[TAG_2]+[TAG_3]\",\"decimalPlaces\":1,\"displayFormat\":\"percent\"},{\"id\":\"TAG_4\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\"}],\"isDynamic\":true,\"rows\":[{\"_pointIdx\":\"0\",\"TAG_1\":\"10\",\"TAG_2\":\"10\",\"TAG_3\":\"\",\"TAG_4\":\"10\"}],\"groupName\":\"Tabela de Resultados 1\",\"columns\":[\"TAG_1\",\"TAG_2\",\"TAG_3\",\"TAG_4\"]}],\"status\":\"Devolvido para correção\",\"isDraft\":false,\"headerValidated\":true,\"headerSaved\":true,\"isAccredited\":false,\"kFactorJustification\":\"Padrão (k=2 para 95.45%)\",\"calculatedPoints\":{\"T1_row0\":{\"_pointIdx\":\"0\",\"TAG_1\":\"10\",\"TAG_2\":\"10\",\"TAG_3\":10,\"TAG_4\":\"10\",\"trace\":{\"TAG_3\":{\"formula\":\"[TAG_2]+[TAG_3]\",\"output\":10}}}}}"
+  },
+  {
+    "id": "AUDIT-1777744702871-419",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "CREATE",
+    "entityId": "TER-1777744662516",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T17:58:22.871Z",
+    "newState": "{\"id\":\"TER-1777744662516\",\"dataEnvio\":\"2026-05-02\",\"laboratorioNome\":\"CertLab\",\"status\":\"Pendente\",\"items\":[{\"id\":\"627f309c-c2a7-4be7-811e-1b84b3f22d59\",\"descricao\":\"Manometro Digital\",\"identificacao\":\"\",\"valorNominal\":\"10 bar\",\"valorLido\":\"10.02 bar\",\"erro\":\"\",\"incerteza\":\"\",\"unidade\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T17:57:42.516Z\"}"
+  },
+  {
+    "id": "AUDIT-1777744835786-951",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "CREATE",
+    "entityId": "TER-1777744780860",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:00:35.786Z",
+    "newState": "{\"id\":\"TER-1777744780860\",\"dataEnvio\":\"2026-05-02\",\"laboratorioNome\":\"CertLab\",\"status\":\"Pendente\",\"items\":[{\"id\":\"31690266-0a41-4985-b663-63fc02c58162\",\"descricao\":\"Manometro Digital\",\"identificacao\":\"\",\"valorNominal\":\"10 bar\",\"valorLido\":\"10.02 bar\",\"erro\":\"\",\"incerteza\":\"\",\"unidade\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T17:59:40.860Z\"}"
+  },
+  {
+    "id": "AUDIT-1777745013014-832",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "CREATE",
+    "entityId": "TER-1777744871411",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:03:33.014Z",
+    "newState": "{\"id\":\"TER-1777744871411\",\"dataEnvio\":\"2026-05-02\",\"laboratorioNome\":\"CertLab\",\"status\":\"Pendente\",\"items\":[{\"id\":\"4f003306-e0f8-451c-bb04-6476c7908165\",\"descricao\":\"Manometro Digital\",\"identificacao\":\"\",\"valorNominal\":\"10 bar\",\"valorLido\":\"10.02 bar\",\"erro\":\"\",\"incerteza\":\"\",\"unidade\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:01:11.411Z\"}"
+  },
+  {
+    "id": "AUDIT-1777745194372-392",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "CREATE",
+    "entityId": "TER-1777745156576",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:06:34.372Z",
+    "newState": "{\"id\":\"TER-1777745156576\",\"dataEnvio\":\"2026-05-02\",\"laboratorioNome\":\"Global Lab\",\"status\":\"Pendente\",\"items\":[{\"id\":\"6bd4ce61-7178-4797-aaeb-4d1a77731862\",\"descricao\":\"Balan\",\"identificacao\":\"\",\"valorNominal\":\"500\",\"valorLido\":\"500\",\"erro\":\"\",\"incerteza\":\"\",\"unidade\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:05:56.576Z\"}"
+  },
+  {
+    "id": "AUDIT-1777745259682-897",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "CREATE",
+    "entityId": "TER-1777745222177",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:07:39.682Z",
+    "newState": "{\"id\":\"TER-1777745222177\",\"dataEnvio\":\"2026-05-02\",\"laboratorioNome\":\"Global Lab\",\"status\":\"Pendente\",\"items\":[{\"id\":\"cab58c17-16de-445d-a1ea-f9bde77e9d9b\",\"descricao\":\"Balanca\",\"identificacao\":\"BAL-01\",\"valorNominal\":\"500\",\"valorLido\":\"500\",\"erro\":\"\",\"incerteza\":\"\",\"unidade\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:07:02.177Z\"}"
+  },
+  {
+    "id": "AUDIT-1777745324027-152",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "CREATE",
+    "entityId": "TER-1777745286749",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:08:44.027Z",
+    "newState": "{\"id\":\"TER-1777745286749\",\"dataEnvio\":\"2026-05-02\",\"laboratorioNome\":\"Lab A\",\"status\":\"Pendente\",\"items\":[{\"id\":\"fa75f3ae-80fc-4d34-ab77-2970d579d0bb\",\"descricao\":\"Item A\",\"identificacao\":\"1\",\"valorNominal\":\"100\",\"valorLido\":\"100\",\"erro\":\"\",\"incerteza\":\"\",\"unidade\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:08:06.749Z\"}"
+  },
+  {
+    "id": "AUDIT-1777745745853-922",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "DELETE",
+    "entityId": "TER-1777744780860",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:15:45.853Z",
+    "previousState": "{\"id\":\"TER-1777744780860\",\"dataEnvio\":\"2026-05-02\",\"laboratorioNome\":\"CertLab\",\"status\":\"Pendente\",\"items\":[{\"id\":\"31690266-0a41-4985-b663-63fc02c58162\",\"descricao\":\"Manometro Digital\",\"identificacao\":\"\",\"valorNominal\":\"10 bar\",\"valorLido\":\"10.02 bar\",\"erro\":\"\",\"incerteza\":\"\",\"unidade\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T17:59:40.860Z\"}"
+  },
+  {
+    "id": "AUDIT-1777745745882-371",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "CREATE",
+    "entityId": "TER-1777745640877",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:15:45.882Z",
+    "newState": "{\"id\":\"TER-1777745640877\",\"numeroReferencia\":\"OS-TEST-001\",\"laboratorioNome\":\"Test Lab\",\"clienteNome\":\"Cliente A\",\"dataEnvio\":\"2026-05-02\",\"status\":\"Pendente\",\"items\":[{\"id\":\"28acdfdb-1ca2-419e-bd0f-2e5ae5585a3e\",\"tipoCalibracao\":\"Rastreável\",\"numeroCertificado\":\"\",\"descricao\":\"Balanca\",\"marca\":\"\",\"modelo\":\"\",\"serialNumber\":\"\",\"identificacao\":\"ID-BAL-001\",\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"resolucao\":\"\",\"unidade\":\"\",\"dataCalibracao\":\"2026-05-02\",\"dataProximaCalibracao\":\"\",\"medicoes\":[],\"observacoes\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:14:00.877Z\"}"
+  },
+  {
+    "id": "AUDIT-1777745747831-339",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "DELETE",
+    "entityId": "TER-1777744871411",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:15:47.831Z",
+    "previousState": "{\"id\":\"TER-1777744871411\",\"dataEnvio\":\"2026-05-02\",\"laboratorioNome\":\"CertLab\",\"status\":\"Pendente\",\"items\":[{\"id\":\"4f003306-e0f8-451c-bb04-6476c7908165\",\"descricao\":\"Manometro Digital\",\"identificacao\":\"\",\"valorNominal\":\"10 bar\",\"valorLido\":\"10.02 bar\",\"erro\":\"\",\"incerteza\":\"\",\"unidade\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:01:11.411Z\"}"
+  },
+  {
+    "id": "AUDIT-1777745749842-241",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "DELETE",
+    "entityId": "TER-1777745156576",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:15:49.843Z",
+    "previousState": "{\"id\":\"TER-1777745156576\",\"dataEnvio\":\"2026-05-02\",\"laboratorioNome\":\"Global Lab\",\"status\":\"Pendente\",\"items\":[{\"id\":\"6bd4ce61-7178-4797-aaeb-4d1a77731862\",\"descricao\":\"Balan\",\"identificacao\":\"\",\"valorNominal\":\"500\",\"valorLido\":\"500\",\"erro\":\"\",\"incerteza\":\"\",\"unidade\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:05:56.576Z\"}"
+  },
+  {
+    "id": "AUDIT-1777745752249-355",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "DELETE",
+    "entityId": "TER-1777745222177",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:15:52.250Z",
+    "previousState": "{\"id\":\"TER-1777745222177\",\"dataEnvio\":\"2026-05-02\",\"laboratorioNome\":\"Global Lab\",\"status\":\"Pendente\",\"items\":[{\"id\":\"cab58c17-16de-445d-a1ea-f9bde77e9d9b\",\"descricao\":\"Balanca\",\"identificacao\":\"BAL-01\",\"valorNominal\":\"500\",\"valorLido\":\"500\",\"erro\":\"\",\"incerteza\":\"\",\"unidade\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:07:02.177Z\"}"
+  },
+  {
+    "id": "AUDIT-1777745755033-538",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "DELETE",
+    "entityId": "TER-1777745286749",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:15:55.033Z",
+    "previousState": "{\"id\":\"TER-1777745286749\",\"dataEnvio\":\"2026-05-02\",\"laboratorioNome\":\"Lab A\",\"status\":\"Pendente\",\"items\":[{\"id\":\"fa75f3ae-80fc-4d34-ab77-2970d579d0bb\",\"descricao\":\"Item A\",\"identificacao\":\"1\",\"valorNominal\":\"100\",\"valorLido\":\"100\",\"erro\":\"\",\"incerteza\":\"\",\"unidade\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:08:06.749Z\"}"
+  },
+  {
+    "id": "AUDIT-1777745758224-542",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "DELETE",
+    "entityId": "TER-1777745640877",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:15:58.224Z",
+    "previousState": "{\"id\":\"TER-1777745640877\",\"numeroReferencia\":\"OS-TEST-001\",\"laboratorioNome\":\"Test Lab\",\"clienteNome\":\"Cliente A\",\"dataEnvio\":\"2026-05-02\",\"status\":\"Pendente\",\"items\":[{\"id\":\"28acdfdb-1ca2-419e-bd0f-2e5ae5585a3e\",\"tipoCalibracao\":\"Rastreável\",\"numeroCertificado\":\"\",\"descricao\":\"Balanca\",\"marca\":\"\",\"modelo\":\"\",\"serialNumber\":\"\",\"identificacao\":\"ID-BAL-001\",\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"resolucao\":\"\",\"unidade\":\"\",\"dataCalibracao\":\"2026-05-02\",\"dataProximaCalibracao\":\"\",\"medicoes\":[],\"observacoes\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:14:00.877Z\"}"
+  },
+  {
+    "id": "AUDIT-1777745759958-7",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "DELETE",
+    "entityId": "TER-1777744662516",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:15:59.958Z",
+    "previousState": "{\"id\":\"TER-1777744662516\",\"dataEnvio\":\"2026-05-02\",\"laboratorioNome\":\"CertLab\",\"status\":\"Pendente\",\"items\":[{\"id\":\"627f309c-c2a7-4be7-811e-1b84b3f22d59\",\"descricao\":\"Manometro Digital\",\"identificacao\":\"\",\"valorNominal\":\"10 bar\",\"valorLido\":\"10.02 bar\",\"erro\":\"\",\"incerteza\":\"\",\"unidade\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T17:57:42.516Z\"}"
+  },
+  {
+    "id": "AUDIT-1777745799692-533",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "CREATE",
+    "entityId": "TER-1777745760662",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:16:39.693Z",
+    "newState": "{\"id\":\"TER-1777745760662\",\"numeroReferencia\":\"1234\",\"laboratorioNome\":\"LRM\",\"clienteNome\":\"Boa Vista\",\"dataEnvio\":\"\",\"status\":\"Pendente\",\"items\":[{\"id\":\"3d120ad8-43e0-4af6-b463-458e1b7e1c75\",\"tipoCalibracao\":\"RBC\",\"numeroCertificado\":\"\",\"descricao\":\"Termômetro\",\"marca\":\"\",\"modelo\":\"\",\"serialNumber\":\"\",\"identificacao\":\"\",\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"resolucao\":\"\",\"unidade\":\"\",\"dataCalibracao\":\"2026-05-02\",\"dataProximaCalibracao\":\"\",\"medicoes\":[{\"id\":\"91778ed0-52a9-4d4b-8d1a-85bb1b0ee66e\",\"padrao\":\"\",\"leitura1\":\"\",\"leitura2\":\"\",\"leitura3\":\"\"}],\"observacoes\":\"As medidas 1, 2 e 3\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:16:00.662Z\"}"
+  },
+  {
+    "id": "AUDIT-1777745851675-752",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "CREATE",
+    "entityId": "TER-1777745767287",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:17:31.675Z",
+    "newState": "{\"id\":\"TER-1777745767287\",\"numeroReferencia\":\"REF-002\",\"laboratorioNome\":\"Test Lab\",\"clienteNome\":\"Cliente A\",\"dataEnvio\":\"2026-05-02\",\"status\":\"Pendente\",\"items\":[{\"id\":\"ef547d23-88ff-48cd-82bf-e563a6355da0\",\"tipoCalibracao\":\"Rastreável\",\"numeroCertificado\":\"\",\"descricao\":\"Balanca\",\"marca\":\"\",\"modelo\":\"\",\"serialNumber\":\"\",\"identificacao\":\"\",\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"resolucao\":\"\",\"unidade\":\"\",\"dataCalibracao\":\"2026-05-02\",\"dataProximaCalibracao\":\"\",\"medicoes\":[],\"observacoes\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:16:07.287Z\"}"
+  },
+  {
+    "id": "AUDIT-1777745967647-400",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "CREATE",
+    "entityId": "TER-1777745902011",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:19:27.647Z",
+    "newState": "{\"id\":\"TER-1777745902011\",\"dataEnvio\":\"2026-05-02\",\"laboratorioNome\":\"Test Lab\",\"status\":\"Pendente\",\"items\":[{\"id\":\"e4cc37ba-9fe7-4a95-8de7-21df8c99e00b\",\"descricao\":\"Balanca\",\"identificacao\":\"Cliente A\",\"valorNominal\":\"\",\"valorLido\":\"\",\"erro\":\"\",\"incerteza\":\"\",\"unidade\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:18:22.011Z\"}"
+  },
+  {
+    "id": "AUDIT-1777746046733-755",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "UPDATE",
+    "entityId": "TER-1777745760662",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:20:46.733Z",
+    "previousState": "{\"id\":\"TER-1777745760662\",\"numeroReferencia\":\"1234\",\"laboratorioNome\":\"LRM\",\"clienteNome\":\"Boa Vista\",\"dataEnvio\":\"\",\"status\":\"Pendente\",\"items\":[{\"id\":\"3d120ad8-43e0-4af6-b463-458e1b7e1c75\",\"tipoCalibracao\":\"RBC\",\"numeroCertificado\":\"\",\"descricao\":\"Termômetro\",\"marca\":\"\",\"modelo\":\"\",\"serialNumber\":\"\",\"identificacao\":\"\",\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"resolucao\":\"\",\"unidade\":\"\",\"dataCalibracao\":\"2026-05-02\",\"dataProximaCalibracao\":\"\",\"medicoes\":[{\"id\":\"91778ed0-52a9-4d4b-8d1a-85bb1b0ee66e\",\"padrao\":\"\",\"leitura1\":\"\",\"leitura2\":\"\",\"leitura3\":\"\"}],\"observacoes\":\"As medidas 1, 2 e 3\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:16:00.662Z\"}",
+    "newState": "{\"id\":\"TER-1777745760662\",\"numeroReferencia\":\"1234\",\"laboratorioNome\":\"LRM\",\"clienteNome\":\"Boa Vista\",\"dataEnvio\":\"2026-05-03\",\"status\":\"Pendente\",\"items\":[{\"id\":\"3d120ad8-43e0-4af6-b463-458e1b7e1c75\",\"tipoCalibracao\":\"RBC\",\"numeroCertificado\":\"\",\"descricao\":\"Termômetro\",\"marca\":\"\",\"modelo\":\"\",\"serialNumber\":\"\",\"identificacao\":\"\",\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"resolucao\":\"\",\"unidade\":\"\",\"dataCalibracao\":\"2026-05-02\",\"dataProximaCalibracao\":\"\",\"medicoes\":[{\"id\":\"91778ed0-52a9-4d4b-8d1a-85bb1b0ee66e\",\"padrao\":\"\",\"leitura1\":\"\",\"leitura2\":\"\",\"leitura3\":\"\"}],\"observacoes\":\"As medidas 1, 2 e 3\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:16:00.662Z\"}"
+  },
+  {
+    "id": "AUDIT-1777746052789-320",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "DELETE",
+    "entityId": "TER-1777745767287",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:20:52.789Z",
+    "previousState": "{\"id\":\"TER-1777745767287\",\"numeroReferencia\":\"REF-002\",\"laboratorioNome\":\"Test Lab\",\"clienteNome\":\"Cliente A\",\"dataEnvio\":\"2026-05-02\",\"status\":\"Pendente\",\"items\":[{\"id\":\"ef547d23-88ff-48cd-82bf-e563a6355da0\",\"tipoCalibracao\":\"Rastreável\",\"numeroCertificado\":\"\",\"descricao\":\"Balanca\",\"marca\":\"\",\"modelo\":\"\",\"serialNumber\":\"\",\"identificacao\":\"\",\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"resolucao\":\"\",\"unidade\":\"\",\"dataCalibracao\":\"2026-05-02\",\"dataProximaCalibracao\":\"\",\"medicoes\":[],\"observacoes\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:16:07.287Z\"}"
+  },
+  {
+    "id": "AUDIT-1777746054913-499",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "DELETE",
+    "entityId": "TER-1777745902011",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:20:54.913Z",
+    "previousState": "{\"id\":\"TER-1777745902011\",\"dataEnvio\":\"2026-05-02\",\"laboratorioNome\":\"Test Lab\",\"status\":\"Pendente\",\"items\":[{\"id\":\"e4cc37ba-9fe7-4a95-8de7-21df8c99e00b\",\"descricao\":\"Balanca\",\"identificacao\":\"Cliente A\",\"valorNominal\":\"\",\"valorLido\":\"\",\"erro\":\"\",\"incerteza\":\"\",\"unidade\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:18:22.011Z\"}"
+  },
+  {
+    "id": "AUDIT-1777746113325-655",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "CREATE",
+    "entityId": "TER-1777746028732",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:21:53.325Z",
+    "newState": "{\"id\":\"TER-1777746028732\",\"numeroReferencia\":\"REF-001\",\"laboratorioNome\":\"Test Lab\",\"clienteNome\":\"Cliente A\",\"dataEnvio\":\"2026-05-02\",\"status\":\"Pendente\",\"items\":[{\"id\":\"b273b919-634b-4b69-801d-9417a1650f22\",\"tipoCalibracao\":\"Rastreável\",\"numeroCertificado\":\"\",\"descricao\":\"Balanca\",\"marca\":\"\",\"modelo\":\"\",\"serialNumber\":\"\",\"identificacao\":\"\",\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"resolucao\":\"\",\"unidade\":\"\",\"dataCalibracao\":\"2026-05-02\",\"dataProximaCalibracao\":\"\",\"medicoes\":[],\"observacoes\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:20:28.732Z\"}"
+  },
+  {
+    "id": "AUDIT-1777746234064-774",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "UPDATE",
+    "entityId": "TER-1777745760662",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:23:54.064Z",
+    "previousState": "{\"id\":\"TER-1777745760662\",\"numeroReferencia\":\"1234\",\"laboratorioNome\":\"LRM\",\"clienteNome\":\"Boa Vista\",\"dataEnvio\":\"2026-05-03\",\"status\":\"Pendente\",\"items\":[{\"id\":\"3d120ad8-43e0-4af6-b463-458e1b7e1c75\",\"tipoCalibracao\":\"RBC\",\"numeroCertificado\":\"\",\"descricao\":\"Termômetro\",\"marca\":\"\",\"modelo\":\"\",\"serialNumber\":\"\",\"identificacao\":\"\",\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"resolucao\":\"\",\"unidade\":\"\",\"dataCalibracao\":\"2026-05-02\",\"dataProximaCalibracao\":\"\",\"medicoes\":[{\"id\":\"91778ed0-52a9-4d4b-8d1a-85bb1b0ee66e\",\"padrao\":\"\",\"leitura1\":\"\",\"leitura2\":\"\",\"leitura3\":\"\"}],\"observacoes\":\"As medidas 1, 2 e 3\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:16:00.662Z\"}",
+    "newState": "{\"id\":\"TER-1777745760662\",\"numeroReferencia\":\"1234\",\"laboratorioNome\":\"LRM\",\"clienteNome\":\"Boa Vista\",\"dataEnvio\":\"2026-05-03\",\"status\":\"Pendente\",\"items\":[{\"id\":\"3d120ad8-43e0-4af6-b463-458e1b7e1c75\",\"tipoCalibracao\":\"RBC\",\"numeroCertificado\":\"\",\"descricao\":\"Termômetro\",\"marca\":\"\",\"modelo\":\"\",\"serialNumber\":\"\",\"identificacao\":\"\",\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"resolucao\":\"\",\"unidade\":\"\",\"dataCalibracao\":\"2026-05-02\",\"dataProximaCalibracao\":\"\",\"medicoes\":[{\"id\":\"91778ed0-52a9-4d4b-8d1a-85bb1b0ee66e\",\"padrao\":\"\",\"leitura1\":\"\",\"leitura2\":\"\",\"leitura3\":\"\"}],\"observacoes\":\"As medidas 1, 2 e 3\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:16:00.662Z\"}"
+  },
+  {
+    "id": "AUDIT-1777746239823-651",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "UPDATE",
+    "entityId": "TER-1777745760662",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:23:59.823Z",
+    "previousState": "{\"id\":\"TER-1777745760662\",\"numeroReferencia\":\"1234\",\"laboratorioNome\":\"LRM\",\"clienteNome\":\"Boa Vista\",\"dataEnvio\":\"2026-05-03\",\"status\":\"Pendente\",\"items\":[{\"id\":\"3d120ad8-43e0-4af6-b463-458e1b7e1c75\",\"tipoCalibracao\":\"RBC\",\"numeroCertificado\":\"\",\"descricao\":\"Termômetro\",\"marca\":\"\",\"modelo\":\"\",\"serialNumber\":\"\",\"identificacao\":\"\",\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"resolucao\":\"\",\"unidade\":\"\",\"dataCalibracao\":\"2026-05-02\",\"dataProximaCalibracao\":\"\",\"medicoes\":[{\"id\":\"91778ed0-52a9-4d4b-8d1a-85bb1b0ee66e\",\"padrao\":\"\",\"leitura1\":\"\",\"leitura2\":\"\",\"leitura3\":\"\"}],\"observacoes\":\"As medidas 1, 2 e 3\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:16:00.662Z\"}",
+    "newState": "{\"id\":\"TER-1777745760662\",\"numeroReferencia\":\"1234\",\"laboratorioNome\":\"LRM\",\"clienteNome\":\"Boa Vista\",\"dataEnvio\":\"2026-05-03\",\"status\":\"Pendente\",\"items\":[{\"id\":\"3d120ad8-43e0-4af6-b463-458e1b7e1c75\",\"tipoCalibracao\":\"RBC\",\"numeroCertificado\":\"\",\"descricao\":\"Termômetro\",\"marca\":\"\",\"modelo\":\"\",\"serialNumber\":\"\",\"identificacao\":\"\",\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"resolucao\":\"\",\"unidade\":\"\",\"dataCalibracao\":\"2026-05-02\",\"dataProximaCalibracao\":\"\",\"medicoes\":[{\"id\":\"91778ed0-52a9-4d4b-8d1a-85bb1b0ee66e\",\"padrao\":\"\",\"leitura1\":\"\",\"leitura2\":\"\",\"leitura3\":\"\"}],\"observacoes\":\"As medidas 1, 2 e 3\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:16:00.662Z\"}"
+  },
+  {
+    "id": "AUDIT-1777746241839-164",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "CREATE",
+    "entityId": "TER-1777746141361",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:24:01.839Z",
+    "newState": "{\"id\":\"TER-1777746141361\",\"numeroReferencia\":\"REF-VERIF\",\"laboratorioNome\":\"Test Lab\",\"clienteNome\":\"Cliente A\",\"dataEnvio\":\"2026-05-02\",\"status\":\"Pendente\",\"items\":[{\"id\":\"f69753c8-f228-417a-86a7-6e175b8bed10\",\"tipoCalibracao\":\"Rastreável\",\"numeroCertificado\":\"\",\"descricao\":\"Balanca\",\"marca\":\"\",\"modelo\":\"\",\"serialNumber\":\"\",\"identificacao\":\"\",\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"resolucao\":\"\",\"unidade\":\"\",\"dataCalibracao\":\"2026-05-02\",\"dataProximaCalibracao\":\"\",\"medicoes\":[],\"observacoes\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:22:21.361Z\"}"
+  },
+  {
+    "id": "AUDIT-1777746242641-505",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "DELETE",
+    "entityId": "TER-1777746028732",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:24:02.641Z",
+    "previousState": "{\"id\":\"TER-1777746028732\",\"numeroReferencia\":\"REF-001\",\"laboratorioNome\":\"Test Lab\",\"clienteNome\":\"Cliente A\",\"dataEnvio\":\"2026-05-02\",\"status\":\"Pendente\",\"items\":[{\"id\":\"b273b919-634b-4b69-801d-9417a1650f22\",\"tipoCalibracao\":\"Rastreável\",\"numeroCertificado\":\"\",\"descricao\":\"Balanca\",\"marca\":\"\",\"modelo\":\"\",\"serialNumber\":\"\",\"identificacao\":\"\",\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"resolucao\":\"\",\"unidade\":\"\",\"dataCalibracao\":\"2026-05-02\",\"dataProximaCalibracao\":\"\",\"medicoes\":[],\"observacoes\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:20:28.732Z\"}"
+  },
+  {
+    "id": "AUDIT-1777746249878-646",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "DELETE",
+    "entityId": "TER-1777746141361",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:24:09.878Z",
+    "previousState": "{\"id\":\"TER-1777746141361\",\"numeroReferencia\":\"REF-VERIF\",\"laboratorioNome\":\"Test Lab\",\"clienteNome\":\"Cliente A\",\"dataEnvio\":\"2026-05-02\",\"status\":\"Pendente\",\"items\":[{\"id\":\"f69753c8-f228-417a-86a7-6e175b8bed10\",\"tipoCalibracao\":\"Rastreável\",\"numeroCertificado\":\"\",\"descricao\":\"Balanca\",\"marca\":\"\",\"modelo\":\"\",\"serialNumber\":\"\",\"identificacao\":\"\",\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"resolucao\":\"\",\"unidade\":\"\",\"dataCalibracao\":\"2026-05-02\",\"dataProximaCalibracao\":\"\",\"medicoes\":[],\"observacoes\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:22:21.361Z\"}"
+  },
+  {
+    "id": "AUDIT-1777746258362-690",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "UPDATE",
+    "entityId": "TER-1777745760662",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:24:18.362Z",
+    "previousState": "{\"id\":\"TER-1777745760662\",\"numeroReferencia\":\"1234\",\"laboratorioNome\":\"LRM\",\"clienteNome\":\"Boa Vista\",\"dataEnvio\":\"2026-05-03\",\"status\":\"Pendente\",\"items\":[{\"id\":\"3d120ad8-43e0-4af6-b463-458e1b7e1c75\",\"tipoCalibracao\":\"RBC\",\"numeroCertificado\":\"\",\"descricao\":\"Termômetro\",\"marca\":\"\",\"modelo\":\"\",\"serialNumber\":\"\",\"identificacao\":\"\",\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"resolucao\":\"\",\"unidade\":\"\",\"dataCalibracao\":\"2026-05-02\",\"dataProximaCalibracao\":\"\",\"medicoes\":[{\"id\":\"91778ed0-52a9-4d4b-8d1a-85bb1b0ee66e\",\"padrao\":\"\",\"leitura1\":\"\",\"leitura2\":\"\",\"leitura3\":\"\"}],\"observacoes\":\"As medidas 1, 2 e 3\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:16:00.662Z\"}",
+    "newState": "{\"id\":\"TER-1777745760662\",\"numeroReferencia\":\"1234\",\"laboratorioNome\":\"LRM\",\"clienteNome\":\"Boa Vista\",\"dataEnvio\":\"2026-05-03\",\"status\":\"Enviado\",\"items\":[{\"id\":\"3d120ad8-43e0-4af6-b463-458e1b7e1c75\",\"tipoCalibracao\":\"RBC\",\"numeroCertificado\":\"\",\"descricao\":\"Termômetro\",\"marca\":\"\",\"modelo\":\"\",\"serialNumber\":\"\",\"identificacao\":\"\",\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"resolucao\":\"\",\"unidade\":\"\",\"dataCalibracao\":\"2026-05-02\",\"dataProximaCalibracao\":\"\",\"medicoes\":[{\"id\":\"91778ed0-52a9-4d4b-8d1a-85bb1b0ee66e\",\"padrao\":\"\",\"leitura1\":\"\",\"leitura2\":\"\",\"leitura3\":\"\"}],\"observacoes\":\"As medidas 1, 2 e 3\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:16:00.662Z\"}"
+  },
+  {
+    "id": "AUDIT-1777746387354-156",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "CREATE",
+    "entityId": "TER-1777746268205",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:26:27.354Z",
+    "newState": "{\"id\":\"TER-1777746268205\",\"numeroReferencia\":\"REF-VERIF\",\"laboratorioNome\":\"Test Lab\",\"clienteNome\":\"Cliente A\",\"dataEnvio\":\"\",\"status\":\"Pendente\",\"items\":[{\"id\":\"962707b1-902e-4a39-bcb8-64fa4961ecd1\",\"tipoCalibracao\":\"Rastreável\",\"numeroCertificado\":\"\",\"descricao\":\"Balanca\",\"marca\":\"\",\"modelo\":\"\",\"serialNumber\":\"\",\"identificacao\":\"\",\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"resolucao\":\"\",\"unidade\":\"\",\"dataCalibracao\":\"2026-05-02\",\"dataProximaCalibracao\":\"\",\"medicoes\":[],\"observacoes\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:24:28.205Z\"}"
+  },
+  {
+    "id": "AUDIT-1777746424137-286",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "UPDATE",
+    "entityId": "TER-1777745760662",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:27:04.138Z",
+    "previousState": "{\"id\":\"TER-1777745760662\",\"numeroReferencia\":\"1234\",\"laboratorioNome\":\"LRM\",\"clienteNome\":\"Boa Vista\",\"dataEnvio\":\"2026-05-03\",\"status\":\"Enviado\",\"items\":[{\"id\":\"3d120ad8-43e0-4af6-b463-458e1b7e1c75\",\"tipoCalibracao\":\"RBC\",\"numeroCertificado\":\"\",\"descricao\":\"Termômetro\",\"marca\":\"\",\"modelo\":\"\",\"serialNumber\":\"\",\"identificacao\":\"\",\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"resolucao\":\"\",\"unidade\":\"\",\"dataCalibracao\":\"2026-05-02\",\"dataProximaCalibracao\":\"\",\"medicoes\":[{\"id\":\"91778ed0-52a9-4d4b-8d1a-85bb1b0ee66e\",\"padrao\":\"\",\"leitura1\":\"\",\"leitura2\":\"\",\"leitura3\":\"\"}],\"observacoes\":\"As medidas 1, 2 e 3\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:16:00.662Z\"}",
+    "newState": "{\"id\":\"TER-1777745760662\",\"numeroReferencia\":\"26001\",\"laboratorioNome\":\"LRM\",\"clienteNome\":\"Boa Vista\",\"dataEnvio\":\"\",\"status\":\"Pendente\",\"items\":[{\"id\":\"7bc91896-477e-4528-8b46-915e8dabc26d\",\"tipoCalibracao\":\"Rastreável\",\"numeroCertificado\":\"L26001\",\"descricao\":\"Termômetro Digital\",\"marca\":\"Term\",\"modelo\":\"T001\",\"serialNumber\":\"XYZ0051\",\"identificacao\":\"TERM-001\",\"capacidadeMinima\":\"1\",\"capacidadeMaxima\":\"100\",\"resolucao\":\"0,01\",\"unidade\":\"ºC\",\"dataCalibracao\":\"2026-05-02\",\"dataProximaCalibracao\":\"\",\"medicoes\":[{\"id\":\"449c5def-9d4e-4d6a-86c7-023feb5d31eb\",\"padrao\":\"0,01\",\"leitura1\":\"0,01\",\"leitura2\":\"0,01\",\"leitura3\":\"0,01\"},{\"id\":\"051521ba-5c4a-4a4e-8de7-0a08d7f89471\",\"padrao\":\"\",\"leitura1\":\"\",\"leitura2\":\"\",\"leitura3\":\"\"},{\"id\":\"a65671ba-bcd9-4e6b-a977-335bfb822c44\",\"padrao\":\"\",\"leitura1\":\"\",\"leitura2\":\"\",\"leitura3\":\"\"}],\"observacoes\":\"Observações\",\"status\":\"N/A\"},{\"id\":\"42c32b09-0dc3-4c0e-b558-26c6eaea8c39\",\"tipoCalibracao\":\"RBC\",\"numeroCertificado\":\"R26002\",\"descricao\":\"Manômetro Analógico\",\"marca\":\"MANTU\",\"modelo\":\"M91\",\"serialNumber\":\"ZYX005\",\"identificacao\":\"MAN-002\",\"capacidadeMinima\":\"0,1\",\"capacidadeMaxima\":\"100\",\"resolucao\":\"0,001\",\"unidade\":\"Bar\",\"dataCalibracao\":\"2026-05-03\",\"dataProximaCalibracao\":\"\",\"medicoes\":[{\"id\":\"34bb7941-c976-4953-b5a3-f9f6cb5498c5\",\"padrao\":\"\",\"leitura1\":\"\",\"leitura2\":\"\",\"leitura3\":\"\"},{\"id\":\"d11d0015-ef0a-40d5-855c-4e50239cd08e\",\"padrao\":\"\",\"leitura1\":\"\",\"leitura2\":\"\",\"leitura3\":\"\"},{\"id\":\"48e9f2cb-c2c7-4fa0-8667-4e86bce496ae\",\"padrao\":\"\",\"leitura1\":\"\",\"leitura2\":\"\",\"leitura3\":\"\"}],\"observacoes\":\"Teste de Observações Manômetro\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:16:00.662Z\"}"
+  },
+  {
+    "id": "AUDIT-1777746429792-675",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "DELETE",
+    "entityId": "TER-1777746268205",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:27:09.792Z",
+    "previousState": "{\"id\":\"TER-1777746268205\",\"numeroReferencia\":\"REF-VERIF\",\"laboratorioNome\":\"Test Lab\",\"clienteNome\":\"Cliente A\",\"dataEnvio\":\"\",\"status\":\"Pendente\",\"items\":[{\"id\":\"962707b1-902e-4a39-bcb8-64fa4961ecd1\",\"tipoCalibracao\":\"Rastreável\",\"numeroCertificado\":\"\",\"descricao\":\"Balanca\",\"marca\":\"\",\"modelo\":\"\",\"serialNumber\":\"\",\"identificacao\":\"\",\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"resolucao\":\"\",\"unidade\":\"\",\"dataCalibracao\":\"2026-05-02\",\"dataProximaCalibracao\":\"\",\"medicoes\":[],\"observacoes\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:24:28.205Z\"}"
+  },
+  {
+    "id": "AUDIT-1777746495156-742",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "CREATE",
+    "entityId": "TER-1777746404728",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:28:15.156Z",
+    "newState": "{\"id\":\"TER-1777746404728\",\"numeroReferencia\":\"\",\"laboratorioNome\":\"Test Lab\",\"clienteNome\":\"Cliente A\",\"dataEnvio\":\"\",\"status\":\"Pendente\",\"items\":[{\"id\":\"d09c2afc-0a55-4fd8-9759-2351c84dbf60\",\"tipoCalibracao\":\"Rastreável\",\"numeroCertificado\":\"\",\"descricao\":\"Balanca\",\"marca\":\"\",\"modelo\":\"\",\"serialNumber\":\"\",\"identificacao\":\"\",\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"resolucao\":\"\",\"unidade\":\"\",\"dataCalibracao\":\"2026-05-02\",\"dataProximaCalibracao\":\"\",\"medicoes\":[],\"observacoes\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:26:44.728Z\"}"
+  },
+  {
+    "id": "AUDIT-1777747094493-161",
+    "userId": "dev-user-id",
+    "userName": "Desenvolvedor MetroFlow",
+    "action": "DELETE",
+    "entityId": "TER-1777746404728",
+    "entityType": "third_party_records",
+    "timestamp": "2026-05-02T18:38:14.493Z",
+    "previousState": "{\"id\":\"TER-1777746404728\",\"numeroReferencia\":\"\",\"laboratorioNome\":\"Test Lab\",\"clienteNome\":\"Cliente A\",\"dataEnvio\":\"\",\"status\":\"Pendente\",\"items\":[{\"id\":\"d09c2afc-0a55-4fd8-9759-2351c84dbf60\",\"tipoCalibracao\":\"Rastreável\",\"numeroCertificado\":\"\",\"descricao\":\"Balanca\",\"marca\":\"\",\"modelo\":\"\",\"serialNumber\":\"\",\"identificacao\":\"\",\"capacidadeMinima\":\"\",\"capacidadeMaxima\":\"\",\"resolucao\":\"\",\"unidade\":\"\",\"dataCalibracao\":\"2026-05-02\",\"dataProximaCalibracao\":\"\",\"medicoes\":[],\"observacoes\":\"\",\"status\":\"N/A\"}],\"criadoEm\":\"2026-05-02T18:26:44.728Z\"}"
+  },
+  {
+    "id": "AUDIT-1777947664758-186",
+    "userId": "admin-1",
+    "userName": "C.G. Moraes Neto",
+    "action": "CREATE",
+    "entityId": "mask-1777947586890",
+    "entityType": "certificate_masks",
+    "timestamp": "2026-05-05T02:21:04.758Z",
+    "newState": "{\"id\":\"mask-1777947586890\",\"title\":\"Nova Máscara de Calibração\",\"description\":\"\",\"procedureId\":\"\",\"standardInstrumentIds\":[],\"version\":1,\"createdAt\":\"2026-05-05T02:19:46.890Z\",\"updatedAt\":\"2026-05-05T02:21:04.714Z\",\"measurementGroups\":[{\"name\":\"\",\"blockId\":\"T1\",\"columnDefinitions\":[{\"id\":\"TAG_1\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\"},{\"id\":\"TAG_2\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\",\"isLocked\":false},{\"id\":\"TAG_3\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\",\"isLocked\":false},{\"id\":\"TAG_4\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\",\"isLocked\":false}],\"isDynamic\":true,\"templateRows\":[{\"TAG_1\":\"\"},{\"TAG_1\":\"\",\"TAG_2\":\"\",\"TAG_3\":\"\",\"TAG_4\":\"\"},{\"TAG_1\":\"\",\"TAG_2\":\"\",\"TAG_3\":\"\",\"TAG_4\":\"\"}]}],\"sections\":[{\"id\":\"sec-1777947586890\",\"title\":\"Nova Seção\",\"groups\":[{\"name\":\"\",\"blockId\":\"T1\",\"columnDefinitions\":[{\"id\":\"TAG_1\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\"},{\"id\":\"TAG_2\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\",\"isLocked\":false},{\"id\":\"TAG_3\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\",\"isLocked\":false},{\"id\":\"TAG_4\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\",\"isLocked\":false}],\"isDynamic\":true,\"templateRows\":[{\"TAG_1\":\"\"},{\"TAG_1\":\"\",\"TAG_2\":\"\",\"TAG_3\":\"\",\"TAG_4\":\"\"},{\"TAG_1\":\"\",\"TAG_2\":\"\",\"TAG_3\":\"\",\"TAG_4\":\"\"}]}]},{\"id\":\"sec-1777947636390\",\"title\":\"Nova Seção\",\"groups\":[]}],\"uncertaintyBudget\":[]}"
+  },
+  {
+    "id": "AUDIT-1777947677892-876",
+    "userId": "admin-1",
+    "userName": "C.G. Moraes Neto",
+    "action": "UPDATE",
+    "entityId": "mask-1776778687276",
+    "entityType": "certificate_masks",
+    "timestamp": "2026-05-05T02:21:17.892Z",
+    "previousState": "{\"type\":\"CALIBRATION_CERTIFICATE\",\"id\":\"mask-1776778687276\",\"title\":\"Teste\",\"description\":\"Paquimetro\",\"procedureId\":\"\",\"standardInstrumentIds\":[],\"version\":1,\"createdAt\":\"2026-04-21T13:38:07.276Z\",\"updatedAt\":\"2026-04-21T13:39:21.160Z\",\"measurementGroups\":[{\"name\":\"Tabela de Resultados 1\",\"blockId\":\"T1\",\"columnDefinitions\":[{\"id\":\"TAG_1\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\"},{\"id\":\"TAG_2\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\",\"displayFormat\":\"percent\"},{\"id\":\"TAG_3\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"CALCULATED\",\"formula\":\"[TAG_2]+[TAG_3]\",\"decimalPlaces\":1,\"displayFormat\":\"percent\"},{\"id\":\"TAG_4\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\"}],\"isDynamic\":true,\"templateRows\":[{\"TAG_1\":\"\",\"TAG_2\":\"\",\"TAG_3\":\"\",\"TAG_4\":\"\"},{\"TAG_1\":\"\",\"TAG_2\":\"\",\"TAG_3\":\"\",\"TAG_4\":\"\"},{\"TAG_1\":\"\",\"TAG_2\":\"\",\"TAG_3\":\"\",\"TAG_4\":\"\"}]}],\"uncertaintyBudget\":[]}",
+    "newState": "{\"type\":\"CALIBRATION_CERTIFICATE\",\"id\":\"mask-1776778687276\",\"title\":\"Teste\",\"description\":\"Paquimetro\",\"procedureId\":\"\",\"standardInstrumentIds\":[],\"version\":1,\"createdAt\":\"2026-04-21T13:38:07.276Z\",\"updatedAt\":\"2026-05-05T02:21:17.854Z\",\"measurementGroups\":[{\"name\":\"Tabela de Resultados 1\",\"blockId\":\"T1\",\"columnDefinitions\":[{\"id\":\"TAG_1\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\"},{\"id\":\"TAG_2\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\",\"displayFormat\":\"percent\"},{\"id\":\"TAG_3\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"CALCULATED\",\"formula\":\"[TAG_2]+[TAG_3]\",\"decimalPlaces\":1,\"displayFormat\":\"percent\"},{\"id\":\"TAG_4\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\"}],\"isDynamic\":true,\"templateRows\":[{\"TAG_1\":\"\",\"TAG_2\":\"\",\"TAG_3\":\"\",\"TAG_4\":\"\"},{\"TAG_1\":\"\",\"TAG_2\":\"\",\"TAG_3\":\"\",\"TAG_4\":\"\"},{\"TAG_1\":\"\",\"TAG_2\":\"\",\"TAG_3\":\"\",\"TAG_4\":\"\"}]}],\"uncertaintyBudget\":[],\"sections\":[{\"id\":\"default-sec\",\"title\":\"Seção Principal\",\"groups\":[{\"name\":\"Tabela de Resultados 1\",\"blockId\":\"T1\",\"columnDefinitions\":[{\"id\":\"TAG_1\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\"},{\"id\":\"TAG_2\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\",\"displayFormat\":\"percent\"},{\"id\":\"TAG_3\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"CALCULATED\",\"formula\":\"[TAG_2]+[TAG_3]\",\"decimalPlaces\":1,\"displayFormat\":\"percent\"},{\"id\":\"TAG_4\",\"name\":\"Nova Coluna\",\"type\":\"NUMBER\",\"behavior\":\"INPUT\"}],\"isDynamic\":true,\"templateRows\":[{\"TAG_1\":\"\",\"TAG_2\":\"\",\"TAG_3\":\"\",\"TAG_4\":\"\"},{\"TAG_1\":\"\",\"TAG_2\":\"\",\"TAG_3\":\"\",\"TAG_4\":\"\"},{\"TAG_1\":\"\",\"TAG_2\":\"\",\"TAG_3\":\"\",\"TAG_4\":\"\"}]}]}]}"
   }
 ]

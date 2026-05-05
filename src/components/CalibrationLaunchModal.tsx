@@ -11,7 +11,7 @@ import {
   ColumnBehavior,
   ColumnType
 } from '../types';
-import { X, Shield, Plus, Settings2, ClipboardList, Lock, Trash2 } from 'lucide-react';
+import { X, Shield, Plus, Settings2, ClipboardList, Lock, Trash2, LayoutGrid } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { useData } from '../contexts/DataContext';
@@ -49,7 +49,7 @@ const CellInput = ({ value, onChange, disabled, className, type }: { value: stri
   };
 
   return (
-    <div className="relative group/cell">
+    <div className="relative group/cell w-full h-full">
       <input 
         ref={inputRef}
         type="text" 
@@ -59,12 +59,13 @@ const CellInput = ({ value, onChange, disabled, className, type }: { value: stri
           if (localValue !== value) onChange(localValue);
         }}
         disabled={disabled}
-        className={`w-full h-9 px-2 text-[11px] text-center rounded-lg border font-black transition-all ${type === ColumnType.TEXTO ? '' : 'tabular-nums'} ${className}`}
+        placeholder={type === ColumnType.TEXTO ? "---" : "0,000"}
+        className={`w-full h-full px-3 py-2 text-[11px] font-bold text-center transition-all border-transparent bg-transparent outline-none focus:bg-white focus:shadow-sm disabled:cursor-not-allowed ${type === ColumnType.TEXTO ? 'text-left' : 'tabular-nums'} ${className}`}
       />
       {type === ColumnType.TEXTO && !disabled && (
         <button 
           onClick={handleInsertOmega}
-          className="absolute right-1 top-1/2 -translate-y-1/2 w-5 h-5 bg-indigo-50 text-indigo-600 rounded flex items-center justify-center text-[10px] font-bold opacity-0 group-hover/cell:opacity-100 transition-opacity hover:bg-indigo-100"
+          className="absolute right-1 top-1/2 -translate-y-1/2 w-5 h-5 bg-indigo-50 text-indigo-600 rounded flex items-center justify-center text-[10px] font-black opacity-0 group-hover/cell:opacity-100 transition-opacity hover:bg-indigo-600 hover:text-white"
           title="Inserir Ω"
         >
           Ω
@@ -117,14 +118,30 @@ export default function CalibrationLaunchModal({
       if (foundResult?.groups?.length) {
         setGroups(foundResult.groups as any);
       } else if (currentMask) {
-        // GERA ESTRUTURA AUTOMÁTICA SE FOR NOVO
-        const allGroups = currentMask.measurementGroups.map((mg) => ({
-          ...mg,
-          groupName: mg.name,
-          rows: [],
-          columns: (mg.columnDefinitions || []).map(d => d.id)
-        }));
-        setGroups(allGroups as any);
+        // GERA ESTRUTURA AUTOMÁTICA SE FOR NOVO (Considerando Seções como Tabelas)
+        let allGroups: any[] = [];
+        
+        if (currentMask.sections && currentMask.sections.length > 0) {
+          allGroups = currentMask.sections.map((sec) => {
+            const mg = sec.groups?.[0] || { name: sec.title, columnDefinitions: [], templateRows: [] };
+            return {
+              ...mg,
+              groupName: sec.title,
+              blockId: mg.blockId || sec.id,
+              rows: (mg.templateRows && mg.templateRows.length > 0) ? JSON.parse(JSON.stringify(mg.templateRows)) : [{}, {}, {}],
+              columnDefinitions: mg.columnDefinitions || []
+            };
+          });
+        } else {
+          // Fallback para máscaras legadas
+          allGroups = currentMask.measurementGroups.map((mg) => ({
+            ...mg,
+            groupName: mg.name,
+            rows: (mg.templateRows && mg.templateRows.length > 0) ? JSON.parse(JSON.stringify(mg.templateRows)) : [{}, {}, {}],
+            columnDefinitions: mg.columnDefinitions || []
+          }));
+        }
+        setGroups(allGroups);
       }
     }
     
@@ -213,7 +230,12 @@ export default function CalibrationLaunchModal({
                         const m = certificateMasks.find(mask => mask.id === e.target.value) || null;
                         setSelectedMask(m);
                         if (m) {
-                          const allGroups = m.measurementGroups.map(mg => ({ ...mg, rows: [], groupName: mg.name, columns: (mg.columnDefinitions || []).map(d => d.id) }));
+                          const allGroups = m.measurementGroups.map(mg => ({ 
+                            ...mg, 
+                            rows: (mg.templateRows && mg.templateRows.length > 0) ? JSON.parse(JSON.stringify(mg.templateRows)) : [], 
+                            groupName: mg.name, 
+                            columns: (mg.columnDefinitions || []).map(d => d.id) 
+                          }));
                           setGroups(allGroups as any);
                         }
                         setIsDirty(true);
@@ -263,97 +285,210 @@ export default function CalibrationLaunchModal({
                   <ClipboardList className="w-12 h-12 mb-4 text-slate-400" />
                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Aguardando Seleção de Máscara</p>
                </div>
-            ) : groups.map((group, gi) => {
-              const visibleCols = (group.columnDefinitions || []); // Show all columns to technician as they might be needed for input/calculation
-              return (
-                <div key={gi} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                  <div className="bg-slate-50/50 px-4 py-2.5 border-b border-slate-200 flex items-center justify-between">
-                     <div className="flex items-center gap-2.5">
-                        <span className="w-6 h-6 rounded bg-slate-900 text-white flex items-center justify-center font-black text-[9px] italic">{gi + 1}</span>
-                        <h3 className="font-black text-slate-800 text-[11px] uppercase opacity-70 tracking-tight">{group.name}</h3>
-                     </div>
-                     {!isSubmitted && (
-                       <button onClick={() => { 
-                          const updated = [...groups];
-                          const newRow: any = { _pointIdx: updated[gi].rows.length.toString() };
-                          (group.columnDefinitions || []).forEach(col => { newRow[col.id] = ''; });
-                          updated[gi].rows.push(newRow); 
-                          setGroups(updated); 
-                           
-                       }} className="flex items-center gap-2 px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-[9px] font-black uppercase shadow-sm hover:bg-slate-900 transition-all">
-                          <Plus size={12} /> Linha
-                       </button>
-                     )}
+            ) : selectedMask?.sections && selectedMask.sections.length > 0 ? (
+              // RENDERIZAÇÃO POR SEÇÕES (NOVO)
+              <div className="space-y-16">
+                {selectedMask.sections.map((section, si) => (
+                  <div key={si} className="space-y-8">
+                    <div className="flex items-center gap-4 ml-2">
+                       <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+                          <LayoutGrid size={24} />
+                       </div>
+                       <div>
+                         <h2 className="text-[13px] font-black text-slate-800 uppercase tracking-widest">{section.title}</h2>
+                         {section.description && <p className="text-[10px] font-medium text-slate-400 uppercase mt-0.5">{section.description}</p>}
+                       </div>
+                    </div>
+                    
+                    <div className="space-y-10">
+                      {section.groups.map((groupInMask) => {
+                        const gi = groups.findIndex(g => g.blockId === groupInMask.blockId);
+                        if (gi === -1) return null;
+                        const group = groups[gi];
+                        const visibleCols = (group.columnDefinitions || []);
+
+                        return (
+                          <div key={groupInMask.blockId || groupInMask.name} className="bg-slate-50/40 rounded-[2.5rem] border border-slate-100 p-8 shadow-sm">
+                            <div className="flex items-center justify-between mb-8 px-4">
+                               <div className="flex items-center gap-3">
+                                  <h3 className="font-black text-slate-800 text-[12px] uppercase tracking-widest opacity-80">{group.name}</h3>
+                               </div>
+                               {!isSubmitted && (
+                                 <button onClick={() => { 
+                                    const updated = [...groups];
+                                    const newRow: any = { _pointIdx: updated[gi].rows.length.toString() };
+                                    (group.columnDefinitions || []).forEach(col => { newRow[col.id] = ''; });
+                                    updated[gi].rows.push(newRow); 
+                                    setGroups(updated); 
+                                 }} className="flex items-center gap-2 px-6 py-2.5 bg-indigo-50 text-indigo-600 rounded-full text-[10px] font-black uppercase hover:bg-indigo-600 hover:text-white transition-all shadow-sm">
+                                    <Plus size={14} /> Add Linha
+                                 </button>
+                               )}
+                            </div>
+                            <div className="overflow-x-auto border border-slate-100 rounded-2xl bg-white overflow-hidden shadow-sm">
+                              <table className="w-full border-collapse">
+                                 <thead className="bg-slate-50/50 border-b border-slate-100">
+                                    <tr>
+                                      {visibleCols.map((def, ci) => (
+                                        <th key={ci} className="px-4 py-3 text-[8px] font-black text-slate-400 uppercase tracking-widest text-center border-r border-slate-100 last:border-r-0">
+                                          <div className="flex items-center justify-center gap-1.5">
+                                            {def.isLocked && <Lock size={9} className="text-amber-400" />}
+                                            {def.name}
+                                          </div>
+                                        </th>
+                                      ))}
+                                      {!isSubmitted && <th className="px-4 py-3 border-none w-10 bg-slate-50/20"></th>}
+                                    </tr>
+                                 </thead>
+                                 <tbody className="divide-y divide-slate-100">
+                                    {group.rows.map((row, ri) => {
+                                      const calc = calculatedPoints[`${group.blockId || group.name}_row${ri}`];
+                                      return (
+                                        <tr key={ri} className="hover:bg-slate-50/30 transition-colors group/row">
+                                          {visibleCols.map((def, ci) => {
+                                            const isReadOnly = (def.behavior === ColumnBehavior.CALCULATED && !!def.formula?.trim()) || def.isLocked || isSubmitted;
+                                            let val = row[def.id] || '';
+                                            if (def.behavior === ColumnBehavior.CALCULATED && calc?.[def.id] !== undefined) {
+                                               const decimals = def.decimalPlaces ?? 4;
+                                               if (typeof calc[def.id] === 'number') {
+                                                 val = def.displayFormat === 'percent' 
+                                                    ? (calc[def.id] * 100).toFixed(decimals).replace('.', ',') + '%'
+                                                    : calc[def.id].toFixed(decimals).replace('.', ',');
+                                               } else {
+                                                 val = calc[def.id];
+                                               }
+                                            }
+                                            return (
+                                              <td key={ci} className="p-0 border-r border-slate-100 last:border-r-0 h-10 min-w-[110px]">
+                                                <CellInput 
+                                                  value={Array.isArray(val) ? val.join('; ') : (val ?? '') as any} 
+                                                  onChange={newVal => updateCell(gi, ri, def.id, newVal)}
+                                                  disabled={isReadOnly}
+                                                  type={def.type}
+                                                  className={isReadOnly ? 'text-slate-400 opacity-60' : 'text-slate-700 font-black'} 
+                                                />
+                                              </td>
+                                            );
+                                          })}
+                                          {!isSubmitted && (
+                                            <td className="p-2 text-center w-12">
+                                               <button 
+                                                 onClick={() => {
+                                                   const updated = [...groups];
+                                                   updated[gi].rows.splice(ri, 1);
+                                                   setGroups(updated);
+                                                   setIsDirty(true);
+                                                 }}
+                                                 className="p-2 text-slate-200 hover:text-rose-400 transition-all rounded-full hover:bg-rose-50"
+                                               >
+                                                 <Trash2 className="w-4 h-4" />
+                                               </button>
+                                            </td>
+                                          )}
+                                        </tr>
+                                      );
+                                    })}
+                                 </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                       <thead className="bg-slate-50/30">
-                          <tr>{visibleCols.map((def, ci) => <th key={ci} className="px-4 py-2 text-[8px] font-black text-slate-400 uppercase tracking-widest text-center border-b border-slate-100">{def.name}</th>)}{!isSubmitted && <th className="px-4 py-2 text-[8px] font-black text-slate-400 uppercase tracking-widest text-center border-b border-slate-100 w-10"></th>}</tr>
-                       </thead>
-                       <tbody className="divide-y divide-slate-100">
-                          {group.rows.map((row, ri) => {
-                            const calc = calculatedPoints[`${group.blockId || group.name}_row${ri}`];
-                            return (
-                              <tr key={ri} className="hover:bg-slate-50/20 transition-colors">
-                                {visibleCols.map((def, ci) => {
-                                  const isReadOnly = (def.behavior === ColumnBehavior.CALCULATED && !!def.formula?.trim()) || isSubmitted;
-                                  let val = row[def.id] || '';
-                                  if (def.behavior === ColumnBehavior.CALCULATED && calc?.[def.id] !== undefined) {
-                                     const decimals = def.decimalPlaces ?? 4;
-                                     if (typeof calc[def.id] === 'number') {
-                                       val = def.displayFormat === 'percent' 
-                                          ? (calc[def.id] * 100).toFixed(decimals).replace('.', ',') + '%'
-                                          : calc[def.id].toFixed(decimals).replace('.', ',');
-                                     } else {
-                                       val = calc[def.id];
-                                     }
-                                  }
-                                  return (
-                                    <td key={ci} className="p-1 text-center">
-                                      <CellInput 
-                                        value={Array.isArray(val) ? val.join('; ') : (val ?? '') as any} 
-                                        onChange={newVal => updateCell(gi, ri, def.id, newVal)}
-                                        disabled={isReadOnly}
-                                        type={def.type}
-                                        className={isReadOnly ? 'bg-slate-50/50 border-transparent text-slate-500' : 'bg-white border-slate-200 focus:border-indigo-500 outline-none'} 
-                                      />
-                                    </td>
-                                  );
-                                })}
-                                {isAuditorMode && (
-                                  <td className="p-1 text-center bg-emerald-50/10">
-                                     <div className="flex flex-col items-center">
-                                        <div className="flex items-center gap-1 text-[7px] font-black text-emerald-600 uppercase">
-                                           <div className="w-1 h-1 rounded-full bg-emerald-500" />
-                                           Valid
-                                        </div>
-                                     </div>
-                                  </td>
-                                )}
-                                 {!isSubmitted && (
-                                   <td className="p-1 text-center">
-                                      <button 
-                                        onClick={() => {
-                                          const updated = [...groups];
-                                          updated[gi].rows.splice(ri, 1);
-                                          setGroups(updated);
-                                          setIsDirty(true);
-                                        }}
-                                        className="p-1.5 text-slate-300 hover:text-rose-500 transition-all rounded-lg hover:bg-rose-50"
-                                      >
-                                        <Trash2 className="w-3.5 h-3.5" />
-                                      </button>
-                                   </td>
-                                 )}
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-10">
+                {groups.map((group, gi) => {
+                  const visibleCols = (group.columnDefinitions || []);
+                  return (
+                    <div key={gi} className="bg-slate-50/40 rounded-[2.5rem] border border-slate-100 p-8 shadow-sm">
+                      <div className="flex items-center justify-between mb-8 px-4">
+                         <h3 className="font-black text-slate-800 text-[12px] uppercase tracking-widest opacity-80">{group.name}</h3>
+                         {!isSubmitted && (
+                           <button onClick={() => { 
+                              const updated = [...groups];
+                              const newRow: any = { _pointIdx: updated[gi].rows.length.toString() };
+                              (group.columnDefinitions || []).forEach(col => { newRow[col.id] = ''; });
+                              updated[gi].rows.push(newRow); 
+                              setGroups(updated); 
+                           }} className="flex items-center gap-2 px-6 py-2.5 bg-indigo-50 text-indigo-600 rounded-full text-[10px] font-black uppercase hover:bg-indigo-600 hover:text-white transition-all shadow-sm">
+                              <Plus size={14} /> Add Linha
+                           </button>
+                         )}
+                      </div>
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-separate border-spacing-0 border border-slate-200 rounded-2xl overflow-hidden">
+                           <thead>
+                              <tr className="bg-slate-100/50">
+                                {visibleCols.map((def, ci) => (
+                                  <th key={ci} className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center border-b border-r border-slate-200 last:border-r-0">
+                                    <div className="flex items-center justify-center gap-1.5">
+                                      {def.isLocked && <Lock size={10} className="text-amber-400" />}
+                                      {def.name}
+                                    </div>
+                                  </th>
+                                ))}
+                                {!isSubmitted && <th className="px-4 py-4 border-b border-slate-200 w-12 bg-slate-100/30"></th>}
                               </tr>
-                            );
-                          })}
-                       </tbody>
-                    </table>
-                  </div>
-                </div>
-              );
-            })}
+                           </thead>
+                           <tbody>
+                              {group.rows.map((row, ri) => {
+                                const calc = calculatedPoints[`${group.blockId || group.name}_row${ri}`];
+                                return (
+                                  <tr key={ri}>
+                                    {visibleCols.map((def, ci) => {
+                                      const isReadOnly = (def.behavior === ColumnBehavior.CALCULATED && !!def.formula?.trim()) || def.isLocked || isSubmitted;
+                                      let val = row[def.id] || '';
+                                      if (def.behavior === ColumnBehavior.CALCULATED && calc?.[def.id] !== undefined) {
+                                         const decimals = def.decimalPlaces ?? 4;
+                                         if (typeof calc[def.id] === 'number') {
+                                           val = def.displayFormat === 'percent' 
+                                              ? (calc[def.id] * 100).toFixed(decimals).replace('.', ',') + '%'
+                                              : calc[def.id].toFixed(decimals).replace('.', ',');
+                                         } else {
+                                           val = calc[def.id];
+                                         }
+                                      }
+                                      return (
+                                        <td key={ci} className="p-0 border-b border-r border-slate-100 last:border-r-0 h-12">
+                                          <CellInput 
+                                            value={Array.isArray(val) ? val.join('; ') : (val ?? '') as any} 
+                                            onChange={newVal => updateCell(gi, ri, def.id, newVal)}
+                                            disabled={isReadOnly}
+                                            type={def.type}
+                                            className={isReadOnly ? 'bg-slate-50/30 text-slate-400 opacity-60' : 'bg-transparent text-slate-700'} 
+                                          />
+                                        </td>
+                                      );
+                                    })}
+                                    {!isSubmitted && (
+                                      <td className="p-2 text-center w-12 border-b border-slate-100 bg-slate-50/10">
+                                         <button 
+                                           onClick={() => {
+                                             const updated = [...groups];
+                                             updated[gi].rows.splice(ri, 1);
+                                             setGroups(updated);
+                                             setIsDirty(true);
+                                           }}
+                                           className="p-2 text-slate-200 hover:text-rose-400 transition-all rounded-full hover:bg-rose-50"
+                                         >
+                                           <Trash2 className="w-4 h-4" />
+                                         </button>
+                                      </td>
+                                    )}
+                                  </tr>
+                                );
+                              })}
+                           </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 

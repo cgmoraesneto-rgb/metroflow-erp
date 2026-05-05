@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ServiceOrder, Client, Quote, InstrumentStatus, StandardCustody, FleetLog, CustodyItem, DocumentTemplate, CertificateStatus } from '../types';
+import { ServiceOrder, Client, Quote, InstrumentStatus, StandardCustody, FleetLog, CustodyItem, DocumentTemplate, CertificateStatus, InventoryItem } from '../types';
 import { ClipboardList, LayoutGrid, List, FileText, Download, ArrowDownToLine, ArrowUpFromLine, Pencil, CheckCircle2, X, Activity, Key, FileCheck, CarFront, Plus, Trash2 } from 'lucide-react';
 import { formatDate } from '../utils/formatters';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -39,7 +39,7 @@ export default function LogisticsModule({
   searchQuery: searchQueryProp
 }: LogisticsModuleProps) {
   const context = useData();
-  const { standardCustodies = [], fleetLogs = [], standardInstruments = [], employees = [], vehicles = [], saveItem, deleteItem } = context || {};
+  const { standardCustodies = [], fleetLogs = [], standardInstruments = [], employees = [], vehicles = [], inventoryItems = [], saveItem, deleteItem } = context || {};
 
   const [activeTab, setActiveTab] = useState<TabMode>('os');
   const [viewMode, setViewMode] = useState<ViewMode>(() => (localStorage.getItem('logisticsViewMode') as ViewMode) || 'list');
@@ -216,8 +216,25 @@ export default function LogisticsModule({
     const empDestino = employees.find(e => e.id === custody.responsavelDestino);
     
     const resolvedItems = (custody.items || []).map(it => {
+      // 1. Tentar resolver pelo inventário (novo padrão V4)
+      if (it.inventoryItemId) {
+        const inv = inventoryItems.find(i => i.id === it.inventoryItemId);
+        if (inv) {
+          return { 
+            nome: inv.descricao, 
+            identificacao: inv.ativoFixo || inv.instrumentoId || '—', 
+            quantidade: it.quantidade 
+          };
+        }
+      }
+
+      // 2. Fallback para instrumentos padrão (legado ou vínculo direto)
       const st = standardInstruments.find(s => s.id === it.standardInstrumentId);
-      return { nome: st?.nome || it.standardInstrumentId, identificacao: st?.identificacao || '', quantidade: it.quantidade };
+      return { 
+        nome: st?.nome || it.standardInstrumentId || 'Item não identificado', 
+        identificacao: st?.identificacao || '—', 
+        quantidade: it.quantidade 
+      };
     });
     
     const respOrigemName = empOrigem?.nome || custody.responsavelOrigem;
@@ -780,7 +797,7 @@ export default function LogisticsModule({
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4" onClick={() => setEditingCustody(null)}>
             <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} onClick={e => e.stopPropagation()} className="bg-white dark:bg-slate-900 rounded-[2rem] md:rounded-[3.5rem] shadow-2xl p-6 md:p-12 w-full max-w-[95%] md:max-w-2xl border border-slate-100 dark:border-slate-800 flex flex-col max-h-[95vh] overflow-hidden">
             <div className="flex items-center justify-between mb-8 shrink-0">
-              <h3 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Formalizar Cautela</h3>
+              <h3 className="text-3xl font-black text-rose-600 uppercase tracking-tight">Formalizar Cautela (V4)</h3>
               <button onClick={() => setEditingCustody(null)} className="p-3 text-slate-400 hover:text-slate-600 rounded-2xl transition-all"><X className="w-6 h-6" /></button>
             </div>
             <form onSubmit={handleSaveCustody} className="space-y-8 overflow-y-auto custom-scrollbar pr-2 -mr-2 pb-2">
@@ -817,23 +834,43 @@ export default function LogisticsModule({
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                  <div className="space-y-4">
                   <div className="flex items-center justify-between px-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Instrumentos Padrões</label>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Itens / Instrumentos</label>
                     <button type="button" onClick={addCustodyItem} className="flex items-center gap-2 text-[10px] font-black text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-full transition-all uppercase tracking-widest"><Plus className="w-4 h-4" /> Adicionar</button>
                   </div>
                   <div className="space-y-3">
                     {editingCustody.items.map((item, index) => (
                         <div key={index} className="flex gap-3 items-center p-2 bg-slate-50 dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700">
-                            <select required value={item.standardInstrumentId} onChange={e => updateCustodyItem(index, 'standardInstrumentId', e.target.value)} className="flex-1 bg-transparent px-4 py-2.5 font-black text-sm outline-none">
-                                <option value="">Selecione o instrumento...</option>
-                                {standardInstruments.map(s => <option key={s.id} value={s.id}>{s.nome} ({s.identificacao})</option>)}
+                             <button 
+                               type="button" 
+                               onClick={() => removeCustodyItem(index)} 
+                               className="flex-shrink-0 p-2.5 text-rose-500 bg-rose-50 hover:bg-rose-100 border-2 border-rose-200 rounded-2xl transition-all shadow-md z-10" 
+                               title="Excluir item da Cautela"
+                             >
+                               <Trash2 className="w-5 h-5" />
+                             </button>
+                            <select
+                              value={item.inventoryItemId || ''}
+                              onChange={e => {
+                                const val = e.target.value;
+                                const items = [...editingCustody!.items];
+                                items[index] = { ...items[index], inventoryItemId: val, standardInstrumentId: '' }; // Limpando standard para não dar conflito legados
+                                setEditingCustody(p => ({...p!, items}));
+                              }}
+                              className="flex-1 bg-transparent px-4 py-2.5 font-black text-sm outline-none min-w-0"
+                            >
+                                <option value="">Selecione o item do estoque...</option>
+                                {inventoryItems.map(i => <option key={i.id} value={i.id}>{i.descricao}{i.ativoFixo ? ` [Patrimônio: ${i.ativoFixo}]` : i.instrumentoId ? ` [ID Inst: ${i.instrumentoId}]` : ''}</option>)}
                             </select>
-                            <input type="number" min="1" value={item.quantidade} onChange={e => updateCustodyItem(index, 'quantidade', Number(e.target.value))} className="w-16 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl py-2 px-3 text-center font-black text-sm focus:ring-2 focus:ring-indigo-300" />
-                            {editingCustody.items.length > 1 && (
-                                <button type="button" onClick={() => removeCustodyItem(index)} className="p-2.5 text-rose-400 hover:bg-rose-50 rounded-2xl transition-all"><Trash2 className="w-5 h-5" /></button>
-                            )}
-                        </div>
+                             <input 
+                               type="number" 
+                               min="1" 
+                               value={item.quantidade} 
+                               onChange={e => updateCustodyItem(index, 'quantidade', Number(e.target.value))} 
+                               className="w-20 flex-shrink-0 bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-2xl py-2 px-3 text-center font-black text-sm focus:ring-2 focus:ring-indigo-300 transition-all" 
+                             />
+                         </div>
                     ))}
                   </div>
                 </div>

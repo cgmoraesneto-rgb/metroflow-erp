@@ -258,7 +258,13 @@ export default function QualityApprovalModule({
                                                 <span className="bg-indigo-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase shadow-sm">RBC</span>
                                             )}
                                         </div>
-                                        <span className={`text-[8px] font-black px-2 py-0.5 rounded uppercase ${status === CertificateStatus.IN_ANALYSIS ? 'bg-amber-50 text-amber-600' : 'bg-indigo-50 text-indigo-600'}`}>{status}</span>
+                                        <span className={`text-[8px] font-black px-2 py-0.5 rounded uppercase ${
+                                            status === CertificateStatus.IN_ANALYSIS ? 'bg-amber-50 text-amber-600' : 
+                                            status === CertificateStatus.APPROVED ? 'bg-emerald-50 text-emerald-600' : 
+                                            'bg-indigo-50 text-indigo-600'
+                                        }`}>
+                                            {status === CertificateStatus.IN_ANALYSIS ? 'Em Análise' : status === CertificateStatus.APPROVED ? 'Aprovado L1' : 'Apto p/ Envio'}
+                                        </span>
                                     </div>
                                     <h4 className="font-extrabold text-slate-900 dark:text-white truncate" title={client?.razaoSocial}>{client?.razaoSocial}</h4>
                                     <p className="text-[10px] text-slate-400 font-bold uppercase mb-4">{record.instrumentName}</p>

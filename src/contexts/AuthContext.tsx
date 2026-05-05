@@ -56,10 +56,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      // Re-trigger loading when a check starts (especially on refresh)
+      setLoading(true);
+      
       try {
         if (localStorage.getItem('metroflow_dev_mode') === 'true') {
           setDevState();
-          setLoading(false);
           return;
         }
 

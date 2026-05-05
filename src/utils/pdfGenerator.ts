@@ -14,7 +14,8 @@ import {
   DocumentTemplate,
   ColumnBehavior,
   DigitalSignature,
-  Employee
+  Employee,
+  ThirdPartyRecord
 } from '../types';
 import { formatDate, formatCurrency, parseNumericInput, formatStandardValidity } from './formatters';
 import { getMetrologyValue } from './metrologyMapper';
@@ -414,12 +415,6 @@ export const addStandardFooter = (doc: jsPDF, isCertificate: boolean = false, cu
     doc.setFontSize(7);
     doc.setTextColor(150, 150, 150);
     
-    const disclaimer = isCertificate 
-      ? "Os resultados apresentados referem-se exclusivamente ao instrumento calibrado nas condições especificadas."
-      : "";
-    
-    doc.text(disclaimer, pageWidth / 2, pageHeight - 15, { align: 'center' });
-
     if (extraLegend && i >= legendStartPage) {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(9);
@@ -428,10 +423,6 @@ export const addStandardFooter = (doc: jsPDF, isCertificate: boolean = false, cu
       doc.setTextColor(150, 150, 150);
       doc.setFontSize(7);
       doc.setFont('helvetica', 'normal');
-    }
-    
-    if (isCertificate) {
-       doc.text(`As incertezas expandidas de medição relatadas foram calculadas conforme o Guia para a Expressão da Incerteza de Medição (GUM).`, pageWidth / 2, pageHeight - 12, { align: 'center' });
     }
     
     doc.text(`Página ${i} de ${pageCount}`, pageWidth - margin, pageHeight - 8, { align: 'right' });
@@ -831,12 +822,33 @@ export const generateCertificatePdf = async (
     
     currentY = drawSectionTitle(`8. RESULTADOS D${isTest ? 'O ENSAIO' : isMaintenance ? 'O TESTE' : 'A CALIBRAÇÃO'}:`, currentY);
 
+    let lastSectionIdx = -1;
     for (let gi = 0; gi < record.groups.length; gi++) {
       const group = record.groups[gi];
       if (group.rows.length === 0) continue;
 
       // Robust matching of group definition in mask (try groupName and name)
       const groupMask = mask?.measurementGroups.find(mg => mg.name === group.groupName || (group.name && mg.name === group.name));
+      
+      // NEW: Renderizar título da seção se houver hierarquia definida
+      if (mask?.sections && mask.sections.length > 0) {
+        const sectionIdx = mask.sections.findIndex(s => s.groups.some(gm => gm.blockId === groupMask?.blockId));
+        if (sectionIdx !== -1 && sectionIdx !== lastSectionIdx) {
+          const section = mask.sections[sectionIdx];
+          if (currentY > pageHeight - marginBottom - 15) {
+            doc.addPage();
+            drawBackgrounds(doc);
+            callHeader(doc);
+          }
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(0, 51, 102);
+          doc.text(section.title.toUpperCase(), marginX + 2, currentY);
+          currentY += 6;
+          lastSectionIdx = sectionIdx;
+        }
+      }
+
       let definitions = groupMask?.columnDefinitions || [];
       if (definitions.length === 0 && groupMask?.columns && groupMask.columns.length > 0) {
         definitions = groupMask.columns.map((colName: string) => ({ id: colName, name: colName, type: ColumnType.TEXTO, behavior: ColumnBehavior.METROLOGY }));
@@ -1968,3 +1980,177 @@ export const generateStandardInstrumentPdf = async (si: StandardInstrument, docu
   addStandardFooter(doc, false, footerImage);
   doc.save(`Ficha_Padrao_${si.identificacao}.pdf`);
 };
+
+/**
+ * Geração de Relatório Consolidado de Terceiros
+ */
+export async function generateThirdPartyReportPdf(
+  record: ThirdPartyRecord,
+  documentTemplates: DocumentTemplate[] = []
+): Promise<string | void> {
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const marginX = 20;
+  let currentY = 40;
+
+  const template = documentTemplates.find(t => t.applyTo === 'TECHNICAL' || t.applyTo === 'ALL');
+  const letterhead = template?.letterheadBase64;
+  const footer = template?.footerBase64;
+
+  const drawBackground = (d: jsPDF) => {
+    if (letterhead) {
+      const format = letterhead.startsWith('data:image') ? getImageFormat(letterhead) : 'PNG';
+      d.addImage(letterhead, format, 0, 0, 210, 297, undefined, 'FAST');
+    }
+    if (footer) {
+      const format = footer.startsWith('data:image') ? getImageFormat(footer) : 'PNG';
+      d.addImage(footer, format, 0, 267, 210, 30, undefined, 'FAST');
+    }
+  };
+
+  drawBackground(doc);
+
+  // Title
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`RELATÓRIO DE CALIBRAÇÃO PARCEIRO: ${record.laboratorioNome.toUpperCase()}`, pageWidth / 2, currentY, { align: 'center' });
+  currentY += 12;
+
+  // Header Info
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Referência: ${record.numeroReferencia || '-'}`, marginX, currentY);
+  doc.text(`Data de Envio: ${record.dataEnvio || '-'}`, pageWidth - marginX, currentY, { align: 'right' });
+  currentY += 6;
+  doc.text(`Cliente: ${record.clienteNome || '-'}`, marginX, currentY);
+  currentY += 12;
+
+  // Instruments Loop
+  for (const item of record.items) {
+    if (currentY > 240) {
+      doc.addPage();
+      drawBackground(doc);
+      currentY = 40;
+    }
+
+    // Instrument Header (Row 1)
+    doc.setFillColor(245, 247, 250);
+    doc.rect(marginX, currentY, pageWidth - (marginX * 2), 8, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`${item.tipoCalibracao} - ${item.descricao}`, marginX + 3, currentY + 5.5);
+    doc.text(`Certificado: ${item.numeroCertificado}`, pageWidth - marginX - 3, currentY + 5.5, { align: 'right' });
+    currentY += 12;
+
+    // Grid System for Metadata
+    const col1 = marginX;
+    const col2 = marginX + 95;
+    const valueOffset = 42; // Space for label
+    
+    doc.setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+
+    // Row 1: Dates
+    doc.setFont('helvetica', 'normal');
+    doc.text('DATA DA CALIBRAÇÃO:', col1, currentY);
+    doc.text('DATA DA PRÓXIMA:', col2, currentY);
+    
+    doc.setFont('helvetica', 'bold');
+    doc.text(`${item.dataCalibracao}`, col1 + valueOffset, currentY);
+    doc.text(`${item.dataProximaCalibracao || '-'}`, col2 + valueOffset, currentY);
+    currentY += 6;
+
+    // Row 2: Marca & Modelo
+    doc.setFont('helvetica', 'normal');
+    doc.text('MARCA:', col1, currentY);
+    doc.text('MODELO:', col2, currentY);
+    
+    doc.setFont('helvetica', 'bold');
+    doc.text(`${item.marca || '-'}`, col1 + valueOffset, currentY);
+    doc.text(`${item.modelo || '-'}`, col2 + valueOffset, currentY);
+    currentY += 6;
+
+    // Row 3: Série & ID
+    doc.setFont('helvetica', 'normal');
+    doc.text('Nº DE SÉRIE:', col1, currentY);
+    doc.text('ID / TAG:', col2, currentY);
+    
+    doc.setFont('helvetica', 'bold');
+    doc.text(`${item.serialNumber || '-'}`, col1 + valueOffset, currentY);
+    doc.text(`${item.identificacao || '-'}`, col2 + valueOffset, currentY);
+    currentY += 6;
+
+    // Row 4: Capacidade & Resolução
+    doc.setFont('helvetica', 'normal');
+    doc.text('CAPACIDADE:', col1, currentY);
+    doc.text('RESOLUÇÃO:', col2, currentY);
+    
+    doc.setFont('helvetica', 'bold');
+    doc.text(`${item.capacidadeMinima} a ${item.capacidadeMaxima} ${item.unidade}`, col1 + valueOffset, currentY);
+    doc.text(`${item.resolucao} ${item.unidade}`, col2 + valueOffset, currentY);
+    currentY += 8;
+
+    // Status / Resultado Final
+    doc.setFont('helvetica', 'bold');
+    doc.text(`RESULTADO FINAL: ${item.status.toUpperCase()}`, marginX, currentY);
+    currentY += 6;
+
+    // Measurement Table
+    if (item.medicoes && item.medicoes.length > 0) {
+      const tableData = item.medicoes.map(m => [
+        m.padrao,
+        m.leitura1,
+        m.leitura2,
+        m.leitura3
+      ]);
+
+      autoTable(doc, {
+        startY: currentY,
+        head: [['Padrão / Nominal', 'Leitura 1', 'Leitura 2', 'Leitura 3']],
+        body: tableData,
+        theme: 'grid',
+        headStyles: { fillColor: [60, 60, 60], textColor: [255, 255, 255], fontSize: 7, halign: 'center' },
+        bodyStyles: { fontSize: 7, halign: 'center' },
+        margin: { left: marginX + 10, right: marginX + 10 },
+        didDrawPage: (data) => {
+          drawBackground(doc);
+        }
+      });
+      // @ts-ignore
+      currentY = doc.lastAutoTable.finalY + 8;
+    } else {
+      doc.setFont('helvetica', 'italic');
+      doc.text('Nenhuma medição registrada para este instrumento.', marginX + 10, currentY);
+      currentY += 8;
+    }
+
+    if (item.observacoes) {
+      doc.setFont('helvetica', 'italic');
+      doc.text(`Obs: ${item.observacoes}`, marginX + 2, currentY);
+      currentY += 10;
+    }
+    
+    currentY += 5; // Extra space between instruments
+  }
+
+  // General Observations
+  if (record.observacoesGerais) {
+    if (currentY > 250) {
+      doc.addPage();
+      drawBackground(doc);
+      currentY = 40;
+    }
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.text('OBSERVAÇÕES GERAIS:', marginX, currentY);
+    currentY += 5;
+    doc.setFont('helvetica', 'normal');
+    const lines = doc.splitTextToSize(record.observacoesGerais, pageWidth - (marginX * 2));
+    doc.text(lines, marginX, currentY);
+  }
+
+  const fileName = `Relatorio_Terceiros_${record.id}.pdf`;
+  doc.save(fileName);
+  return fileName;
+}

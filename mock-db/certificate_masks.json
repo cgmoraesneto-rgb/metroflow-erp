@@ -8,7 +8,7 @@
     "standardInstrumentIds": [],
     "version": 1,
     "createdAt": "2026-04-21T13:38:07.276Z",
-    "updatedAt": "2026-04-21T13:39:21.160Z",
+    "updatedAt": "2026-05-05T02:21:17.854Z",
     "measurementGroups": [
       {
         "name": "Tabela de Resultados 1",
@@ -43,7 +43,218 @@
             "behavior": "INPUT"
           }
         ],
-        "isDynamic": true
+        "isDynamic": true,
+        "templateRows": [
+          {
+            "TAG_1": "",
+            "TAG_2": "",
+            "TAG_3": "",
+            "TAG_4": ""
+          },
+          {
+            "TAG_1": "",
+            "TAG_2": "",
+            "TAG_3": "",
+            "TAG_4": ""
+          },
+          {
+            "TAG_1": "",
+            "TAG_2": "",
+            "TAG_3": "",
+            "TAG_4": ""
+          }
+        ]
+      }
+    ],
+    "uncertaintyBudget": [],
+    "sections": [
+      {
+        "id": "default-sec",
+        "title": "Seção Principal",
+        "groups": [
+          {
+            "name": "Tabela de Resultados 1",
+            "blockId": "T1",
+            "columnDefinitions": [
+              {
+                "id": "TAG_1",
+                "name": "Nova Coluna",
+                "type": "NUMBER",
+                "behavior": "INPUT"
+              },
+              {
+                "id": "TAG_2",
+                "name": "Nova Coluna",
+                "type": "NUMBER",
+                "behavior": "INPUT",
+                "displayFormat": "percent"
+              },
+              {
+                "id": "TAG_3",
+                "name": "Nova Coluna",
+                "type": "NUMBER",
+                "behavior": "CALCULATED",
+                "formula": "[TAG_2]+[TAG_3]",
+                "decimalPlaces": 1,
+                "displayFormat": "percent"
+              },
+              {
+                "id": "TAG_4",
+                "name": "Nova Coluna",
+                "type": "NUMBER",
+                "behavior": "INPUT"
+              }
+            ],
+            "isDynamic": true,
+            "templateRows": [
+              {
+                "TAG_1": "",
+                "TAG_2": "",
+                "TAG_3": "",
+                "TAG_4": ""
+              },
+              {
+                "TAG_1": "",
+                "TAG_2": "",
+                "TAG_3": "",
+                "TAG_4": ""
+              },
+              {
+                "TAG_1": "",
+                "TAG_2": "",
+                "TAG_3": "",
+                "TAG_4": ""
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mask-1777947586890",
+    "title": "Nova Máscara de Calibração",
+    "description": "",
+    "procedureId": "",
+    "standardInstrumentIds": [],
+    "version": 1,
+    "createdAt": "2026-05-05T02:19:46.890Z",
+    "updatedAt": "2026-05-05T02:21:04.714Z",
+    "measurementGroups": [
+      {
+        "name": "",
+        "blockId": "T1",
+        "columnDefinitions": [
+          {
+            "id": "TAG_1",
+            "name": "Nova Coluna",
+            "type": "NUMBER",
+            "behavior": "INPUT"
+          },
+          {
+            "id": "TAG_2",
+            "name": "Nova Coluna",
+            "type": "NUMBER",
+            "behavior": "INPUT",
+            "isLocked": false
+          },
+          {
+            "id": "TAG_3",
+            "name": "Nova Coluna",
+            "type": "NUMBER",
+            "behavior": "INPUT",
+            "isLocked": false
+          },
+          {
+            "id": "TAG_4",
+            "name": "Nova Coluna",
+            "type": "NUMBER",
+            "behavior": "INPUT",
+            "isLocked": false
+          }
+        ],
+        "isDynamic": true,
+        "templateRows": [
+          {
+            "TAG_1": ""
+          },
+          {
+            "TAG_1": "",
+            "TAG_2": "",
+            "TAG_3": "",
+            "TAG_4": ""
+          },
+          {
+            "TAG_1": "",
+            "TAG_2": "",
+            "TAG_3": "",
+            "TAG_4": ""
+          }
+        ]
+      }
+    ],
+    "sections": [
+      {
+        "id": "sec-1777947586890",
+        "title": "Nova Seção",
+        "groups": [
+          {
+            "name": "",
+            "blockId": "T1",
+            "columnDefinitions": [
+              {
+                "id": "TAG_1",
+                "name": "Nova Coluna",
+                "type": "NUMBER",
+                "behavior": "INPUT"
+              },
+              {
+                "id": "TAG_2",
+                "name": "Nova Coluna",
+                "type": "NUMBER",
+                "behavior": "INPUT",
+                "isLocked": false
+              },
+              {
+                "id": "TAG_3",
+                "name": "Nova Coluna",
+                "type": "NUMBER",
+                "behavior": "INPUT",
+                "isLocked": false
+              },
+              {
+                "id": "TAG_4",
+                "name": "Nova Coluna",
+                "type": "NUMBER",
+                "behavior": "INPUT",
+                "isLocked": false
+              }
+            ],
+            "isDynamic": true,
+            "templateRows": [
+              {
+                "TAG_1": ""
+              },
+              {
+                "TAG_1": "",
+                "TAG_2": "",
+                "TAG_3": "",
+                "TAG_4": ""
+              },
+              {
+                "TAG_1": "",
+                "TAG_2": "",
+                "TAG_3": "",
+                "TAG_4": ""
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "sec-1777947636390",
+        "title": "Nova Seção",
+        "groups": []
       }
     ],
     "uncertaintyBudget": []

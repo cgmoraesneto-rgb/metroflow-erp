@@ -12,27 +12,37 @@ import { evaluate } from './formulaParser';
 
 export const executeRow = (
   row: any, 
-  globalValues: Record<string, number>,
-  columnDefinitions: any[]
+  globalValues: Record<string, any>,
+  columnDefinitions: any[],
+  rowIndex: number
 ) => {
   const results: Record<string, any> = { ...row };
   const trace: Record<string, { formula: string, output: any }> = {};
 
-  // 1. Extrair valores numéricos da linha para o contexto da fórmula
-  const rowContext: Record<string, number> = { ...globalValues };
+  // 1. Preparar o contexto da linha
+  // O contexto inclui valores globais, valores da linha atual e referências cruzadas
+  const rowContext: Record<string, any> = { ...globalValues };
+  
+  // Adicionar valores da linha atual (sobrescreve se houver conflito com global, o que é desejado)
   columnDefinitions.forEach(col => {
     const val = row[col.id];
     if (val !== undefined && val !== '') {
-      // Replaces all commas with dots to ensure correct parsing in PT-BR context
-      rowContext[col.id] = parseFloat(String(val).replace(/,/g, '.')) || 0;
+      rowContext[col.id] = typeof val === 'string' ? parseFloat(val.replace(/,/g, '.')) || 0 : val;
+    } else {
+      rowContext[col.id] = 0;
     }
   });
 
-  // 2. Processar colunas que possuem fórmulas
+  // 2. Processar colunas calculadas
   columnDefinitions.forEach(col => {
     if (col.behavior === ColumnBehavior.CALCULATED && col.formula) {
       try {
         const cleanFormula = col.formula.startsWith('=') ? col.formula.substring(1) : col.formula;
+        
+        // Injetar valores de outras tabelas para o índice atual se solicitado explicitamente ou como fallback
+        // Se a fórmula usa [OUTRA_TABELA.COLUNA], o rowContext já deve ter isso mapeado como Array.
+        // O evaluate() do formulaParser lida com arrays se as funções (MEAN, SUM) forem usadas.
+        
         const result = evaluate(cleanFormula, rowContext);
         
         results[col.id] = result;
@@ -59,33 +69,43 @@ export const executeDocument = (
 ) => {
   const results: Record<string, any> = {};
   
-  // 1. Calcular U_PADRAO Combinada (RSS - Root Sum Square)
-  // U_total = sqrt( U1^2 + U2^2 + ... )
+  // 1. Preparar Contexto Global e de Referência Cruzada
+  const globalValues: Record<string, any> = {
+    ...globalContext,
+    'RESOLUCAO': metrologyContext.resolution || 0
+  };
+
+  // Cálculo de Incerteza do Padrão (RSS)
   let sumSq = 0;
   let maxK = 2.0;
-
   standardDetails.forEach(detail => {
     const u = detail.declaredU || 0;
     sumSq += (u * u);
-    if (detail.certificateK && detail.certificateK > maxK) {
-      maxK = detail.certificateK;
-    }
+    if (detail.certificateK && detail.certificateK > maxK) maxK = detail.certificateK;
   });
+  globalValues['U_PADRAO'] = Math.sqrt(sumSq);
+  globalValues['K_PADRAO'] = maxK;
 
-  const combinedUPadrao = Math.sqrt(sumSq);
+  // 2. Pré-mapear todos os valores de todas as tabelas para permitir referências cruzadas [GRUPO.COLUNA]
+  data.groups.forEach(group => {
+    const groupId = group.blockId || group.name;
+    if (!group.columnDefinitions) return;
 
-  // 2. Preparar valores globais (TAGS fixas)
-  const globalValues: Record<string, number> = {
-    ...globalContext,
-    'U_PADRAO': combinedUPadrao,
-    'K_PADRAO': maxK,
-    'RESOLUCAO': metrologyContext.resolution || 0
-  };
+    group.columnDefinitions.forEach(col => {
+      const colKey = `${groupId}.${col.id}`;
+      // Mapeia a coluna inteira como um array para funções como MEAN([GRUPO.COL])
+      globalValues[colKey] = group.rows.map(r => {
+        const val = r[col.id];
+        return typeof val === 'string' ? parseFloat(val.replace(/,/g, '.')) || 0 : (val || 0);
+      });
+    });
+  });
 
   // 3. Processar cada grupo e linha
   data.groups.forEach(group => {
     group.rows.forEach((row, ri) => {
-      const rowResult = executeRow(row, globalValues, group.columnDefinitions || []);
+      // O executeRow recebe o globalValues que agora contém as referências [GRUPO.COL]
+      const rowResult = executeRow(row, globalValues, group.columnDefinitions || [], ri);
       const key = `${group.blockId || group.name}_row${ri}`;
       results[key] = {
         ...rowResult.results,
