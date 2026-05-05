@@ -425,8 +425,8 @@ function MaskIDE({ mask, onSave, onClose, procedures, standardInstruments }: {
             <div className="flex flex-col flex-1">
               <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Identificação da Máscara</span>
               <input 
-                value={localMask.description}
-                onChange={(e) => setLocalMask({...localMask, description: e.target.value})}
+                value={localMask.title}
+                onChange={(e) => setLocalMask({...localMask, title: e.target.value})}
                 className="text-2xl font-black text-slate-900 outline-none bg-transparent placeholder:text-slate-200 uppercase tracking-tight w-full"
                 placeholder="NOME DA MÁSCARA..."
               />
