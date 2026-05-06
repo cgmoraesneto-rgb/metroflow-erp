@@ -331,9 +331,19 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setPaginationLoading(prev => ({ ...prev, [collection]: true }));
     try {
       const url = collection === 'records' ? '/api/mock/calibration_records' : `/api/mock/${collection}`;
-      const orderField = collection === 'clients' ? 'id' : 'createdAt';
+      let orderField = 'createdAt';
+      let orderDir: 'asc' | 'desc' = 'desc';
       
-      const result = await apiClient.fetchPaginated<any>(url, 20, cursors[collection], orderField, 'desc');
+      if (collection === 'clients') {
+        orderField = 'id';
+        orderDir = 'asc';
+      } else if (collection === 'quotes') {
+        orderField = 'dataEmissao';
+      } else if (collection === 'records') {
+        orderField = 'calibrationDate';
+      }
+      
+      const result = await apiClient.fetchPaginated<any>(url, 20, cursors[collection], orderField, orderDir);
       
       if (collection === 'clients') setClients(prev => [...prev, ...result.data]);
       if (collection === 'quotes') setQuotes(prev => [...prev, ...result.data]);
@@ -370,7 +380,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Inicia com paginação se for Real Database
       if (apiClient.useRealDatabase) {
          const cRes = await apiClient.fetchPaginated<Client>('/api/mock/clients', 20, null, 'id', 'asc');
-         const qRes = await apiClient.fetchPaginated<Quote>('/api/mock/quotes', 20, null, 'createdAt', 'desc');
+         const qRes = await apiClient.fetchPaginated<Quote>('/api/mock/quotes', 20, null, 'dataEmissao', 'desc');
          setClients(cRes.data);
          setQuotes(qRes.data);
          setCursors(prev => ({ ...prev, clients: cRes.lastVisible, quotes: qRes.lastVisible }));
@@ -421,7 +431,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const [calData, resData, finData, expData, fleetData, vehData, custodyData, ptData, itData, cmData, procData, pmData, bankData, uomData, dtRawResult, invData, movData, tpData] = results;
 
       if (apiClient.useRealDatabase) {
-        const rRes = await apiClient.fetchPaginated<CalibrationRecord>('/api/mock/calibration_records', 20, null, 'createdAt', 'desc');
+        const rRes = await apiClient.fetchPaginated<CalibrationRecord>('/api/mock/calibration_records', 20, null, 'calibrationDate', 'desc');
         setCalibrationRecords(rRes.data);
         setCursors(prev => ({ ...prev, records: rRes.lastVisible }));
         setHasMore(prev => ({ ...prev, records: rRes.data.length === 20 }));
