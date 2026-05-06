@@ -369,7 +369,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Inicia com paginação se for Real Database
       if (apiClient.useRealDatabase) {
-         const cRes = await apiClient.fetchPaginated<Client>('/api/mock/clients', 20, null, 'id', 'desc');
+         const cRes = await apiClient.fetchPaginated<Client>('/api/mock/clients', 20, null, 'id', 'asc');
          const qRes = await apiClient.fetchPaginated<Quote>('/api/mock/quotes', 20, null, 'createdAt', 'desc');
          setClients(cRes.data);
          setQuotes(qRes.data);
