@@ -32,7 +32,7 @@ describe('Industrial Calculation Engine - Production Audit', () => {
       { id: 'res', name: 'R', type: ColumnType.TEXTO, behavior: ColumnBehavior.CALCULATED, formula: '10 / [val]' }
     ];
     const { results } = executeRow({ 'val': 0 }, {}, divZeroCols, 0);
-    expect(results['res']).toBe(Infinity);
+    expect(results['res']).toBe('Erro');
   });
 
   it('should support RAIZ function (GUM Compliance Context)', () => {

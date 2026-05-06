@@ -24,6 +24,7 @@ export interface Client {
   inscricaoMunicipal?: string;
   inscricaoEstadual?: string;
   dataLimiteNF?: string;
+  isDeleted?: boolean;
 }
 
 export interface DocumentTemplate {
@@ -80,6 +81,7 @@ export interface Quote {
   revision?: number;      // NEW: Revision number (0 = original)
   criadoPor?: string;
   criadoEm?: string;
+  isDeleted?: boolean;
 }
 
 export enum InstrumentStatus {

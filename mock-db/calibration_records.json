@@ -1,106 +1,3215 @@
 [
   {
-    "id": "CAL-1776781131293",
-    "serviceOrderId": "OS-2026-001",
-    "quoteItemIndex": 0,
-    "unitIndex": 0,
-    "instrumentName": "Micrômetro Externo 0-25mm",
-    "certificateNumber": "CERT-2026-3374",
-    "calibrationDate": "2026-04-21",
-    "nextCalibrationDate": "2026-04-21",
-    "technicianName": "admin-1",
-    "manufacturer": "",
-    "model": "",
-    "serialNumber": "",
-    "identification": "",
-    "periodicity": "12 meses",
-    "calibrationLocation": "Laboratório",
-    "resolution": 0,
-    "capacidadeMinima": "",
-    "capacidadeMaxima": "",
-    "unidadeMedida": "",
+    "id": "CAL-1776036771305",
+    "serialNumber": "59150884MV",
     "temperature": 20,
-    "humidity": 50,
-    "envStandardInstrumentId": "",
-    "environmentalStandardId": "",
-    "certificateMaskId": "mask-1776778687276",
-    "procedureId": "",
-    "standardInstrumentIds": [],
-    "observations": "",
+    "certificateMaskId": "",
+    "headerSaved": true,
+    "unitIndex": 0,
     "attachments": [],
+    "instrumentName": "Alicate Amperímetro",
+    "headerValidated": true,
+    "nextCalibrationDate": "",
+    "observations": "CALIBRAÇÃO COM EMISSÃO DE CERTIFICADO VIA LRM",
+    "capacidadeMinima": "0",
+    "procedureId": "",
+    "identification": "AL-003",
+    "unidadeMedida": "V",
+    "calibrationDate": "2026-04-13",
+    "manufacturer": "Fluke",
+    "serviceOrderId": "26280",
+    "humidity": 50,
+    "kFactorJustification": "Padrão (k=2 para 95.45%)",
+    "status": "Em confecção",
+    "environmentalStandardId": "",
+    "isDraft": true,
+    "standardInstrumentIds": [],
+    "resolution": 0.1,
+    "periodicity": "12 meses",
+    "capacidadeMaxima": "600",
+    "calibrationLocation": "Laboratório",
+    "certificateNumber": "R16853/26",
+    "quoteItemIndex": 0,
+    "groups": [],
+    "envStandardInstrumentId": "",
+    "technicianName": "EKKsNoGs6wZlh3c0Ht9B",
+    "isAccredited": true,
+    "model": "302+"
+  },
+  {
+    "id": "CAL-1776037171843",
+    "attachments": [],
+    "headerValidated": false,
+    "instrumentName": "Alicate Amperímetro",
+    "serialNumber": "59150884MV",
+    "temperature": 20,
+    "certificateMaskId": "",
+    "headerSaved": true,
+    "unitIndex": 0,
+    "capacidadeMinima": "0",
+    "procedureId": "",
+    "unidadeMedida": "V",
+    "identification": "AL-003",
+    "nextCalibrationDate": "",
+    "observations": "CALIBRAÇÃO COM EMISSÃO DE CERTIFICADO VIA LRM",
+    "humidity": 58,
+    "status": "Em confecção",
+    "kFactorJustification": "Padrão (k=2 para 95.45%)",
+    "calibrationDate": "2026-04-12",
+    "manufacturer": "Fluke",
+    "serviceOrderId": "26280",
+    "quoteItemIndex": 0,
+    "capacidadeMaxima": "600",
+    "calibrationLocation": "Laboratório",
+    "certificateNumber": "CRW26001",
+    "groups": [],
+    "envStandardInstrumentId": "",
+    "technicianName": "EKKsNoGs6wZlh3c0Ht9B",
+    "isAccredited": true,
+    "model": "302+",
+    "standardInstrumentIds": [],
+    "environmentalStandardId": "",
+    "isDraft": true,
+    "resolution": 0.1,
+    "periodicity": "12 meses"
+  },
+  {
+    "id": "CAL-1776177817900",
+    "status": "Devolvido para correção",
+    "kFactorJustification": "Padrão (k=2 para 95.45%)",
+    "humidity": 55,
+    "serviceOrderId": "26282",
+    "manufacturer": "Digimess",
+    "standardInstrumentUncertainties": [
+      {
+        "declaredU": 0.5,
+        "instrumentId": "Ab8ZcOmbYE7UnY1MbBAD",
+        "certificateK": 2
+      },
+      {
+        "declaredU": 0.5,
+        "certificateK": 2,
+        "instrumentId": "FYzVrd2zjfWLaehrZOtn"
+      },
+      {
+        "declaredU": 0.5,
+        "instrumentId": "TvVkjsfvuU7wQ3fsJZIR",
+        "certificateK": 2
+      },
+      {
+        "declaredU": 0.06,
+        "instrumentId": "wednsAaoSW1M67PPoFi5",
+        "certificateK": 2
+      }
+    ],
+    "calibrationDate": "2026-04-10",
+    "model": "Não Consta",
+    "isAccredited": false,
+    "technicianName": "Rki2Xmyw8rzd2J0SwI39",
     "groups": [
       {
-        "name": "Tabela de Resultados 1",
-        "blockId": "T1",
+        "hasGraph": false,
+        "name": "Medição Externa:",
         "columnDefinitions": [
           {
-            "id": "TAG_1",
-            "name": "Nova Coluna",
-            "type": "NUMBER",
+            "type": "VVC",
+            "name": "Valor Verdadeiro Convencional (mm)",
+            "id": "col_e05588b3",
             "behavior": "INPUT"
           },
           {
-            "id": "TAG_2",
-            "name": "Nova Coluna",
-            "type": "NUMBER",
             "behavior": "INPUT",
-            "displayFormat": "percent"
+            "id": "col_9479077a",
+            "name": "Indicação no Instrumento",
+            "type": "LEITURA"
           },
           {
-            "id": "TAG_3",
-            "name": "Nova Coluna",
-            "type": "NUMBER",
+            "id": "col_erro",
+            "type": "ERRO",
             "behavior": "CALCULATED",
-            "formula": "[TAG_2]+[TAG_3]",
-            "decimalPlaces": 1,
-            "displayFormat": "percent"
+            "name": "Erro ( µm )",
+            "formula": "[col_9479077a] - [col_e05588b3]"
           },
           {
-            "id": "TAG_4",
-            "name": "Nova Coluna",
-            "type": "NUMBER",
+            "id": "col_u",
+            "type": "INCERTEZA",
+            "behavior": "METROLOGY",
+            "metrologyField": "U",
+            "name": "Incerteza (U)"
+          },
+          {
+            "name": "Coeficiente k",
+            "metrologyField": "k",
+            "behavior": "METROLOGY",
+            "type": "CONFORMIDADE",
+            "id": "col_aa7d49a2"
+          }
+        ],
+        "groupName": "Medição Externa:",
+        "graphType": "error_curve",
+        "rows": [
+          {
+            "col_erro": "",
+            "_pointIdx": "0",
+            "col_u": "",
+            "col_9479077a": "10",
+            "col_aa7d49a2": "",
+            "col_e05588b3": "10"
+          }
+        ],
+        "hiddenColumns": [],
+        "columns": [
+          "col_e05588b3",
+          "col_9479077a",
+          "col_erro",
+          "col_u",
+          "col_aa7d49a2"
+        ]
+      },
+      {
+        "rows": [],
+        "graphType": "error_curve",
+        "hiddenColumns": [],
+        "columns": [
+          "col_e05588b3",
+          "col_9479077a",
+          "col_erro",
+          "col_u",
+          "col_aa7d49a2"
+        ],
+        "hasGraph": false,
+        "name": "Medição Interna:",
+        "columnDefinitions": [
+          {
+            "type": "VVC",
+            "name": "Valor Verdadeiro Convencional (mm)",
+            "id": "col_e05588b3",
+            "behavior": "INPUT"
+          },
+          {
+            "behavior": "INPUT",
+            "type": "LEITURA",
+            "name": "Indicação no Instrumento",
+            "id": "col_9479077a"
+          },
+          {
+            "behavior": "CALCULATED",
+            "type": "ERRO",
+            "id": "col_erro",
+            "formula": "[col_9479077a] - [col_e05588b3]",
+            "name": "Erro ( µm )"
+          },
+          {
+            "name": "Incerteza (U)",
+            "metrologyField": "U",
+            "behavior": "METROLOGY",
+            "type": "INCERTEZA",
+            "id": "col_u"
+          },
+          {
+            "id": "col_aa7d49a2",
+            "type": "CONFORMIDADE",
+            "behavior": "METROLOGY",
+            "metrologyField": "k",
+            "name": "Coeficiente k"
+          }
+        ],
+        "groupName": "Medição Interna:"
+      },
+      {
+        "columnDefinitions": [
+          {
+            "id": "col_e05588b3",
+            "name": "Valor Verdadeiro Convencional (mm)",
+            "type": "VVC",
+            "behavior": "INPUT"
+          },
+          {
+            "behavior": "INPUT",
+            "name": "Indicação no Instrumento",
+            "id": "col_9479077a",
+            "type": "LEITURA"
+          },
+          {
+            "formula": "[col_9479077a] - [col_e05588b3]",
+            "name": "Erro ( µm )",
+            "behavior": "CALCULATED",
+            "id": "col_erro",
+            "type": "ERRO"
+          },
+          {
+            "type": "INCERTEZA",
+            "id": "col_u",
+            "metrologyField": "U",
+            "behavior": "METROLOGY",
+            "name": "Incerteza (U)"
+          },
+          {
+            "id": "col_aa7d49a2",
+            "type": "CONFORMIDADE",
+            "behavior": "METROLOGY",
+            "metrologyField": "k",
+            "name": "Coeficiente k"
+          }
+        ],
+        "groupName": "Medição de Ressalto:",
+        "hasGraph": false,
+        "name": "Medição de Ressalto:",
+        "hiddenColumns": [],
+        "columns": [
+          "col_e05588b3",
+          "col_9479077a",
+          "col_erro",
+          "col_u",
+          "col_aa7d49a2"
+        ],
+        "rows": [],
+        "graphType": "error_curve"
+      },
+      {
+        "hiddenColumns": [],
+        "columns": [
+          "col_e05588b3",
+          "col_9479077a",
+          "col_erro",
+          "col_u",
+          "col_aa7d49a2"
+        ],
+        "rows": [],
+        "graphType": "error_curve",
+        "columnDefinitions": [
+          {
+            "name": "Valor Verdadeiro Convencional (mm)",
+            "id": "col_e05588b3",
+            "type": "VVC",
+            "behavior": "INPUT"
+          },
+          {
+            "type": "LEITURA",
+            "id": "col_9479077a",
+            "name": "Indicação no Instrumento",
+            "behavior": "INPUT"
+          },
+          {
+            "behavior": "CALCULATED",
+            "id": "col_erro",
+            "type": "ERRO",
+            "formula": "[col_9479077a] - [col_e05588b3]",
+            "name": "Erro ( µm )"
+          },
+          {
+            "name": "Incerteza (U)",
+            "type": "INCERTEZA",
+            "id": "col_u",
+            "metrologyField": "U",
+            "behavior": "METROLOGY"
+          },
+          {
+            "behavior": "METROLOGY",
+            "metrologyField": "k",
+            "id": "col_aa7d49a2",
+            "type": "CONFORMIDADE",
+            "name": "Coeficiente k"
+          }
+        ],
+        "groupName": "Medição de Profundidade:",
+        "hasGraph": false,
+        "name": "Medição de Profundidade:"
+      },
+      {
+        "columnDefinitions": [
+          {
+            "behavior": "INPUT",
+            "type": "TEXTO",
+            "id": "col_e05588b3",
+            "name": "Referência de Medição"
+          },
+          {
+            "behavior": "INPUT",
+            "name": "Erro (µm)",
+            "id": "col_07aaadcb",
+            "type": "TEXTO"
+          }
+        ],
+        "groupName": "Paralelismo:",
+        "hasGraph": false,
+        "name": "Paralelismo:",
+        "hiddenColumns": [],
+        "columns": [
+          "col_e05588b3",
+          "col_07aaadcb"
+        ],
+        "rows": [],
+        "graphType": "error_curve"
+      },
+      {
+        "groupName": "Erro Máximo Admissível:",
+        "columnDefinitions": [
+          {
+            "name": "Referência de Medição",
+            "id": "col_e05588b3",
+            "type": "TEXTO",
+            "behavior": "INPUT"
+          },
+          {
+            "type": "TEXTO",
+            "name": "Erro Máximo Admissível",
+            "id": "col_07aaadcb",
             "behavior": "INPUT"
           }
         ],
-        "isDynamic": true,
-        "rows": [
+        "name": "Erro Máximo Admissível:",
+        "hasGraph": false,
+        "columns": [
+          "col_e05588b3",
+          "col_07aaadcb"
+        ],
+        "hiddenColumns": [],
+        "rows": [],
+        "graphType": "error_curve"
+      }
+    ],
+    "envStandardInstrumentId": "xnqCaLBlXqVYoBJGl963",
+    "quoteItemIndex": 3,
+    "capacidadeMaxima": "300",
+    "certificateNumber": "CRW267850009",
+    "calibrationLocation": "Laboratório",
+    "calculatedPoints": {
+      "Medição Externa:_row0": {
+        "col_u": "",
+        "_pointIdx": "0",
+        "col_erro": 0,
+        "col_9479077a": "10",
+        "col_aa7d49a2": "",
+        "col_e05588b3": "10",
+        "trace": {
+          "col_erro": {
+            "output": 0,
+            "formula": "[col_9479077a] - [col_e05588b3]"
+          }
+        }
+      }
+    },
+    "periodicity": "12 meses",
+    "resolution": 0.01,
+    "standardInstrumentIds": [
+      "Ab8ZcOmbYE7UnY1MbBAD",
+      "FYzVrd2zjfWLaehrZOtn",
+      "TvVkjsfvuU7wQ3fsJZIR",
+      "wednsAaoSW1M67PPoFi5"
+    ],
+    "environmentalStandardId": "xnqCaLBlXqVYoBJGl963",
+    "isDraft": true,
+    "maskSnapshot": {
+      "title": "Paquímetro Quadrimensional Digital",
+      "measurementGroups": [
+        {
+          "columnDefinitions": [
+            {
+              "id": "col_e05588b3",
+              "name": "Valor Verdadeiro Convencional (mm)",
+              "type": "VVC",
+              "behavior": "INPUT"
+            },
+            {
+              "name": "Indicação no Instrumento",
+              "id": "col_9479077a",
+              "type": "LEITURA",
+              "behavior": "INPUT"
+            },
+            {
+              "behavior": "CALCULATED",
+              "type": "ERRO",
+              "id": "col_erro",
+              "formula": "[col_9479077a] - [col_e05588b3]",
+              "name": "Erro ( µm )"
+            },
+            {
+              "name": "Incerteza (U)",
+              "metrologyField": "U",
+              "behavior": "METROLOGY",
+              "type": "INCERTEZA",
+              "id": "col_u"
+            },
+            {
+              "behavior": "METROLOGY",
+              "metrologyField": "k",
+              "id": "col_aa7d49a2",
+              "type": "CONFORMIDADE",
+              "name": "Coeficiente k"
+            }
+          ],
+          "name": "Medição Externa:",
+          "hasGraph": false,
+          "columns": [
+            "Valor Verdadeiro Convencional (mm)",
+            "Indicação no Instrumento",
+            "Erro ( µm )",
+            "Incerteza (U)",
+            "Coeficiente k"
+          ],
+          "hiddenColumns": [],
+          "graphType": "error_curve"
+        },
+        {
+          "columnDefinitions": [
+            {
+              "type": "VVC",
+              "name": "Valor Verdadeiro Convencional (mm)",
+              "id": "col_e05588b3",
+              "behavior": "INPUT"
+            },
+            {
+              "name": "Indicação no Instrumento",
+              "id": "col_9479077a",
+              "type": "LEITURA",
+              "behavior": "INPUT"
+            },
+            {
+              "type": "ERRO",
+              "id": "col_erro",
+              "behavior": "CALCULATED",
+              "name": "Erro ( µm )",
+              "formula": "[col_9479077a] - [col_e05588b3]"
+            },
+            {
+              "id": "col_u",
+              "type": "INCERTEZA",
+              "behavior": "METROLOGY",
+              "metrologyField": "U",
+              "name": "Incerteza (U)"
+            },
+            {
+              "name": "Coeficiente k",
+              "type": "CONFORMIDADE",
+              "id": "col_aa7d49a2",
+              "metrologyField": "k",
+              "behavior": "METROLOGY"
+            }
+          ],
+          "hasGraph": false,
+          "name": "Medição Interna:",
+          "hiddenColumns": [],
+          "columns": [
+            "Valor Verdadeiro Convencional (mm)",
+            "Indicação no Instrumento",
+            "Erro ( µm )",
+            "Incerteza (U)",
+            "Coeficiente k"
+          ],
+          "graphType": "error_curve"
+        },
+        {
+          "hasGraph": false,
+          "name": "Medição de Ressalto:",
+          "columnDefinitions": [
+            {
+              "id": "col_e05588b3",
+              "name": "Valor Verdadeiro Convencional (mm)",
+              "type": "VVC",
+              "behavior": "INPUT"
+            },
+            {
+              "behavior": "INPUT",
+              "name": "Indicação no Instrumento",
+              "id": "col_9479077a",
+              "type": "LEITURA"
+            },
+            {
+              "formula": "[col_9479077a] - [col_e05588b3]",
+              "name": "Erro ( µm )",
+              "behavior": "CALCULATED",
+              "type": "ERRO",
+              "id": "col_erro"
+            },
+            {
+              "behavior": "METROLOGY",
+              "metrologyField": "U",
+              "id": "col_u",
+              "type": "INCERTEZA",
+              "name": "Incerteza (U)"
+            },
+            {
+              "name": "Coeficiente k",
+              "id": "col_aa7d49a2",
+              "type": "CONFORMIDADE",
+              "behavior": "METROLOGY",
+              "metrologyField": "k"
+            }
+          ],
+          "graphType": "error_curve",
+          "hiddenColumns": [],
+          "columns": [
+            "Valor Verdadeiro Convencional (mm)",
+            "Indicação no Instrumento",
+            "Erro ( µm )",
+            "Incerteza (U)",
+            "Coeficiente k"
+          ]
+        },
+        {
+          "columnDefinitions": [
+            {
+              "id": "col_e05588b3",
+              "name": "Valor Verdadeiro Convencional (mm)",
+              "type": "VVC",
+              "behavior": "INPUT"
+            },
+            {
+              "behavior": "INPUT",
+              "name": "Indicação no Instrumento",
+              "id": "col_9479077a",
+              "type": "LEITURA"
+            },
+            {
+              "id": "col_erro",
+              "type": "ERRO",
+              "behavior": "CALCULATED",
+              "name": "Erro ( µm )",
+              "formula": "[col_9479077a] - [col_e05588b3]"
+            },
+            {
+              "type": "INCERTEZA",
+              "id": "col_u",
+              "metrologyField": "U",
+              "behavior": "METROLOGY",
+              "name": "Incerteza (U)"
+            },
+            {
+              "type": "CONFORMIDADE",
+              "id": "col_aa7d49a2",
+              "metrologyField": "k",
+              "behavior": "METROLOGY",
+              "name": "Coeficiente k"
+            }
+          ],
+          "name": "Medição de Profundidade:",
+          "hasGraph": false,
+          "columns": [
+            "Valor Verdadeiro Convencional (mm)",
+            "Indicação no Instrumento",
+            "Erro ( µm )",
+            "Incerteza (U)",
+            "Coeficiente k"
+          ],
+          "hiddenColumns": [],
+          "graphType": "error_curve"
+        },
+        {
+          "name": "Paralelismo:",
+          "hasGraph": false,
+          "columnDefinitions": [
+            {
+              "behavior": "INPUT",
+              "type": "TEXTO",
+              "id": "col_e05588b3",
+              "name": "Referência de Medição"
+            },
+            {
+              "type": "TEXTO",
+              "id": "col_07aaadcb",
+              "name": "Erro (µm)",
+              "behavior": "INPUT"
+            }
+          ],
+          "graphType": "error_curve",
+          "columns": [
+            "Referência de Medição",
+            "Erro (µm)"
+          ],
+          "hiddenColumns": []
+        },
+        {
+          "hasGraph": false,
+          "name": "Erro Máximo Admissível:",
+          "columnDefinitions": [
+            {
+              "type": "TEXTO",
+              "id": "col_e05588b3",
+              "name": "Referência de Medição",
+              "behavior": "INPUT"
+            },
+            {
+              "type": "TEXTO",
+              "id": "col_07aaadcb",
+              "name": "Erro Máximo Admissível",
+              "behavior": "INPUT"
+            }
+          ],
+          "graphType": "error_curve",
+          "hiddenColumns": [],
+          "columns": [
+            "Referência de Medição",
+            "Erro Máximo Admissível"
+          ]
+        }
+      ],
+      "unit": "",
+      "version": 1,
+      "isActive": true,
+      "standardInstrumentUncertainties": [],
+      "id": "mask_1776191008722",
+      "repetitions": 0,
+      "type": "CALIBRATION_CERTIFICATE",
+      "numberOfPoints": 2,
+      "procedureId": "GzL1Ja65xAupcHY5YG31",
+      "instrumentType": "",
+      "standardInstrumentIds": [
+        "Ab8ZcOmbYE7UnY1MbBAD",
+        "FYzVrd2zjfWLaehrZOtn",
+        "TvVkjsfvuU7wQ3fsJZIR",
+        "wednsAaoSW1M67PPoFi5"
+      ],
+      "measuredQuantity": ""
+    },
+    "headerValidated": true,
+    "instrumentName": "Paquímetro 0 ~ 300mm",
+    "attachments": [],
+    "headerSaved": true,
+    "unitIndex": 0,
+    "temperature": 21,
+    "certificateMaskId": "mask_1776191008722",
+    "serialNumber": "11060320",
+    "unidadeMedida": "mm",
+    "identification": "F-0051",
+    "procedureId": "GzL1Ja65xAupcHY5YG31",
+    "capacidadeMinima": "0",
+    "observations": "",
+    "nextCalibrationDate": "04/2027"
+  },
+  {
+    "id": "CAL-1776440123294",
+    "identification": "BAL-006",
+    "unidadeMedida": "Kg",
+    "procedureId": "TE44k39Pmepk8vIEdpHM",
+    "capacidadeMinima": "0,5",
+    "observations": "Visor quebrado",
+    "nextCalibrationDate": "2027-04-17",
+    "instrumentName": "Balança",
+    "headerValidated": true,
+    "l1ApproverId": "dev-emp-id",
+    "attachments": [],
+    "headerSaved": true,
+    "unitIndex": 0,
+    "temperature": 20,
+    "certificateMaskId": "mask-1776438347952",
+    "serialNumber": "100890",
+    "model": "3290",
+    "isAccredited": false,
+    "envStandardInstrumentId": "xnqCaLBlXqVYoBJGl963",
+    "groups": [
+      {
+        "blockId": "T1",
+        "name": "Tabela de Resultados 1",
+        "columnDefinitions": [
           {
-            "_pointIdx": "0",
-            "TAG_1": "10",
-            "TAG_2": "10",
-            "TAG_3": "",
-            "TAG_4": "10"
+            "behavior": "CALCULATED",
+            "id": "TAG_1",
+            "type": "NUMBER",
+            "formula": "",
+            "name": "Unidade"
+          },
+          {
+            "behavior": "CALCULATED",
+            "id": "TAG_2",
+            "type": "NUMBER",
+            "formula": "",
+            "name": "Valor Indicado no Padrão"
+          },
+          {
+            "behavior": "CALCULATED",
+            "type": "NUMBER",
+            "id": "TAG_3",
+            "formula": "",
+            "name": "Valor Indicado no Instrumento"
+          },
+          {
+            "formula": "([TAG_3]-[TAG_2])",
+            "name": "Erro",
+            "behavior": "CALCULATED",
+            "type": "NUMBER",
+            "id": "TAG_4"
+          },
+          {
+            "type": "NUMBER",
+            "id": "TAG_5",
+            "behavior": "CALCULATED",
+            "name": "Incerteza de Medição (mg)",
+            "formula": "[U_PADRAO]"
+          },
+          {
+            "formula": "",
+            "name": "Medição 1",
+            "behavior": "CALCULATED",
+            "type": "NUMBER",
+            "id": "TAG_6"
+          },
+          {
+            "id": "TAG_7",
+            "type": "NUMBER",
+            "behavior": "CALCULATED",
+            "name": "Medição 2",
+            "formula": ""
+          },
+          {
+            "type": "NUMBER",
+            "id": "TAG_8",
+            "behavior": "CALCULATED",
+            "name": "Medição 3",
+            "formula": ""
+          },
+          {
+            "behavior": "CALCULATED",
+            "id": "TAG_9",
+            "type": "NUMBER",
+            "formula": "([TAG_6]+[TAG_7]+[TAG_8]) / 3",
+            "name": "Média"
           }
         ],
         "groupName": "Tabela de Resultados 1",
+        "rows": [
+          {
+            "TAG_5": "",
+            "TAG_1": "",
+            "TAG_4": "",
+            "TAG_8": "",
+            "TAG_3": "",
+            "_pointIdx": "0",
+            "TAG_7": "",
+            "TAG_2": "",
+            "TAG_6": "",
+            "TAG_9": ""
+          }
+        ],
+        "isDynamic": true,
+        "hiddenColumns": [
+          "TAG_7",
+          "TAG_8",
+          "TAG_6"
+        ],
         "columns": [
           "TAG_1",
           "TAG_2",
           "TAG_3",
-          "TAG_4"
+          "TAG_4",
+          "TAG_5",
+          "TAG_6",
+          "TAG_7",
+          "TAG_8",
+          "TAG_9"
         ]
       }
     ],
-    "status": "Devolvido para correção",
-    "isDraft": false,
-    "headerValidated": true,
-    "headerSaved": true,
-    "isAccredited": false,
-    "kFactorJustification": "Padrão (k=2 para 95.45%)",
+    "technicianName": "Rki2Xmyw8rzd2J0SwI39",
+    "calibrationLocation": "Laboratório",
+    "capacidadeMaxima": "200",
+    "signedBy": [
+      "dev-emp-id"
+    ],
+    "certificateNumber": "262950006",
+    "quoteItemIndex": 5,
     "calculatedPoints": {
       "T1_row0": {
-        "_pointIdx": "0",
-        "TAG_1": "10",
-        "TAG_2": "10",
-        "TAG_3": 10,
-        "TAG_4": "10",
         "trace": {
-          "TAG_3": {
-            "formula": "[TAG_2]+[TAG_3]",
-            "output": 10
+          "TAG_9": {
+            "formula": "([TAG_6]+[TAG_7]+[TAG_8]) / 3",
+            "output": 0
+          },
+          "TAG_5": {
+            "formula": "[U_PADRAO]",
+            "output": 0
+          },
+          "TAG_4": {
+            "formula": "([TAG_3]-[TAG_2])",
+            "output": 0
+          }
+        },
+        "TAG_9": 0,
+        "TAG_6": "",
+        "TAG_2": "",
+        "TAG_7": "",
+        "TAG_5": 0,
+        "_pointIdx": "0",
+        "TAG_8": "",
+        "TAG_4": 0,
+        "TAG_3": "",
+        "TAG_1": ""
+      }
+    },
+    "periodicity": "12 meses",
+    "resolution": 0.01,
+    "isDraft": false,
+    "environmentalStandardId": "xnqCaLBlXqVYoBJGl963",
+    "standardInstrumentIds": [],
+    "kFactorJustification": "Padrão (k=2 para 95.45%)",
+    "status": "Aprovado",
+    "humidity": 50,
+    "serviceOrderId": "26295",
+    "manufacturer": "Toledo",
+    "calibrationDate": "2026-04-17"
+  },
+  {
+    "id": "CAL-1776782040136",
+    "calibrationDate": "2026-04-21",
+    "serviceOrderId": "26295",
+    "manufacturer": "",
+    "humidity": 50,
+    "status": "Em confecção",
+    "kFactorJustification": "Padrão (k=2 para 95.45%)",
+    "resolution": 0,
+    "standardInstrumentIds": [],
+    "isDraft": true,
+    "environmentalStandardId": "",
+    "calculatedPoints": {},
+    "periodicity": "12 meses",
+    "technicianName": "Rki2Xmyw8rzd2J0SwI39",
+    "envStandardInstrumentId": "",
+    "groups": [],
+    "quoteItemIndex": 4,
+    "certificateNumber": "CERT-2026-5495",
+    "calibrationLocation": "Laboratório",
+    "capacidadeMaxima": "",
+    "model": "",
+    "isAccredited": false,
+    "serialNumber": "",
+    "unitIndex": 0,
+    "headerSaved": true,
+    "certificateMaskId": "",
+    "temperature": 20,
+    "headerValidated": true,
+    "instrumentName": "Termômetro infravermelho",
+    "attachments": [],
+    "observations": "",
+    "nextCalibrationDate": "Abril/2027",
+    "capacidadeMinima": "",
+    "unidadeMedida": "",
+    "identification": "",
+    "procedureId": ""
+  },
+  {
+    "id": "CAL-1777040207003",
+    "kFactorJustification": "Padrão (k=2 para 95.45%)",
+    "status": "Em confecção",
+    "humidity": 50,
+    "serviceOrderId": "26295",
+    "manufacturer": "",
+    "standardInstrumentUncertainties": [],
+    "calibrationDate": "2026-04-24",
+    "model": "",
+    "standardInstrumentsSnapshot": [],
+    "isAccredited": false,
+    "envStandardInstrumentId": "",
+    "groups": [
+      {
+        "columns": [
+          "TAG_1",
+          "COL2",
+          "COL3",
+          "COL4",
+          "COL5",
+          "COL6",
+          "COL7"
+        ],
+        "hiddenColumns": [
+          "COL3",
+          "COL4",
+          "COL5"
+        ],
+        "isDynamic": true,
+        "rows": [
+          {
+            "COL2": "0,000",
+            "TAG_1": "mm",
+            "COL6": ""
+          },
+          {
+            "COL2": "1,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "2,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "3,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "4,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "5,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "10,000",
+            "TAG_1": "mm"
+          }
+        ],
+        "graphType": "error_curve",
+        "templateRows": [
+          {
+            "COL6": "",
+            "COL2": "0,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "1,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "2,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "3,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "4,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "5,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "10,000",
+            "TAG_1": "mm"
+          }
+        ],
+        "groupName": "",
+        "columnDefinitions": [
+          {
+            "name": "Unidade de Medida",
+            "displayFormat": "text",
+            "id": "TAG_1",
+            "type": "NUMBER",
+            "behavior": "INPUT"
+          },
+          {
+            "id": "COL2",
+            "decimalPlaces": 3,
+            "type": "NUMBER",
+            "behavior": "INPUT",
+            "name": "Valor Verdadeiro Convencional (mm)",
+            "isLocked": false
+          },
+          {
+            "decimalPlaces": 3,
+            "type": "NUMBER",
+            "id": "COL3",
+            "behavior": "INPUT",
+            "name": "Leitura 1",
+            "isLocked": false
+          },
+          {
+            "name": "Leitura 2",
+            "isLocked": false,
+            "id": "COL4",
+            "type": "NUMBER",
+            "decimalPlaces": 3,
+            "behavior": "INPUT"
+          },
+          {
+            "behavior": "INPUT",
+            "type": "NUMBER",
+            "decimalPlaces": 3,
+            "id": "COL5",
+            "isLocked": false,
+            "name": "Leitura 3"
+          },
+          {
+            "type": "NUMBER",
+            "id": "COL6",
+            "behavior": "CALCULATED",
+            "name": "Indicação no Instrumento (mm)",
+            "formula": "(COL3+COL4+COL5)/3",
+            "isLocked": true
+          },
+          {
+            "formula": "[COL6]-[COL2]",
+            "isLocked": false,
+            "name": "Erro (mm)",
+            "behavior": "CALCULATED",
+            "id": "COL7",
+            "type": "NUMBER"
+          }
+        ],
+        "name": "",
+        "blockId": "T1",
+        "hasGraph": true
+      },
+      {
+        "rows": [
+          {
+            "COL1": "± 0,001 mm",
+            "COL2": "2,08"
+          }
+        ],
+        "templateRows": [
+          {
+            "COL1": "± 0,001 mm",
+            "COL2": "2,08"
+          }
+        ],
+        "columns": [
+          "COL1",
+          "COL2"
+        ],
+        "blockId": "T2",
+        "name": "",
+        "columnDefinitions": [
+          {
+            "displayFormat": "text",
+            "formula": "",
+            "name": "Incerteza de Medição",
+            "behavior": "INPUT",
+            "id": "COL1",
+            "decimalPlaces": 4,
+            "type": "NUMBER"
+          },
+          {
+            "displayFormat": "text",
+            "formula": "",
+            "isLocked": false,
+            "name": "Coeficiente K",
+            "behavior": "INPUT",
+            "id": "COL2",
+            "type": "NUMBER"
+          }
+        ],
+        "groupName": ""
+      }
+    ],
+    "technicianName": "EKKsNoGs6wZlh3c0Ht9B",
+    "calibrationLocation": "Laboratório",
+    "certificateNumber": "CERT-2026-6455",
+    "capacidadeMaxima": "",
+    "quoteItemIndex": 8,
+    "calculatedPoints": {
+      "T1_row5": {
+        "COL7": -5,
+        "trace": {
+          "COL6": {
+            "formula": "(COL3+COL4+COL5)/3",
+            "output": 0
+          },
+          "COL7": {
+            "output": -5,
+            "formula": "[COL6]-[COL2]"
+          }
+        },
+        "COL2": "5,000",
+        "TAG_1": "mm",
+        "COL6": 0
+      },
+      "T1_row4": {
+        "COL6": 0,
+        "TAG_1": "mm",
+        "COL2": "4,000",
+        "COL7": -4,
+        "trace": {
+          "COL6": {
+            "output": 0,
+            "formula": "(COL3+COL4+COL5)/3"
+          },
+          "COL7": {
+            "formula": "[COL6]-[COL2]",
+            "output": -4
+          }
+        }
+      },
+      "T1_row2": {
+        "TAG_5": "",
+        "COL6": 0,
+        "TAG_4": "",
+        "TAG_3": "",
+        "COL2": "2,000",
+        "TAG_1": "mm",
+        "_pointIdx": "2",
+        "trace": {
+          "COL6": {
+            "formula": "(COL3+COL4+COL5)/3",
+            "output": 0
+          },
+          "TAG_7": {
+            "formula": "([TAG_6]-[TAG_1])/[TAG_1]",
+            "output": "Erro na fórmula"
+          },
+          "COL7": {
+            "output": -2,
+            "formula": "[COL6]-[COL2]"
+          },
+          "TAG_6": {
+            "formula": "([TAG_3]+[TAG_4]+[TAG_5])/3",
+            "output": 0
+          }
+        },
+        "COL7": -2,
+        "TAG_2": "",
+        "TAG_7": "Erro",
+        "TAG_6": 0
+      },
+      "T1_row3": {
+        "COL7": -3,
+        "trace": {
+          "COL6": {
+            "output": 0,
+            "formula": "(COL3+COL4+COL5)/3"
+          },
+          "COL7": {
+            "output": -3,
+            "formula": "[COL6]-[COL2]"
+          }
+        },
+        "COL2": "3,000",
+        "TAG_1": "mm",
+        "COL6": 0
+      },
+      "T1_row0": {
+        "_pointIdx": "0",
+        "TAG_3": "",
+        "TAG_4": "",
+        "COL6": 0,
+        "TAG_1": "mm",
+        "COL2": "0,000",
+        "TAG_5": "",
+        "TAG_6": 0,
+        "TAG_2": "",
+        "TAG_7": -1,
+        "COL7": 0,
+        "trace": {
+          "TAG_6": {
+            "output": 0,
+            "formula": "([TAG_3]+[TAG_4]+[TAG_5])/3"
+          },
+          "COL7": {
+            "formula": "[COL6]-[COL2]",
+            "output": 0
+          },
+          "TAG_7": {
+            "output": -1,
+            "formula": "([TAG_6]-[TAG_1])/[TAG_1]"
+          },
+          "COL6": {
+            "formula": "(COL3+COL4+COL5)/3",
+            "output": 0
+          }
+        }
+      },
+      "T1_row6": {
+        "trace": {
+          "COL6": {
+            "output": 0,
+            "formula": "(COL3+COL4+COL5)/3"
+          },
+          "COL7": {
+            "output": -10,
+            "formula": "[COL6]-[COL2]"
+          }
+        },
+        "COL7": -10,
+        "COL2": "10,000",
+        "TAG_1": "mm",
+        "COL6": 0
+      },
+      "T2_row0": {
+        "COL1": "± 0,001 mm",
+        "trace": {},
+        "COL2": "2,08"
+      },
+      "T1_row1": {
+        "TAG_5": "",
+        "COL6": 0,
+        "TAG_4": "",
+        "TAG_3": "",
+        "COL2": "1,000",
+        "TAG_1": "mm",
+        "_pointIdx": "1",
+        "trace": {
+          "TAG_6": {
+            "output": 0,
+            "formula": "([TAG_3]+[TAG_4]+[TAG_5])/3"
+          },
+          "COL7": {
+            "output": -1,
+            "formula": "[COL6]-[COL2]"
+          },
+          "TAG_7": {
+            "output": -1,
+            "formula": "([TAG_6]-[TAG_1])/[TAG_1]"
+          },
+          "COL6": {
+            "output": 0,
+            "formula": "(COL3+COL4+COL5)/3"
+          }
+        },
+        "COL7": -1,
+        "TAG_2": "",
+        "TAG_7": -1,
+        "TAG_6": 0
+      }
+    },
+    "periodicity": "12 meses",
+    "resolution": 0,
+    "environmentalStandardId": "",
+    "isDraft": true,
+    "standardInstrumentIds": [],
+    "maskSnapshot": {
+      "sections": [
+        {
+          "groups": [
+            {
+              "hiddenColumns": [
+                "COL3",
+                "COL4",
+                "COL5"
+              ],
+              "isDynamic": true,
+              "templateRows": [
+                {
+                  "TAG_1": "mm",
+                  "COL2": "0,000",
+                  "COL6": ""
+                },
+                {
+                  "TAG_1": "mm",
+                  "COL2": "1,000"
+                },
+                {
+                  "COL2": "2,000",
+                  "TAG_1": "mm"
+                },
+                {
+                  "COL2": "3,000",
+                  "TAG_1": "mm"
+                },
+                {
+                  "TAG_1": "mm",
+                  "COL2": "4,000"
+                },
+                {
+                  "TAG_1": "mm",
+                  "COL2": "5,000"
+                },
+                {
+                  "TAG_1": "mm",
+                  "COL2": "10,000"
+                }
+              ],
+              "graphType": "error_curve",
+              "columnDefinitions": [
+                {
+                  "type": "NUMBER",
+                  "id": "TAG_1",
+                  "behavior": "INPUT",
+                  "name": "Unidade de Medida",
+                  "displayFormat": "text"
+                },
+                {
+                  "behavior": "INPUT",
+                  "id": "COL2",
+                  "type": "NUMBER",
+                  "decimalPlaces": 3,
+                  "isLocked": false,
+                  "name": "Valor Verdadeiro Convencional (mm)"
+                },
+                {
+                  "type": "NUMBER",
+                  "decimalPlaces": 3,
+                  "id": "COL3",
+                  "behavior": "INPUT",
+                  "name": "Leitura 1",
+                  "isLocked": false
+                },
+                {
+                  "behavior": "INPUT",
+                  "type": "NUMBER",
+                  "decimalPlaces": 3,
+                  "id": "COL4",
+                  "isLocked": false,
+                  "name": "Leitura 2"
+                },
+                {
+                  "isLocked": false,
+                  "name": "Leitura 3",
+                  "behavior": "INPUT",
+                  "type": "NUMBER",
+                  "decimalPlaces": 3,
+                  "id": "COL5"
+                },
+                {
+                  "behavior": "CALCULATED",
+                  "type": "NUMBER",
+                  "id": "COL6",
+                  "formula": "(COL3+COL4+COL5)/3",
+                  "isLocked": true,
+                  "name": "Indicação no Instrumento (mm)"
+                },
+                {
+                  "behavior": "CALCULATED",
+                  "type": "NUMBER",
+                  "id": "COL7",
+                  "formula": "[COL6]-[COL2]",
+                  "isLocked": false,
+                  "name": "Erro (mm)"
+                }
+              ],
+              "blockId": "T1",
+              "hasGraph": true,
+              "name": ""
+            }
+          ],
+          "title": "",
+          "id": "sec-1777952246260"
+        },
+        {
+          "title": "",
+          "id": "sec-1777952491085",
+          "groups": [
+            {
+              "columnDefinitions": [
+                {
+                  "behavior": "INPUT",
+                  "id": "COL1",
+                  "type": "NUMBER",
+                  "decimalPlaces": 4,
+                  "displayFormat": "text",
+                  "formula": "",
+                  "name": "Incerteza de Medição"
+                },
+                {
+                  "behavior": "INPUT",
+                  "id": "COL2",
+                  "type": "NUMBER",
+                  "formula": "",
+                  "isLocked": false,
+                  "displayFormat": "text",
+                  "name": "Coeficiente K"
+                }
+              ],
+              "blockId": "T2",
+              "name": "",
+              "templateRows": [
+                {
+                  "COL2": "2,08",
+                  "COL1": "± 0,001 mm"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "title": "medidor de espessura",
+      "procedureId": "",
+      "measurementGroups": [
+        {
+          "templateRows": [
+            {
+              "COL6": "",
+              "COL2": "0,000",
+              "TAG_1": "mm"
+            },
+            {
+              "COL2": "1,000",
+              "TAG_1": "mm"
+            },
+            {
+              "COL2": "2,000",
+              "TAG_1": "mm"
+            },
+            {
+              "COL2": "3,000",
+              "TAG_1": "mm"
+            },
+            {
+              "COL2": "4,000",
+              "TAG_1": "mm"
+            },
+            {
+              "COL2": "5,000",
+              "TAG_1": "mm"
+            },
+            {
+              "COL2": "10,000",
+              "TAG_1": "mm"
+            }
+          ],
+          "graphType": "error_curve",
+          "isDynamic": true,
+          "hiddenColumns": [
+            "COL3",
+            "COL4",
+            "COL5"
+          ],
+          "name": "",
+          "blockId": "T1",
+          "hasGraph": true,
+          "columnDefinitions": [
+            {
+              "name": "Unidade de Medida",
+              "displayFormat": "text",
+              "type": "NUMBER",
+              "id": "TAG_1",
+              "behavior": "INPUT"
+            },
+            {
+              "name": "Valor Verdadeiro Convencional (mm)",
+              "isLocked": false,
+              "decimalPlaces": 3,
+              "type": "NUMBER",
+              "id": "COL2",
+              "behavior": "INPUT"
+            },
+            {
+              "isLocked": false,
+              "name": "Leitura 1",
+              "behavior": "INPUT",
+              "id": "COL3",
+              "decimalPlaces": 3,
+              "type": "NUMBER"
+            },
+            {
+              "behavior": "INPUT",
+              "decimalPlaces": 3,
+              "type": "NUMBER",
+              "id": "COL4",
+              "isLocked": false,
+              "name": "Leitura 2"
+            },
+            {
+              "name": "Leitura 3",
+              "isLocked": false,
+              "type": "NUMBER",
+              "decimalPlaces": 3,
+              "id": "COL5",
+              "behavior": "INPUT"
+            },
+            {
+              "behavior": "CALCULATED",
+              "type": "NUMBER",
+              "id": "COL6",
+              "isLocked": true,
+              "formula": "(COL3+COL4+COL5)/3",
+              "name": "Indicação no Instrumento (mm)"
+            },
+            {
+              "behavior": "CALCULATED",
+              "id": "COL7",
+              "type": "NUMBER",
+              "formula": "[COL6]-[COL2]",
+              "isLocked": false,
+              "name": "Erro (mm)"
+            }
+          ]
+        },
+        {
+          "templateRows": [
+            {
+              "COL1": "± 0,001 mm",
+              "COL2": "2,08"
+            }
+          ],
+          "name": "",
+          "blockId": "T2",
+          "columnDefinitions": [
+            {
+              "name": "Incerteza de Medição",
+              "formula": "",
+              "displayFormat": "text",
+              "decimalPlaces": 4,
+              "type": "NUMBER",
+              "id": "COL1",
+              "behavior": "INPUT"
+            },
+            {
+              "displayFormat": "text",
+              "formula": "",
+              "isLocked": false,
+              "name": "Coeficiente K",
+              "behavior": "INPUT",
+              "type": "NUMBER",
+              "id": "COL2"
+            }
+          ]
+        }
+      ],
+      "standardInstrumentIds": [],
+      "description": "medidor de espessura",
+      "updatedAt": "2026-05-05T03:57:34.673Z",
+      "version": 1,
+      "uncertaintyBudget": [],
+      "type": "CALIBRATION_CERTIFICATE",
+      "id": "mask-1777952246260",
+      "createdAt": "2026-05-05T03:37:26.260Z"
+    },
+    "instrumentName": "Multímetro de bancada",
+    "headerValidated": true,
+    "attachments": [],
+    "headerSaved": true,
+    "unitIndex": 0,
+    "temperature": 20,
+    "certificateMaskId": "mask-1777952246260",
+    "serialNumber": "",
+    "identification": "",
+    "unidadeMedida": "",
+    "procedureId": "bfEwP4Mw8cXN9R1hOaXf",
+    "capacidadeMinima": "",
+    "observations": "",
+    "nextCalibrationDate": ""
+  },
+  {
+    "id": "CAL-1777041396453",
+    "serviceOrderId": "26295",
+    "manufacturer": "",
+    "standardInstrumentUncertainties": [
+      {
+        "declaredU": 0.28,
+        "instrumentId": "xnqCaLBlXqVYoBJGl963",
+        "certificateK": 2
+      },
+      {
+        "declaredU": 0.08,
+        "instrumentId": "kx82P3p8A1js6htcQSLk",
+        "certificateK": 2
+      }
+    ],
+    "calibrationDate": "2026-04-24",
+    "kFactorJustification": "Padrão (k=2 para 95.45%)",
+    "status": "Em confecção",
+    "humidity": 50,
+    "calculatedPoints": {
+      "T1_row6": {
+        "trace": {
+          "COL6": {
+            "output": 0,
+            "formula": "(COL3+COL4+COL5)/3"
+          },
+          "COL7": {
+            "formula": "[COL6]-[COL2]",
+            "output": -10
+          }
+        },
+        "COL7": -10,
+        "TAG_1": "mm",
+        "COL2": "10,000",
+        "COL6": 0
+      },
+      "T2_row0": {
+        "COL2": "2,08",
+        "trace": {},
+        "COL1": "± 0,001 mm"
+      },
+      "T1_row0": {
+        "TAG_2": "10",
+        "TAG_6": 0,
+        "trace": {
+          "TAG_7": {
+            "output": "Erro na fórmula",
+            "formula": "[TAG_6]/[TAG_8]"
+          },
+          "COL6": {
+            "formula": "(COL3+COL4+COL5)/3",
+            "output": 0
+          },
+          "TAG_6": {
+            "formula": "[TAG_5]-[TAG_1]",
+            "output": 0
+          },
+          "TAG_5": {
+            "output": 10,
+            "formula": "([TAG_2]+[TAG_3]+[TAG_4])/3"
+          },
+          "COL7": {
+            "formula": "[COL6]-[COL2]",
+            "output": 0
+          }
+        },
+        "TAG_1": "mm",
+        "COL2": "0,000",
+        "TAG_8": "",
+        "TAG_3": "10",
+        "TAG_4": "10",
+        "TAG_5": 10,
+        "TAG_7": "Erro",
+        "COL7": 0,
+        "COL6": 0,
+        "_pointIdx": "0"
+      },
+      "T1_row4": {
+        "COL6": 0,
+        "COL2": "4,000",
+        "TAG_1": "mm",
+        "COL7": -4,
+        "trace": {
+          "COL6": {
+            "formula": "(COL3+COL4+COL5)/3",
+            "output": 0
+          },
+          "COL7": {
+            "formula": "[COL6]-[COL2]",
+            "output": -4
+          }
+        }
+      },
+      "T1_row5": {
+        "COL6": 0,
+        "TAG_1": "mm",
+        "COL2": "5,000",
+        "COL7": -5,
+        "trace": {
+          "COL6": {
+            "output": 0,
+            "formula": "(COL3+COL4+COL5)/3"
+          },
+          "COL7": {
+            "output": -5,
+            "formula": "[COL6]-[COL2]"
+          }
+        }
+      },
+      "T1_row2": {
+        "COL6": 0,
+        "COL2": "2,000",
+        "TAG_1": "mm",
+        "trace": {
+          "COL6": {
+            "formula": "(COL3+COL4+COL5)/3",
+            "output": 0
+          },
+          "COL7": {
+            "output": -2,
+            "formula": "[COL6]-[COL2]"
+          }
+        },
+        "COL7": -2
+      },
+      "T1_row3": {
+        "COL7": -3,
+        "trace": {
+          "COL6": {
+            "output": 0,
+            "formula": "(COL3+COL4+COL5)/3"
+          },
+          "COL7": {
+            "formula": "[COL6]-[COL2]",
+            "output": -3
+          }
+        },
+        "TAG_1": "mm",
+        "COL2": "3,000",
+        "COL6": 0
+      },
+      "T1_row1": {
+        "COL2": "1,000",
+        "TAG_1": "mm",
+        "COL6": 0,
+        "COL7": -1,
+        "trace": {
+          "COL6": {
+            "formula": "(COL3+COL4+COL5)/3",
+            "output": 0
+          },
+          "COL7": {
+            "formula": "[COL6]-[COL2]",
+            "output": -1
           }
         }
       }
+    },
+    "periodicity": "12 meses",
+    "resolution": 1,
+    "environmentalStandardId": "",
+    "isDraft": true,
+    "standardInstrumentIds": [
+      "xnqCaLBlXqVYoBJGl963",
+      "kx82P3p8A1js6htcQSLk"
+    ],
+    "model": "",
+    "standardInstrumentsSnapshot": [
+      {
+        "unidadeMedida": "um",
+        "statusMovimentacao": "Disponível",
+        "periodicidade": "36",
+        "orgaoCalibrador": "RBC/MITUTOYO",
+        "dataCalibracao": "2023-03-28",
+        "resolucao": "0,01",
+        "identificacao": "516-357-60",
+        "kFactor": 2,
+        "certificadoCalibracao": "01281/23",
+        "nome": "JOGO DE BLOCOS - PADRÃO",
+        "uncertainty": 0.08,
+        "id": "kx82P3p8A1js6htcQSLk",
+        "dataValidadeCalibracao": "2026-03-30"
+      },
+      {
+        "nome": "Termohigrômetro Digital",
+        "statusMovimentacao": "Disponível",
+        "uncertainty": 0.28,
+        "identificacao": " WAN-TEM-215",
+        "unidadeMedida": "°C",
+        "certificadoCalibracao": "R 5594/24",
+        "dataValidadeCalibracao": "2026-09-19",
+        "resolucao": "0,1",
+        "orgaoCalibrador": "Laboratório de Temperatura LRM-LabTem",
+        "periodicidade": "24",
+        "id": "xnqCaLBlXqVYoBJGl963",
+        "dataCalibracao": "2024-09-19"
+      }
+    ],
+    "isAccredited": false,
+    "envStandardInstrumentId": "",
+    "technicianName": "EKKsNoGs6wZlh3c0Ht9B",
+    "groups": [
+      {
+        "rows": [
+          {
+            "TAG_1": "mm",
+            "COL2": "0,000",
+            "COL6": ""
+          },
+          {
+            "COL2": "1,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "2,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "3,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "4,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "5,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "10,000",
+            "TAG_1": "mm"
+          }
+        ],
+        "columns": [
+          "TAG_1",
+          "COL2",
+          "COL3",
+          "COL4",
+          "COL5",
+          "COL6",
+          "COL7"
+        ],
+        "hiddenColumns": [
+          "COL3",
+          "COL4",
+          "COL5"
+        ],
+        "isDynamic": true,
+        "name": "",
+        "blockId": "T1",
+        "hasGraph": true,
+        "groupName": "",
+        "columnDefinitions": [
+          {
+            "type": "NUMBER",
+            "id": "TAG_1",
+            "behavior": "INPUT",
+            "name": "Unidade de Medida",
+            "displayFormat": "text"
+          },
+          {
+            "name": "Valor Verdadeiro Convencional (mm)",
+            "isLocked": false,
+            "id": "COL2",
+            "decimalPlaces": 3,
+            "type": "NUMBER",
+            "behavior": "INPUT"
+          },
+          {
+            "type": "NUMBER",
+            "decimalPlaces": 3,
+            "id": "COL3",
+            "behavior": "INPUT",
+            "name": "Leitura 1",
+            "isLocked": false
+          },
+          {
+            "name": "Leitura 2",
+            "isLocked": false,
+            "decimalPlaces": 3,
+            "type": "NUMBER",
+            "id": "COL4",
+            "behavior": "INPUT"
+          },
+          {
+            "isLocked": false,
+            "name": "Leitura 3",
+            "behavior": "INPUT",
+            "type": "NUMBER",
+            "decimalPlaces": 3,
+            "id": "COL5"
+          },
+          {
+            "formula": "(COL3+COL4+COL5)/3",
+            "isLocked": true,
+            "name": "Indicação no Instrumento (mm)",
+            "behavior": "CALCULATED",
+            "id": "COL6",
+            "type": "NUMBER"
+          },
+          {
+            "type": "NUMBER",
+            "id": "COL7",
+            "behavior": "CALCULATED",
+            "name": "Erro (mm)",
+            "isLocked": false,
+            "formula": "[COL6]-[COL2]"
+          }
+        ],
+        "templateRows": [
+          {
+            "COL6": "",
+            "TAG_1": "mm",
+            "COL2": "0,000"
+          },
+          {
+            "COL2": "1,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "2,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "3,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "4,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "5,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "10,000",
+            "TAG_1": "mm"
+          }
+        ],
+        "graphType": "error_curve"
+      },
+      {
+        "blockId": "T2",
+        "name": "",
+        "columnDefinitions": [
+          {
+            "displayFormat": "text",
+            "formula": "",
+            "name": "Incerteza de Medição",
+            "behavior": "INPUT",
+            "id": "COL1",
+            "type": "NUMBER",
+            "decimalPlaces": 4
+          },
+          {
+            "behavior": "INPUT",
+            "type": "NUMBER",
+            "id": "COL2",
+            "formula": "",
+            "isLocked": false,
+            "displayFormat": "text",
+            "name": "Coeficiente K"
+          }
+        ],
+        "groupName": "",
+        "templateRows": [
+          {
+            "COL1": "± 0,001 mm",
+            "COL2": "2,08"
+          }
+        ],
+        "rows": [
+          {
+            "COL1": "± 0,001 mm",
+            "COL2": "2,08"
+          }
+        ],
+        "columns": [
+          "COL1",
+          "COL2"
+        ]
+      }
+    ],
+    "certificateNumber": "CERT-2026-1752",
+    "calibrationLocation": "Laboratório",
+    "capacidadeMaxima": "",
+    "quoteItemIndex": 9,
+    "headerSaved": true,
+    "unitIndex": 0,
+    "certificateMaskId": "mask-1777952246260",
+    "temperature": 20,
+    "serialNumber": "",
+    "maskSnapshot": {
+      "title": "medidor de espessura",
+      "procedureId": "",
+      "measurementGroups": [
+        {
+          "hasGraph": true,
+          "blockId": "T1",
+          "name": "",
+          "columnDefinitions": [
+            {
+              "name": "Unidade de Medida",
+              "displayFormat": "text",
+              "type": "NUMBER",
+              "id": "TAG_1",
+              "behavior": "INPUT"
+            },
+            {
+              "behavior": "INPUT",
+              "type": "NUMBER",
+              "decimalPlaces": 3,
+              "id": "COL2",
+              "isLocked": false,
+              "name": "Valor Verdadeiro Convencional (mm)"
+            },
+            {
+              "isLocked": false,
+              "name": "Leitura 1",
+              "behavior": "INPUT",
+              "type": "NUMBER",
+              "decimalPlaces": 3,
+              "id": "COL3"
+            },
+            {
+              "id": "COL4",
+              "type": "NUMBER",
+              "decimalPlaces": 3,
+              "behavior": "INPUT",
+              "name": "Leitura 2",
+              "isLocked": false
+            },
+            {
+              "name": "Leitura 3",
+              "isLocked": false,
+              "decimalPlaces": 3,
+              "type": "NUMBER",
+              "id": "COL5",
+              "behavior": "INPUT"
+            },
+            {
+              "isLocked": true,
+              "formula": "(COL3+COL4+COL5)/3",
+              "name": "Indicação no Instrumento (mm)",
+              "behavior": "CALCULATED",
+              "id": "COL6",
+              "type": "NUMBER"
+            },
+            {
+              "behavior": "CALCULATED",
+              "type": "NUMBER",
+              "id": "COL7",
+              "isLocked": false,
+              "formula": "[COL6]-[COL2]",
+              "name": "Erro (mm)"
+            }
+          ],
+          "templateRows": [
+            {
+              "COL2": "0,000",
+              "TAG_1": "mm",
+              "COL6": ""
+            },
+            {
+              "COL2": "1,000",
+              "TAG_1": "mm"
+            },
+            {
+              "COL2": "2,000",
+              "TAG_1": "mm"
+            },
+            {
+              "COL2": "3,000",
+              "TAG_1": "mm"
+            },
+            {
+              "COL2": "4,000",
+              "TAG_1": "mm"
+            },
+            {
+              "COL2": "5,000",
+              "TAG_1": "mm"
+            },
+            {
+              "COL2": "10,000",
+              "TAG_1": "mm"
+            }
+          ],
+          "graphType": "error_curve",
+          "hiddenColumns": [
+            "COL3",
+            "COL4",
+            "COL5"
+          ],
+          "isDynamic": true
+        },
+        {
+          "blockId": "T2",
+          "name": "",
+          "templateRows": [
+            {
+              "COL1": "± 0,001 mm",
+              "COL2": "2,08"
+            }
+          ],
+          "columnDefinitions": [
+            {
+              "id": "COL1",
+              "type": "NUMBER",
+              "decimalPlaces": 4,
+              "behavior": "INPUT",
+              "name": "Incerteza de Medição",
+              "formula": "",
+              "displayFormat": "text"
+            },
+            {
+              "type": "NUMBER",
+              "id": "COL2",
+              "behavior": "INPUT",
+              "name": "Coeficiente K",
+              "isLocked": false,
+              "formula": "",
+              "displayFormat": "text"
+            }
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "groups": [
+            {
+              "blockId": "T1",
+              "hasGraph": true,
+              "name": "",
+              "columnDefinitions": [
+                {
+                  "displayFormat": "text",
+                  "name": "Unidade de Medida",
+                  "behavior": "INPUT",
+                  "id": "TAG_1",
+                  "type": "NUMBER"
+                },
+                {
+                  "isLocked": false,
+                  "name": "Valor Verdadeiro Convencional (mm)",
+                  "behavior": "INPUT",
+                  "id": "COL2",
+                  "decimalPlaces": 3,
+                  "type": "NUMBER"
+                },
+                {
+                  "isLocked": false,
+                  "name": "Leitura 1",
+                  "behavior": "INPUT",
+                  "id": "COL3",
+                  "decimalPlaces": 3,
+                  "type": "NUMBER"
+                },
+                {
+                  "name": "Leitura 2",
+                  "isLocked": false,
+                  "id": "COL4",
+                  "type": "NUMBER",
+                  "decimalPlaces": 3,
+                  "behavior": "INPUT"
+                },
+                {
+                  "isLocked": false,
+                  "name": "Leitura 3",
+                  "behavior": "INPUT",
+                  "id": "COL5",
+                  "type": "NUMBER",
+                  "decimalPlaces": 3
+                },
+                {
+                  "name": "Indicação no Instrumento (mm)",
+                  "isLocked": true,
+                  "formula": "(COL3+COL4+COL5)/3",
+                  "id": "COL6",
+                  "type": "NUMBER",
+                  "behavior": "CALCULATED"
+                },
+                {
+                  "isLocked": false,
+                  "formula": "[COL6]-[COL2]",
+                  "name": "Erro (mm)",
+                  "behavior": "CALCULATED",
+                  "id": "COL7",
+                  "type": "NUMBER"
+                }
+              ],
+              "templateRows": [
+                {
+                  "COL6": "",
+                  "TAG_1": "mm",
+                  "COL2": "0,000"
+                },
+                {
+                  "TAG_1": "mm",
+                  "COL2": "1,000"
+                },
+                {
+                  "COL2": "2,000",
+                  "TAG_1": "mm"
+                },
+                {
+                  "COL2": "3,000",
+                  "TAG_1": "mm"
+                },
+                {
+                  "TAG_1": "mm",
+                  "COL2": "4,000"
+                },
+                {
+                  "TAG_1": "mm",
+                  "COL2": "5,000"
+                },
+                {
+                  "TAG_1": "mm",
+                  "COL2": "10,000"
+                }
+              ],
+              "graphType": "error_curve",
+              "isDynamic": true,
+              "hiddenColumns": [
+                "COL3",
+                "COL4",
+                "COL5"
+              ]
+            }
+          ],
+          "title": "",
+          "id": "sec-1777952246260"
+        },
+        {
+          "id": "sec-1777952491085",
+          "title": "",
+          "groups": [
+            {
+              "name": "",
+              "templateRows": [
+                {
+                  "COL1": "± 0,001 mm",
+                  "COL2": "2,08"
+                }
+              ],
+              "blockId": "T2",
+              "columnDefinitions": [
+                {
+                  "behavior": "INPUT",
+                  "id": "COL1",
+                  "decimalPlaces": 4,
+                  "type": "NUMBER",
+                  "displayFormat": "text",
+                  "formula": "",
+                  "name": "Incerteza de Medição"
+                },
+                {
+                  "behavior": "INPUT",
+                  "id": "COL2",
+                  "type": "NUMBER",
+                  "formula": "",
+                  "displayFormat": "text",
+                  "isLocked": false,
+                  "name": "Coeficiente K"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "type": "CALIBRATION_CERTIFICATE",
+      "uncertaintyBudget": [],
+      "id": "mask-1777952246260",
+      "createdAt": "2026-05-05T03:37:26.260Z",
+      "standardInstrumentIds": [],
+      "description": "medidor de espessura",
+      "updatedAt": "2026-05-05T03:57:34.673Z",
+      "version": 1
+    },
+    "instrumentName": "Manômetro Analógico",
+    "headerValidated": true,
+    "attachments": [],
+    "observations": "",
+    "nextCalibrationDate": "",
+    "identification": "",
+    "unidadeMedida": "",
+    "procedureId": "UMPsFucxXMrT14b20qLy",
+    "capacidadeMinima": ""
+  },
+  {
+    "id": "CAL-1777850819780",
+    "kFactorJustification": "Padrão (k=2 para 95.45%)",
+    "status": "Em confecção",
+    "humidity": 65,
+    "serviceOrderId": "26329",
+    "manufacturer": "LUPUS",
+    "calibrationDate": "2026-05-05",
+    "model": "2600 MP",
+    "isAccredited": false,
+    "envStandardInstrumentId": "JU4EsLq2PjmqSQpeUS6k",
+    "groups": [],
+    "technicianName": "EKKsNoGs6wZlh3c0Ht9B",
+    "certificateNumber": "CRW263290001",
+    "calibrationLocation": "Dependências do Cliente",
+    "capacidadeMaxima": "1000",
+    "quoteItemIndex": 0,
+    "calculatedPoints": {},
+    "periodicity": "12 meses",
+    "resolution": 0.1,
+    "isDraft": true,
+    "environmentalStandardId": "JU4EsLq2PjmqSQpeUS6k",
+    "standardInstrumentIds": [],
+    "instrumentName": "Fluxômetro",
+    "headerValidated": true,
+    "attachments": [],
+    "headerSaved": true,
+    "unitIndex": 0,
+    "certificateMaskId": "",
+    "temperature": 24,
+    "serialNumber": "0060",
+    "identification": "FLUX-001",
+    "unidadeMedida": "l/min",
+    "procedureId": "",
+    "capacidadeMinima": "100",
+    "observations": "",
+    "nextCalibrationDate": "05/2027",
+    "envStandardInstrumentSnapshot": {
+      "id": "JU4EsLq2PjmqSQpeUS6k",
+      "dataValidadeCalibracao": "2026-09-04",
+      "identificacao": "WAN-TEM-009",
+      "certificadoCalibracao": "R46150/25",
+      "kFactor": 2,
+      "nome": "TERMOHIGRÔMETRO DIGITAL",
+      "uncertainty": 0.16,
+      "dataCalibracao": "2025-09-04",
+      "periodicidade": "12",
+      "orgaoCalibrador": "RBC - LRM GROUP",
+      "resolucao": "0,01",
+      "unidadeMedida": "ºC / %UR",
+      "statusMovimentacao": "Disponível"
     }
+  },
+  {
+    "id": "CAL-1777918862202",
+    "standardInstrumentUncertainties": [
+      {
+        "declaredU": 0.06,
+        "certificateK": 2,
+        "instrumentId": "wednsAaoSW1M67PPoFi5"
+      },
+      {
+        "certificateK": 2,
+        "instrumentId": "temp-1777924280463",
+        "declaredU": 0.01
+      }
+    ],
+    "calibrationDate": "2026-05-04",
+    "serviceOrderId": "26326",
+    "manufacturer": "Não consta",
+    "humidity": 51,
+    "kFactorJustification": "Padrão (k=2 para 95.45%)",
+    "status": "Em confecção",
+    "resolution": 0.001,
+    "isDraft": true,
+    "environmentalStandardId": "rvRO5Vnjb6N5RxFR7Lfu",
+    "standardInstrumentIds": [
+      "wednsAaoSW1M67PPoFi5",
+      "temp-1777924280463"
+    ],
+    "calculatedPoints": {
+      "T1_row1": {
+        "TAG_1": "mm",
+        "COL2": "1,000",
+        "COL5": "1,004",
+        "COL3": "1,004",
+        "COL6": 1.004,
+        "COL4": "1,004",
+        "trace": {
+          "COL6": {
+            "output": 1.004,
+            "formula": "(COL3+COL4+COL5)/3"
+          },
+          "COL7": {
+            "formula": "[COL6]-[COL2]",
+            "output": 0.0040000000000000036
+          }
+        },
+        "COL7": 0.0040000000000000036
+      },
+      "T1_row2": {
+        "COL7": 0.0030000000000001137,
+        "trace": {
+          "COL6": {
+            "output": 2.003,
+            "formula": "(COL3+COL4+COL5)/3"
+          },
+          "COL7": {
+            "output": 0.0030000000000001137,
+            "formula": "[COL6]-[COL2]"
+          }
+        },
+        "COL4": "2,003",
+        "TAG_1": "mm",
+        "COL2": "2,000",
+        "COL6": 2.003,
+        "COL3": "2,003",
+        "COL5": "2,003"
+      },
+      "T1_row3": {
+        "COL6": 3.001,
+        "COL5": "3,001",
+        "COL3": "3,001",
+        "COL2": "3,000",
+        "TAG_1": "mm",
+        "COL4": "3,001",
+        "trace": {
+          "COL6": {
+            "output": 3.001,
+            "formula": "(COL3+COL4+COL5)/3"
+          },
+          "COL7": {
+            "formula": "[COL6]-[COL2]",
+            "output": 0.0009999999999998899
+          }
+        },
+        "COL7": 0.0009999999999998899
+      },
+      "T1_row5": {
+        "COL7": 0.001000000000000334,
+        "trace": {
+          "COL6": {
+            "formula": "(COL3+COL4+COL5)/3",
+            "output": 5.001
+          },
+          "COL7": {
+            "formula": "[COL6]-[COL2]",
+            "output": 0.001000000000000334
+          }
+        },
+        "COL4": "5,001",
+        "COL6": 5.001,
+        "COL3": "5,001",
+        "COL5": "5,001",
+        "COL2": "5,000",
+        "TAG_1": "mm"
+      },
+      "T2_row0": {
+        "COL1": "± 0,001 mm",
+        "COL2": "2,08",
+        "trace": {}
+      },
+      "T1_row0": {
+        "TAG_1": "mm",
+        "COL2": "0,000",
+        "COL6": 0,
+        "trace": {
+          "COL6": {
+            "formula": "(COL3+COL4+COL5)/3",
+            "output": 0
+          },
+          "COL7": {
+            "output": 0,
+            "formula": "[COL6]-[COL2]"
+          }
+        },
+        "COL7": 0
+      },
+      "T1_row7": {
+        "trace": {
+          "COL6": {
+            "output": 12.003,
+            "formula": "(COL3+COL4+COL5)/3"
+          },
+          "COL7": {
+            "output": 0.0030000000000001137,
+            "formula": "[COL6]-[COL2]"
+          }
+        },
+        "COL7": 0.0030000000000001137,
+        "COL5": "12,003",
+        "COL3": "12,003",
+        "COL6": 12.003,
+        "COL2": "12,000",
+        "TAG_1": "mm",
+        "COL4": "12,003",
+        "_pointIdx": "7"
+      },
+      "T1_row4": {
+        "COL7": 0.0019999999999997797,
+        "trace": {
+          "COL6": {
+            "formula": "(COL3+COL4+COL5)/3",
+            "output": 4.002
+          },
+          "COL7": {
+            "output": 0.0019999999999997797,
+            "formula": "[COL6]-[COL2]"
+          }
+        },
+        "COL4": "4,002",
+        "COL2": "4,000",
+        "TAG_1": "mm",
+        "COL3": "4,002",
+        "COL6": 4.002,
+        "COL5": "4,002"
+      },
+      "T1_row6": {
+        "COL7": 0,
+        "trace": {
+          "COL6": {
+            "formula": "(COL3+COL4+COL5)/3",
+            "output": 10
+          },
+          "COL7": {
+            "formula": "[COL6]-[COL2]",
+            "output": 0
+          }
+        },
+        "COL4": "10,000",
+        "TAG_1": "mm",
+        "COL2": "10,000",
+        "COL5": "10,000",
+        "COL3": "10,000",
+        "COL6": 10
+      }
+    },
+    "periodicity": "12 meses",
+    "technicianName": "OWDKx4FhP38Mdqqwkysn",
+    "envStandardInstrumentId": "rvRO5Vnjb6N5RxFR7Lfu",
+    "groups": [
+      {
+        "rows": [
+          {
+            "COL6": "",
+            "TAG_1": "mm",
+            "COL2": "0,000"
+          },
+          {
+            "COL4": "1,004",
+            "COL3": "1,004",
+            "COL5": "1,004",
+            "TAG_1": "mm",
+            "COL2": "1,000"
+          },
+          {
+            "COL2": "2,000",
+            "TAG_1": "mm",
+            "COL3": "2,003",
+            "COL5": "2,003",
+            "COL4": "2,003"
+          },
+          {
+            "COL2": "3,000",
+            "TAG_1": "mm",
+            "COL3": "3,001",
+            "COL5": "3,001",
+            "COL4": "3,001"
+          },
+          {
+            "COL5": "4,002",
+            "COL3": "4,002",
+            "COL2": "4,000",
+            "TAG_1": "mm",
+            "COL4": "4,002"
+          },
+          {
+            "COL4": "5,001",
+            "COL2": "5,000",
+            "TAG_1": "mm",
+            "COL5": "5,001",
+            "COL3": "5,001"
+          },
+          {
+            "COL5": "10,000",
+            "COL3": "10,000",
+            "COL2": "10,000",
+            "TAG_1": "mm",
+            "COL4": "10,000"
+          },
+          {
+            "COL7": "",
+            "_pointIdx": "7",
+            "COL4": "12,003",
+            "COL3": "12,003",
+            "COL6": "",
+            "COL5": "12,003",
+            "COL2": "12,000",
+            "TAG_1": "mm"
+          }
+        ],
+        "hiddenColumns": [
+          "COL3",
+          "COL4",
+          "COL5"
+        ],
+        "isDynamic": true,
+        "templateRows": [
+          {
+            "COL2": "0,000",
+            "TAG_1": "mm",
+            "COL6": ""
+          },
+          {
+            "COL2": "1,000",
+            "TAG_1": "mm"
+          },
+          {
+            "TAG_1": "mm",
+            "COL2": "2,000"
+          },
+          {
+            "TAG_1": "mm",
+            "COL2": "3,000"
+          },
+          {
+            "COL2": "4,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "5,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "10,000",
+            "TAG_1": "mm"
+          }
+        ],
+        "graphType": "error_curve",
+        "hasGraph": true,
+        "blockId": "T1",
+        "name": "",
+        "columnDefinitions": [
+          {
+            "id": "TAG_1",
+            "type": "NUMBER",
+            "behavior": "INPUT",
+            "name": "Unidade de Medida",
+            "displayFormat": "text"
+          },
+          {
+            "isLocked": false,
+            "name": "Valor Verdadeiro Convencional (mm)",
+            "behavior": "INPUT",
+            "id": "COL2",
+            "type": "NUMBER",
+            "decimalPlaces": 3
+          },
+          {
+            "name": "Leitura 1",
+            "isLocked": false,
+            "type": "NUMBER",
+            "decimalPlaces": 3,
+            "id": "COL3",
+            "behavior": "INPUT"
+          },
+          {
+            "name": "Leitura 2",
+            "isLocked": false,
+            "decimalPlaces": 3,
+            "type": "NUMBER",
+            "id": "COL4",
+            "behavior": "INPUT"
+          },
+          {
+            "isLocked": false,
+            "name": "Leitura 3",
+            "behavior": "INPUT",
+            "id": "COL5",
+            "decimalPlaces": 3,
+            "type": "NUMBER"
+          },
+          {
+            "name": "Indicação no Instrumento (mm)",
+            "isLocked": true,
+            "formula": "(COL3+COL4+COL5)/3",
+            "id": "COL6",
+            "type": "NUMBER",
+            "decimalPlaces": 3,
+            "behavior": "CALCULATED"
+          },
+          {
+            "name": "Erro (mm)",
+            "isLocked": false,
+            "formula": "[COL6]-[COL2]",
+            "type": "NUMBER",
+            "decimalPlaces": 3,
+            "id": "COL7",
+            "behavior": "CALCULATED"
+          }
+        ],
+        "groupName": ""
+      },
+      {
+        "columnDefinitions": [
+          {
+            "behavior": "INPUT",
+            "decimalPlaces": 4,
+            "type": "NUMBER",
+            "id": "COL1",
+            "formula": "",
+            "displayFormat": "text",
+            "name": "Incerteza de Medição"
+          },
+          {
+            "isLocked": false,
+            "displayFormat": "text",
+            "formula": "",
+            "name": "Coeficiente K",
+            "behavior": "INPUT",
+            "id": "COL2",
+            "type": "NUMBER"
+          }
+        ],
+        "groupName": "",
+        "blockId": "T2",
+        "name": "",
+        "rows": [
+          {
+            "COL1": "± 0,001 mm",
+            "COL2": "2,08"
+          }
+        ],
+        "templateRows": [
+          {
+            "COL1": "± 0,001 mm",
+            "COL2": "2,08"
+          }
+        ]
+      }
+    ],
+    "calibrationLocation": "Laboratório Wantec/LRM",
+    "capacidadeMaxima": "12.7mm",
+    "certificateNumber": "CRW263260001",
+    "quoteItemIndex": 0,
+    "model": "não consta",
+    "standardInstrumentsSnapshot": [
+      {
+        "dataValidadeCalibracao": "2027-12-13",
+        "id": "temp-1777924280463",
+        "uncertainty": 0.01,
+        "nome": "Jg de Blocos Padrão 38 pçs",
+        "certificadoCalibracao": "LRM-DIM-007",
+        "kFactor": 2,
+        "identificacao": "04243/23",
+        "resolucao": "0,01",
+        "dataCalibracao": "2023-12-13",
+        "periodicidade": "48",
+        "orgaoCalibrador": "RBC - Mitutoyo",
+        "statusMovimentacao": "Disponível",
+        "unidadeMedida": "38"
+      },
+      {
+        "id": "wednsAaoSW1M67PPoFi5",
+        "orgaoCalibrador": "Mitutoyo",
+        "periodicidade": "48",
+        "dataCalibracao": "2023-12-11",
+        "resolucao": "0,01",
+        "dataValidadeCalibracao": "2027-12-11",
+        "certificadoCalibracao": "04243/23",
+        "identificacao": "LRM-DIM-007",
+        "unidadeMedida": "mm",
+        "uncertainty": 0.06,
+        "statusMovimentacao": "Disponível",
+        "nome": "Jg de Blocos Padrão 38 pçs"
+      }
+    ],
+    "isAccredited": false,
+    "serialNumber": "KJ25074701",
+    "headerSaved": true,
+    "unitIndex": 0,
+    "temperature": 24,
+    "certificateMaskId": "mask-1777952246260",
+    "instrumentName": "Medidor de espessura com relógio",
+    "headerValidated": true,
+    "attachments": [],
+    "maskSnapshot": {
+      "updatedAt": "2026-05-05T14:35:37.306Z",
+      "version": 1,
+      "standardInstrumentIds": [],
+      "description": "medidor de espessura",
+      "createdAt": "2026-05-05T03:37:26.260Z",
+      "uncertaintyBudget": [],
+      "type": "CALIBRATION_CERTIFICATE",
+      "id": "mask-1777952246260",
+      "sections": [
+        {
+          "title": "",
+          "id": "sec-1777952246260",
+          "groups": [
+            {
+              "graphType": "error_curve",
+              "templateRows": [
+                {
+                  "COL2": "0,000",
+                  "TAG_1": "mm",
+                  "COL6": ""
+                },
+                {
+                  "COL2": "1,000",
+                  "TAG_1": "mm"
+                },
+                {
+                  "TAG_1": "mm",
+                  "COL2": "2,000"
+                },
+                {
+                  "TAG_1": "mm",
+                  "COL2": "3,000"
+                },
+                {
+                  "COL2": "4,000",
+                  "TAG_1": "mm"
+                },
+                {
+                  "COL2": "5,000",
+                  "TAG_1": "mm"
+                },
+                {
+                  "COL2": "10,000",
+                  "TAG_1": "mm"
+                }
+              ],
+              "hiddenColumns": [
+                "COL3",
+                "COL4",
+                "COL5"
+              ],
+              "isDynamic": true,
+              "name": "",
+              "blockId": "T1",
+              "hasGraph": true,
+              "columnDefinitions": [
+                {
+                  "behavior": "INPUT",
+                  "type": "NUMBER",
+                  "id": "TAG_1",
+                  "displayFormat": "text",
+                  "name": "Unidade de Medida"
+                },
+                {
+                  "behavior": "INPUT",
+                  "type": "NUMBER",
+                  "decimalPlaces": 3,
+                  "id": "COL2",
+                  "isLocked": false,
+                  "name": "Valor Verdadeiro Convencional (mm)"
+                },
+                {
+                  "behavior": "INPUT",
+                  "id": "COL3",
+                  "decimalPlaces": 3,
+                  "type": "NUMBER",
+                  "isLocked": false,
+                  "name": "Leitura 1"
+                },
+                {
+                  "isLocked": false,
+                  "name": "Leitura 2",
+                  "behavior": "INPUT",
+                  "type": "NUMBER",
+                  "decimalPlaces": 3,
+                  "id": "COL4"
+                },
+                {
+                  "isLocked": false,
+                  "name": "Leitura 3",
+                  "behavior": "INPUT",
+                  "id": "COL5",
+                  "decimalPlaces": 3,
+                  "type": "NUMBER"
+                },
+                {
+                  "name": "Indicação no Instrumento (mm)",
+                  "formula": "(COL3+COL4+COL5)/3",
+                  "isLocked": true,
+                  "type": "NUMBER",
+                  "decimalPlaces": 3,
+                  "id": "COL6",
+                  "behavior": "CALCULATED"
+                },
+                {
+                  "type": "NUMBER",
+                  "decimalPlaces": 3,
+                  "id": "COL7",
+                  "behavior": "CALCULATED",
+                  "name": "Erro (mm)",
+                  "formula": "[COL6]-[COL2]",
+                  "isLocked": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "groups": [
+            {
+              "columnDefinitions": [
+                {
+                  "behavior": "INPUT",
+                  "decimalPlaces": 4,
+                  "type": "NUMBER",
+                  "id": "COL1",
+                  "formula": "",
+                  "displayFormat": "text",
+                  "name": "Incerteza de Medição"
+                },
+                {
+                  "behavior": "INPUT",
+                  "type": "NUMBER",
+                  "id": "COL2",
+                  "isLocked": false,
+                  "displayFormat": "text",
+                  "formula": "",
+                  "name": "Coeficiente K"
+                }
+              ],
+              "blockId": "T2",
+              "name": "",
+              "templateRows": [
+                {
+                  "COL2": "2,08",
+                  "COL1": "± 0,001 mm"
+                }
+              ]
+            }
+          ],
+          "id": "sec-1777952491085",
+          "title": ""
+        }
+      ],
+      "measurementGroups": [
+        {
+          "columnDefinitions": [
+            {
+              "behavior": "INPUT",
+              "id": "TAG_1",
+              "type": "NUMBER",
+              "displayFormat": "text",
+              "name": "Unidade de Medida"
+            },
+            {
+              "type": "NUMBER",
+              "decimalPlaces": 3,
+              "id": "COL2",
+              "behavior": "INPUT",
+              "name": "Valor Verdadeiro Convencional (mm)",
+              "isLocked": false
+            },
+            {
+              "behavior": "INPUT",
+              "id": "COL3",
+              "decimalPlaces": 3,
+              "type": "NUMBER",
+              "isLocked": false,
+              "name": "Leitura 1"
+            },
+            {
+              "type": "NUMBER",
+              "decimalPlaces": 3,
+              "id": "COL4",
+              "behavior": "INPUT",
+              "name": "Leitura 2",
+              "isLocked": false
+            },
+            {
+              "isLocked": false,
+              "name": "Leitura 3",
+              "behavior": "INPUT",
+              "decimalPlaces": 3,
+              "type": "NUMBER",
+              "id": "COL5"
+            },
+            {
+              "behavior": "CALCULATED",
+              "type": "NUMBER",
+              "decimalPlaces": 3,
+              "id": "COL6",
+              "formula": "(COL3+COL4+COL5)/3",
+              "isLocked": true,
+              "name": "Indicação no Instrumento (mm)"
+            },
+            {
+              "behavior": "CALCULATED",
+              "type": "NUMBER",
+              "decimalPlaces": 3,
+              "id": "COL7",
+              "isLocked": false,
+              "formula": "[COL6]-[COL2]",
+              "name": "Erro (mm)"
+            }
+          ],
+          "blockId": "T1",
+          "hasGraph": true,
+          "name": "",
+          "isDynamic": true,
+          "hiddenColumns": [
+            "COL3",
+            "COL4",
+            "COL5"
+          ],
+          "templateRows": [
+            {
+              "COL2": "0,000",
+              "TAG_1": "mm",
+              "COL6": ""
+            },
+            {
+              "COL2": "1,000",
+              "TAG_1": "mm"
+            },
+            {
+              "TAG_1": "mm",
+              "COL2": "2,000"
+            },
+            {
+              "TAG_1": "mm",
+              "COL2": "3,000"
+            },
+            {
+              "COL2": "4,000",
+              "TAG_1": "mm"
+            },
+            {
+              "COL2": "5,000",
+              "TAG_1": "mm"
+            },
+            {
+              "COL2": "10,000",
+              "TAG_1": "mm"
+            }
+          ],
+          "graphType": "error_curve"
+        },
+        {
+          "columnDefinitions": [
+            {
+              "formula": "",
+              "displayFormat": "text",
+              "name": "Incerteza de Medição",
+              "behavior": "INPUT",
+              "type": "NUMBER",
+              "decimalPlaces": 4,
+              "id": "COL1"
+            },
+            {
+              "type": "NUMBER",
+              "id": "COL2",
+              "behavior": "INPUT",
+              "name": "Coeficiente K",
+              "isLocked": false,
+              "formula": "",
+              "displayFormat": "text"
+            }
+          ],
+          "blockId": "T2",
+          "templateRows": [
+            {
+              "COL2": "2,08",
+              "COL1": "± 0,001 mm"
+            }
+          ],
+          "name": ""
+        }
+      ],
+      "title": "medidor de espessura",
+      "procedureId": "UMPsFucxXMrT14b20qLy"
+    },
+    "envStandardInstrumentSnapshot": {
+      "identificacao": "LRM-TEM-082",
+      "kFactor": 2,
+      "certificadoCalibracao": "R1866/26",
+      "nome": "TERMOHIGRÔMETRO DIGITAL",
+      "uncertainty": 0.16,
+      "id": "rvRO5Vnjb6N5RxFR7Lfu",
+      "dataValidadeCalibracao": "2027-01-08",
+      "unidadeMedida": "ºC / %UR",
+      "statusMovimentacao": "Disponível",
+      "periodicidade": "12",
+      "orgaoCalibrador": "RBC - LRM GROUP",
+      "dataCalibracao": "2026-01-08",
+      "resolucao": "0,01"
+    },
+    "observations": "",
+    "nextCalibrationDate": "Maio/2027",
+    "capacidadeMinima": "0",
+    "identification": "KJ25074701",
+    "unidadeMedida": "1",
+    "procedureId": "UMPsFucxXMrT14b20qLy"
+  },
+  {
+    "id": "CAL-1777919269170",
+    "calibrationDate": "2026-05-04",
+    "manufacturer": "Não Consta",
+    "serviceOrderId": "26326",
+    "humidity": 51,
+    "kFactorJustification": "Padrão (k=2 para 95.45%)",
+    "status": "Em confecção",
+    "isDraft": true,
+    "environmentalStandardId": "rvRO5Vnjb6N5RxFR7Lfu",
+    "standardInstrumentIds": [],
+    "resolution": 0.001,
+    "periodicity": "12 meses",
+    "calculatedPoints": {},
+    "capacidadeMaxima": "12,7",
+    "calibrationLocation": "Laboratório Wantec/LRM",
+    "certificateNumber": "CRW263260002",
+    "quoteItemIndex": 0,
+    "envStandardInstrumentId": "rvRO5Vnjb6N5RxFR7Lfu",
+    "groups": [],
+    "technicianName": "OWDKx4FhP38Mdqqwkysn",
+    "isAccredited": false,
+    "model": "Não Consta",
+    "serialNumber": "KJ25074741",
+    "certificateMaskId": "",
+    "temperature": 24,
+    "headerSaved": true,
+    "unitIndex": 1,
+    "attachments": [],
+    "instrumentName": "Medidor de espessura com relógio",
+    "headerValidated": true,
+    "envStandardInstrumentSnapshot": {
+      "statusMovimentacao": "Disponível",
+      "unidadeMedida": "ºC / %UR",
+      "resolucao": "0,01",
+      "dataCalibracao": "2026-01-08",
+      "periodicidade": "12",
+      "orgaoCalibrador": "RBC - LRM GROUP",
+      "nome": "TERMOHIGRÔMETRO DIGITAL",
+      "uncertainty": 0.16,
+      "identificacao": "LRM-TEM-082",
+      "certificadoCalibracao": "R1866/26",
+      "kFactor": 2,
+      "dataValidadeCalibracao": "2027-01-08",
+      "id": "rvRO5Vnjb6N5RxFR7Lfu"
+    },
+    "nextCalibrationDate": "Maio/2027",
+    "observations": "",
+    "capacidadeMinima": "0",
+    "procedureId": "",
+    "identification": "KJ25074741",
+    "unidadeMedida": "1"
+  },
+  {
+    "id": "CAL-1778001148870",
+    "humidity": 65,
+    "kFactorJustification": "Padrão (k=2 para 95.45%)",
+    "status": "Em confecção",
+    "calibrationDate": "2026-05-05",
+    "serviceOrderId": "26329",
+    "manufacturer": "Riberfluid",
+    "technicianName": "EKKsNoGs6wZlh3c0Ht9B",
+    "groups": [],
+    "envStandardInstrumentId": "JU4EsLq2PjmqSQpeUS6k",
+    "certificateNumber": "CRW263290002",
+    "calibrationLocation": "Dependências do Cliente",
+    "capacidadeMaxima": "300",
+    "quoteItemIndex": 1,
+    "model": "não consta",
+    "isAccredited": false,
+    "resolution": 5,
+    "isDraft": true,
+    "environmentalStandardId": "JU4EsLq2PjmqSQpeUS6k",
+    "standardInstrumentIds": [],
+    "calculatedPoints": {},
+    "periodicity": "12 meses",
+    "instrumentName": "Termômetro Bimetálico",
+    "headerValidated": true,
+    "attachments": [],
+    "serialNumber": "não consta",
+    "headerSaved": true,
+    "unitIndex": 0,
+    "certificateMaskId": "",
+    "temperature": 24,
+    "capacidadeMinima": "0",
+    "identification": "TERM-03",
+    "unidadeMedida": "°C",
+    "procedureId": "",
+    "envStandardInstrumentSnapshot": {
+      "identificacao": "WAN-TEM-009",
+      "kFactor": 2,
+      "certificadoCalibracao": "R46150/25",
+      "nome": "TERMOHIGRÔMETRO DIGITAL",
+      "uncertainty": 0.16,
+      "id": "JU4EsLq2PjmqSQpeUS6k",
+      "dataValidadeCalibracao": "2026-09-04",
+      "unidadeMedida": "ºC / %UR",
+      "statusMovimentacao": "Disponível",
+      "orgaoCalibrador": "RBC - LRM GROUP",
+      "periodicidade": "12",
+      "dataCalibracao": "2025-09-04",
+      "resolucao": "0,01"
+    },
+    "observations": "Faixa Calibrada até 270°C  diametro da haste 100mm",
+    "nextCalibrationDate": "05/2027"
+  },
+  {
+    "id": "CAL-1778001323947",
+    "humidity": 65,
+    "status": "Em confecção",
+    "kFactorJustification": "Padrão (k=2 para 95.45%)",
+    "calibrationDate": "2026-05-05",
+    "manufacturer": "Efatá",
+    "serviceOrderId": "26329",
+    "quoteItemIndex": 2,
+    "calibrationLocation": "Dependências do Cliente",
+    "capacidadeMaxima": "25",
+    "certificateNumber": "CRW263290002",
+    "technicianName": "EKKsNoGs6wZlh3c0Ht9B",
+    "envStandardInstrumentId": "JU4EsLq2PjmqSQpeUS6k",
+    "groups": [],
+    "isAccredited": false,
+    "model": "Não Consta",
+    "standardInstrumentIds": [],
+    "isDraft": true,
+    "environmentalStandardId": "JU4EsLq2PjmqSQpeUS6k",
+    "resolution": 0.5,
+    "periodicity": "12 meses",
+    "calculatedPoints": {},
+    "attachments": [],
+    "headerValidated": true,
+    "instrumentName": "Manômetro Analógico ",
+    "serialNumber": "Não consta ",
+    "temperature": 24,
+    "certificateMaskId": "",
+    "unitIndex": 0,
+    "headerSaved": true,
+    "capacidadeMinima": "0",
+    "procedureId": "",
+    "unidadeMedida": "kgf/cm²",
+    "identification": "MAN-020",
+    "envStandardInstrumentSnapshot": {
+      "id": "JU4EsLq2PjmqSQpeUS6k",
+      "dataValidadeCalibracao": "2026-09-04",
+      "identificacao": "WAN-TEM-009",
+      "kFactor": 2,
+      "certificadoCalibracao": "R46150/25",
+      "nome": "TERMOHIGRÔMETRO DIGITAL",
+      "uncertainty": 0.16,
+      "periodicidade": "12",
+      "orgaoCalibrador": "RBC - LRM GROUP",
+      "dataCalibracao": "2025-09-04",
+      "resolucao": "0,01",
+      "unidadeMedida": "ºC / %UR",
+      "statusMovimentacao": "Disponível"
+    },
+    "nextCalibrationDate": "05/2027",
+    "observations": ""
   }
 ]

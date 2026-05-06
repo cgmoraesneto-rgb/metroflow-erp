@@ -1,35 +1,4272 @@
 [
   {
-    "id": "PT-1776778571762",
-    "nome": "2026",
+    "id": "PT-1775591358467",
+    "nome": "Valores 2026",
     "items": [
       {
-        "nomeInstrumento": "Paquimetro",
-        "valorRastreavel": 100,
-        "valorAcreditado": 0,
-        "manutencao": 0,
         "ensaio": 0,
+        "nomeInstrumento": "Torquímetro Analógico",
+        "qualificacao": 0,
+        "id": "PTI-1775595133916",
+        "manutencao": 0,
+        "teste": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 160
+      },
+      {
+        "valorAcreditado": 180,
+        "valorRastreavel": 130,
+        "nomeInstrumento": "Termo-higrômetro Digital",
+        "ensaio": 0,
+        "id": "PTI-1775749890850",
+        "teste": 0,
+        "manutencao": 0,
+        "qualificacao": 0
+      },
+      {
+        "nomeInstrumento": "Detector de qualidade do ar",
+        "ensaio": 0,
+        "id": "PTI-1775749978937",
+        "teste": 0,
+        "manutencao": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 250
+      },
+      {
+        "nomeInstrumento": "Manômetro Analógico",
+        "ensaio": 0,
+        "id": "PTI-1775755519243",
+        "manutencao": 0,
         "teste": 0,
         "qualificacao": 0,
+        "valorAcreditado": 150,
+        "valorRastreavel": 80
+      },
+      {
+        "nomeInstrumento": "Espectrofotômetro",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1775755546699",
+        "valorAcreditado": 2100,
+        "valorRastreavel": 1800
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Alicate Amperímetro",
+        "qualificacao": 0,
+        "manutencao": 0,
+        "id": "PTI-1775830653673",
+        "teste": 0,
+        "valorAcreditado": 200,
+        "valorRastreavel": 160
+      },
+      {
+        "valorRastreavel": 160,
+        "valorAcreditado": 0,
+        "id": "PTI-1775833051402",
+        "manutencao": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Inclinômetro",
+        "ensaio": 0
+      },
+      {
+        "valorRastreavel": 130,
+        "valorAcreditado": 180,
+        "qualificacao": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1775845055242",
+        "ensaio": 0,
+        "nomeInstrumento": "Termômetro de espeto/vareta"
+      },
+      {
+        "nomeInstrumento": "Paquímetro 0 ~ 300mm",
+        "ensaio": 0,
+        "teste": 0,
+        "id": "PTI-1775845207440",
+        "manutencao": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 70
+      },
+      {
+        "valorRastreavel": 80,
+        "valorAcreditado": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "id": "PTI-1775845231450",
+        "manutencao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Paquímetro 0 ~ 600mm"
+      },
+      {
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1775845250489",
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Paquímetro 600 ~ 1000mm",
+        "valorRastreavel": 110,
+        "valorAcreditado": 0
+      },
+      {
+        "teste": 0,
+        "id": "PTI-1775845281514",
+        "manutencao": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Micrômetro Externo 0 ~ 25mm",
+        "ensaio": 0,
+        "valorRastreavel": 70,
+        "valorAcreditado": 0
+      },
+      {
+        "nomeInstrumento": "Micrômetro 25 ~ 50mm",
+        "ensaio": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1775845305349",
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 80
+      },
+      {
+        "qualificacao": 0,
+        "id": "PTI-1775845322933",
+        "manutencao": 0,
+        "teste": 0,
+        "nomeInstrumento": "Micrômetro 50 ~ 75mm",
+        "ensaio": 0,
+        "valorRastreavel": 85,
+        "valorAcreditado": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 70,
+        "ensaio": 0,
+        "nomeInstrumento": "Micrômetro externo",
+        "qualificacao": 0,
+        "id": "PTI-1775845358284",
+        "manutencao": 0,
+        "teste": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 180,
+        "nomeInstrumento": "Nível de precisão",
+        "ensaio": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1775845378255",
+        "qualificacao": 0
+      },
+      {
+        "nomeInstrumento": "Rugosímetro",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "manutencao": 0,
+        "id": "PTI-1775845398379",
+        "teste": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 320
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 70,
+        "nomeInstrumento": "Escala de aço ",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776080558462"
+      },
+      {
+        "nomeInstrumento": "Oxímetro de dedo",
+        "ensaio": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776080613334",
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 80
+      },
+      {
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776080681008",
+        "qualificacao": 0,
+        "nomeInstrumento": "Desfibrilador Externo Automático (DEA)",
+        "ensaio": 0,
+        "valorRastreavel": 520,
+        "valorAcreditado": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 150,
+        "ensaio": 0,
+        "nomeInstrumento": "Detector de tensão",
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776080731984",
+        "qualificacao": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Detector de gás combustível",
+        "qualificacao": 0,
+        "id": "PTI-1776081057317",
+        "manutencao": 0,
+        "teste": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 350
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Alicate Amperímetro",
+        "id": "PTI-1776081308109",
+        "teste": 0,
+        "manutencao": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 200,
+        "valorRastreavel": 160
+      },
+      {
+        "nomeInstrumento": "Termômetro Infravermelho",
+        "ensaio": 0,
+        "teste": 0,
+        "id": "PTI-1776081474098",
+        "manutencao": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 140
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 350,
+        "ensaio": 0,
+        "nomeInstrumento": "Termovisor",
+        "qualificacao": 0,
+        "manutencao": 0,
+        "id": "PTI-1776081511978",
+        "teste": 0
+      },
+      {
+        "nomeInstrumento": "Medidor de espessura com relógio",
+        "ensaio": 0,
+        "teste": 0,
+        "id": "PTI-1776081707813",
+        "manutencao": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 100
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776082451824",
+        "ensaio": 0,
+        "nomeInstrumento": "Relógio Comparador",
+        "valorRastreavel": 70,
+        "valorAcreditado": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 70,
+        "ensaio": 0,
+        "nomeInstrumento": "Relógio Apalpador",
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776082462031",
+        "qualificacao": 0
+      },
+      {
+        "nomeInstrumento": "Termômetro Analógico",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776082999962",
+        "valorAcreditado": 170,
+        "valorRastreavel": 100
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "BALANÇA 2000kg",
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776088178373",
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 700
+      },
+      {
+        "nomeInstrumento": "Balança 3000kg",
+        "ensaio": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776088329505",
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 970
+      },
+      {
+        "valorRastreavel": 1500,
+        "valorAcreditado": 0,
+        "qualificacao": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776088340629",
+        "ensaio": 0,
+        "nomeInstrumento": "Balança 5000kg"
+      },
+      {
+        "valorRastreavel": 170,
+        "valorAcreditado": 250,
+        "qualificacao": 0,
+        "manutencao": 0,
+        "id": "PTI-1776088409953",
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Balança analítica (0 ~ 6200g)"
+      },
+      {
+        "valorAcreditado": 190,
+        "valorRastreavel": 130,
+        "ensaio": 0,
+        "nomeInstrumento": "Balança 0 ~ 90kg",
+        "qualificacao": 0,
+        "manutencao": 0,
+        "id": "PTI-1776088803639",
+        "teste": 0
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "id": "PTI-1776088842493",
+        "manutencao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Balança 100 ~ 200kg",
+        "valorRastreavel": 150,
+        "valorAcreditado": 200
+      },
+      {
+        "id": "PTI-1776088895656",
+        "manutencao": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Balança 201 ~ 300kg",
+        "ensaio": 0,
+        "valorRastreavel": 160,
+        "valorAcreditado": 250
+      },
+      {
+        "valorRastreavel": 420,
+        "valorAcreditado": 480,
+        "qualificacao": 0,
+        "id": "PTI-1776088944308",
+        "teste": 0,
+        "manutencao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Balança 301 ~ 500kg"
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 480,
+        "ensaio": 0,
+        "nomeInstrumento": "Balança 501 ~ 700kg",
+        "id": "PTI-1776089875200",
+        "teste": 0,
+        "manutencao": 0,
+        "qualificacao": 0
+      },
+      {
+        "valorRastreavel": 550,
+        "valorAcreditado": 0,
+        "qualificacao": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776089914156",
+        "ensaio": 0,
+        "nomeInstrumento": "Balança 701 ~ 900kg"
+      },
+      {
+        "valorRastreavel": 600,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776089942071",
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Balança 901 ~ 1000kg"
+      },
+      {
+        "nomeInstrumento": "Medidor de umidade de madeira",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "id": "PTI-1776090025650",
+        "manutencao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 130
+      },
+      {
+        "nomeInstrumento": "Massa padrão (Peso) 10kg",
+        "ensaio": 0,
+        "id": "PTI-1776090103091",
+        "manutencao": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 80
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Massa padrão (Peso) 20kg",
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776090123283",
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 90
+      },
+      {
+        "valorRastreavel": 130,
+        "valorAcreditado": 200,
+        "qualificacao": 0,
+        "id": "PTI-1776093512901",
+        "teste": 0,
+        "manutencao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Multímetro até 5.1/2 "
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Multímetro de bancada",
+        "qualificacao": 0,
+        "teste": 0,
+        "id": "PTI-1776093532316",
+        "manutencao": 0,
+        "valorAcreditado": 280,
+        "valorRastreavel": 180
+      },
+      {
+        "nomeInstrumento": "Multímetro 6.1/2",
+        "ensaio": 0,
+        "id": "PTI-1776093553345",
+        "teste": 0,
+        "manutencao": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 280,
+        "valorRastreavel": 180
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 160,
+        "ensaio": 0,
+        "nomeInstrumento": "Balança 32KG",
+        "id": "PTI-1776103334982",
+        "teste": 0,
+        "manutencao": 0,
+        "qualificacao": 0
+      },
+      {
+        "nomeInstrumento": "Medidor multiparâmetro",
+        "ensaio": 0,
+        "manutencao": 0,
+        "id": "PTI-1776168894079",
+        "teste": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 270
+      },
+      {
+        "nomeInstrumento": "Válvula de Segurança",
+        "ensaio": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776259785314",
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 300
+      },
+      {
+        "valorRastreavel": 650,
+        "valorAcreditado": 0,
+        "qualificacao": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776263680463",
+        "nomeInstrumento": "Câmera Termográfica ",
+        "ensaio": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 180,
+        "nomeInstrumento": "Miliohmímetro",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "id": "PTI-1776263720384",
+        "manutencao": 0
+      },
+      {
+        "valorRastreavel": 160,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "id": "PTI-1776266952661",
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Medidor de pressão arterial"
+      },
+      {
+        "nomeInstrumento": "Esfigmomanômetro",
+        "ensaio": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776266961743",
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 160
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 180,
+        "nomeInstrumento": "Balança Antropométrica (200kg)",
+        "ensaio": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776266996879",
+        "qualificacao": 0
+      },
+      {
+        "teste": 0,
+        "id": "PTI-1776267271600",
+        "manutencao": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Termômetro Digital",
+        "valorRastreavel": 130,
+        "valorAcreditado": 180
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 650,
+        "ensaio": 0,
+        "nomeInstrumento": "Balança 1001 ~ 1500kg",
+        "manutencao": 0,
+        "id": "PTI-1776279830261",
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 140,
+        "ensaio": 0,
+        "nomeInstrumento": "Luxímetro",
+        "teste": 0,
+        "id": "PTI-1776280781416",
+        "manutencao": 0,
+        "qualificacao": 0
+      },
+      {
+        "qualificacao": 0,
+        "id": "PTI-1776280830666",
+        "manutencao": 0,
+        "teste": 0,
+        "nomeInstrumento": "Trena",
+        "ensaio": 0,
+        "valorRastreavel": 60,
+        "valorAcreditado": 0
+      },
+      {
+        "valorRastreavel": 150,
+        "valorAcreditado": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776280840121",
+        "qualificacao": 0,
+        "nomeInstrumento": "Trena a laser",
+        "ensaio": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 90,
+        "nomeInstrumento": "Calíbre de folga",
+        "ensaio": 0,
+        "teste": 0,
+        "id": "PTI-1776282278191",
+        "manutencao": 0,
+        "qualificacao": 0
+      },
+      {
+        "qualificacao": 0,
+        "id": "PTI-1776338935902",
+        "teste": 0,
+        "manutencao": 0,
+        "nomeInstrumento": "Hidrômetro",
+        "ensaio": 0,
+        "valorRastreavel": 420,
+        "valorAcreditado": 0
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Termômetro Clínico Digital",
+        "ensaio": 0,
         "logistica": 0,
-        "id": "PTI-1776778611431"
+        "id": "PTI-1776342206066",
+        "manutencao": 0,
+        "valorRastreavel": 50,
+        "valorAcreditado": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Goniômetro Digital",
+        "qualificacao": 0,
+        "teste": 0,
+        "id": "PTI-1776346444375",
+        "manutencao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 90
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "id": "PTI-1776346556894",
+        "manutencao": 0,
+        "nomeInstrumento": "PHmetro Portátil Digital",
+        "ensaio": 0,
+        "valorRastreavel": 240,
+        "valorAcreditado": 0
+      },
+      {
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776867610208",
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Manômetro Digital",
+        "valorRastreavel": 80,
+        "valorAcreditado": 150
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 120,
+        "ensaio": 0,
+        "nomeInstrumento": "Manovacuômetro",
+        "qualificacao": 0,
+        "id": "PTI-1776869776740",
+        "teste": 0,
+        "manutencao": 0
+      },
+      {
+        "valorRastreavel": 420,
+        "valorAcreditado": 0,
+        "id": "PTI-1776870581221",
+        "teste": 0,
+        "manutencao": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Medidor de vazão por ultrasson"
+      },
+      {
+        "qualificacao": 0,
+        "manutencao": 0,
+        "id": "PTI-1776870611636",
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Hidrômetro",
+        "valorRastreavel": 420,
+        "valorAcreditado": 0
+      },
+      {
+        "valorAcreditado": 150,
+        "valorRastreavel": 130,
+        "nomeInstrumento": "CONTROLADOR DE TEMPERATURA",
+        "ensaio": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776870751624",
+        "qualificacao": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 140,
+        "nomeInstrumento": "DECIBELÍMETRO",
+        "ensaio": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776870891457",
+        "qualificacao": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 200,
+        "nomeInstrumento": "DOSÍMETRO",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "id": "PTI-1776870932229",
+        "manutencao": 0
+      },
+      {
+        "valorRastreavel": 200,
+        "valorAcreditado": 0,
+        "id": "PTI-1776871030276",
+        "teste": 0,
+        "manutencao": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "CALIBRADOR ACÚSTICO"
+      },
+      {
+        "valorAcreditado": 320,
+        "valorRastreavel": 240,
+        "ensaio": 0,
+        "nomeInstrumento": "Phmetro de bancada",
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776871082163",
+        "qualificacao": 0
+      },
+      {
+        "valorRastreavel": 240,
+        "valorAcreditado": 320,
+        "id": "PTI-1776871132381",
+        "teste": 0,
+        "manutencao": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Condutivimetro"
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Anemômetro Digital",
+        "qualificacao": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776871221128",
+        "valorAcreditado": 0,
+        "valorRastreavel": 240
+      },
+      {
+        "valorRastreavel": 280,
+        "valorAcreditado": 0,
+        "qualificacao": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776871292994",
+        "ensaio": 0,
+        "nomeInstrumento": "Transmissor de pressão"
+      },
+      {
+        "teste": 0,
+        "id": "PTI-1776872598816",
+        "manutencao": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Oxímetro",
+        "ensaio": 0,
+        "valorRastreavel": 80,
+        "valorAcreditado": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Torquímetro Digital",
+        "teste": 0,
+        "id": "PTI-1776948148298",
+        "manutencao": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 160
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 100,
+        "ensaio": 0,
+        "nomeInstrumento": "Relógio Apalpador",
+        "qualificacao": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776948165584"
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "id": "PTI-1776949727931",
+        "manutencao": 0,
+        "nomeInstrumento": "Audiômetro",
+        "ensaio": 0,
+        "valorRastreavel": 250,
+        "valorAcreditado": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Balança 200kg",
+        "qualificacao": 0,
+        "manutencao": 0,
+        "id": "PTI-1776949739738",
+        "teste": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 160
+      },
+      {
+        "nomeInstrumento": "Cabine Audiométrica",
+        "ensaio": 0,
+        "id": "PTI-1776949762802",
+        "teste": 0,
+        "manutencao": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 250
+      },
+      {
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776949788496",
+        "qualificacao": 0,
+        "nomeInstrumento": "Eletrocardiógrafo - ECG",
+        "ensaio": 0,
+        "valorRastreavel": 440,
+        "valorAcreditado": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 440,
+        "ensaio": 0,
+        "nomeInstrumento": "Eletroencefalógrafo - EEG",
+        "manutencao": 0,
+        "id": "PTI-1776949831048",
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Espirômetro",
+        "qualificacao": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776949852456",
+        "valorAcreditado": 0,
+        "valorRastreavel": 280
+      },
+      {
+        "qualificacao": 0,
+        "manutencao": 0,
+        "id": "PTI-1776949874304",
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Acuidade Visual - Optotipo",
+        "valorRastreavel": 360,
+        "valorAcreditado": 0
+      },
+      {
+        "valorAcreditado": 480,
+        "valorRastreavel": 0,
+        "nomeInstrumento": "Termômetro de Globo - TGD 400",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "manutencao": 0,
+        "id": "PTI-1776949892353",
+        "teste": 0
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Data logger",
+        "valorRastreavel": 200,
+        "valorAcreditado": 360,
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1776970768938"
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "DETECTOR DE GÁS",
+        "logistica": 0,
+        "id": "PTI-1777061007061",
+        "manutencao": 0,
+        "valorRastreavel": 680,
+        "valorAcreditado": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Paquímetro de profundidade",
+        "qualificacao": 0,
+        "teste": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 80,
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1777295442834"
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "nomeInstrumento": "Glicosímetro",
+        "ensaio": 0,
+        "valorRastreavel": 80,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "id": "PTI-1777310227148",
+        "logistica": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 220,
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1777385051280",
+        "nomeInstrumento": "Manifold Digital",
+        "ensaio": 0,
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "valorRastreavel": 380,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "id": "PTI-1777385148310",
+        "logistica": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Transmissor de Pressão",
+        "ensaio": 0
+      },
+      {
+        "manutencao": 0,
+        "id": "PTI-1777385158022",
+        "logistica": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 140,
+        "ensaio": 0,
+        "nomeInstrumento": "Vacuômetro",
+        "qualificacao": 0,
+        "teste": 0
+      },
+      {
+        "id": "PTI-1777475504690",
+        "manutencao": 0,
+        "logistica": 0,
+        "valorRastreavel": 140,
+        "valorAcreditado": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "nomeInstrumento": "FLUXÔMETRO",
+        "ensaio": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 100,
+        "logistica": 0,
+        "id": "PTI-1777759496569",
+        "manutencao": 0,
+        "nomeInstrumento": "Termômetro Tipo Espeto",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Caixa aquecedora de soro",
+        "qualificacao": 0,
+        "teste": 0,
+        "logistica": 0,
+        "id": "PTI-1777918693307",
+        "manutencao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 650
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "CENTRÍFUGA",
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1777918745026",
+        "valorRastreavel": 350,
+        "valorAcreditado": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 720,
+        "id": "PTI-1777927470442",
+        "manutencao": 0,
+        "logistica": 0,
+        "nomeInstrumento": "FOTÔMETRO",
+        "ensaio": 0,
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "valorRastreavel": 320,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "id": "PTI-1777927485703",
+        "logistica": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "COLORÍMETRO"
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "válvula de pressão e vácuo",
+        "valorRastreavel": 950,
+        "valorAcreditado": 0,
+        "id": "PTI-1778068865986",
+        "logistica": 0,
+        "manutencao": 0
+      },
+      {
+        "logistica": 0,
+        "id": "PTI-1778072813395",
+        "manutencao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 100,
+        "ensaio": 0,
+        "nomeInstrumento": "Trena de Profundidade",
+        "qualificacao": 0,
+        "teste": 0
       }
     ]
   },
   {
-    "id": "PT-1776779794448",
-    "nome": "2026",
+    "id": "PT-1775755574873",
     "items": [
       {
-        "nomeInstrumento": "Paq",
-        "valorRastreavel": 100,
-        "valorAcreditado": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Logística (Coleta + Devolução) - Distrito",
+        "qualificacao": 0,
+        "teste": 0,
+        "id": "PTI-1775756124082",
         "manutencao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 70
+      },
+      {
+        "qualificacao": 0,
+        "manutencao": 0,
+        "id": "PTI-1775756137630",
+        "teste": 0,
+        "nomeInstrumento": "Logística (Coleta + Devolução) - Distrito II",
+        "ensaio": 0,
+        "valorRastreavel": 100,
+        "valorAcreditado": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 70,
+        "ensaio": 0,
+        "nomeInstrumento": "Logística (Coleta + Devolução) - Zona Oeste/Centro-oeste",
+        "qualificacao": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1775756771000"
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Logística (Deslocamento técnico) Zona Sul / Centro-Sul",
+        "qualificacao": 0,
+        "manutencao": 0,
+        "id": "PTI-1776083119349",
+        "teste": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 80
+      },
+      {
+        "valorRastreavel": 80,
+        "valorAcreditado": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "id": "PTI-1776084426455",
+        "manutencao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Logística (Coleta + Devolução) Zona Sul / Centro-Sul"
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 80,
+        "ensaio": 0,
+        "nomeInstrumento": "Logística (Deslocamento técnico) - Distrito I",
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776090562527",
+        "qualificacao": 0
+      },
+      {
+        "id": "PTI-1776090668649",
+        "logistica": 1500,
+        "manutencao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 1500,
+        "ensaio": 0,
+        "nomeInstrumento": "Aluguel Munck para calibração de balanças acima de 500kg com peso total",
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 500,
+        "ensaio": 0,
+        "nomeInstrumento": "Logística (Serviço In Loco) - Manacapuru",
+        "qualificacao": 0,
+        "teste": 1,
+        "id": "PTI-1776104469374",
+        "manutencao": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 50,
+        "nomeInstrumento": "Logística (Coleta + Devolução)",
+        "ensaio": 0,
+        "manutencao": 0,
+        "id": "PTI-1776167751966",
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 70,
+        "id": "PTI-1776438133157",
+        "manutencao": 0,
+        "logistica": 0,
+        "nomeInstrumento": "Logística (Deslocamento técnico) - Zona Oeste/Centro-oeste",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Logística (Deslocamento Técnico) - Zona Norte",
+        "teste": 0,
+        "id": "PTI-1776705399695",
+        "manutencao": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 100
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "id": "PTI-1776717633910",
+        "manutencao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Logística (Deslocamento técnico) - Distrito II",
+        "valorRastreavel": 100,
+        "valorAcreditado": 0
+      },
+      {
+        "id": "PTI-1776875327656",
+        "teste": 0,
+        "manutencao": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Logística - Itacoatiara",
+        "ensaio": 0,
+        "valorRastreavel": 1000,
+        "valorAcreditado": 0
+      },
+      {
+        "id": "PTI-1777312089984",
+        "manutencao": 0,
+        "logistica": 50,
+        "valorAcreditado": 0,
+        "valorRastreavel": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Logística (Serviço In Loco)",
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Logística de devolução de equipamento calibrado",
+        "ensaio": 0,
+        "manutencao": 0,
+        "logistica": 200,
+        "id": "PTI-1777384422313",
+        "valorRastreavel": 0,
+        "valorAcreditado": 0
+      }
+    ],
+    "nome": "Deslocamentos"
+  },
+  {
+    "id": "PT-1775836283843",
+    "nome": "VALORES ESPECIAIS (CLIENTES BRUNA)",
+    "items": [
+      {
+        "valorAcreditado": 110,
+        "valorRastreavel": 80,
+        "ensaio": 0,
+        "nomeInstrumento": "Manômetro Analógico/Digital",
+        "qualificacao": 0,
+        "manutencao": 0,
+        "id": "PTI-1775836317276",
+        "teste": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 150,
+        "ensaio": 0,
+        "nomeInstrumento": "Termômetro infravermelho",
+        "qualificacao": 0,
+        "id": "PTI-1775844876178",
+        "manutencao": 0,
+        "teste": 0
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776095038051",
+        "ensaio": 0,
+        "nomeInstrumento": "Multímetro Digital",
+        "valorRastreavel": 160,
+        "valorAcreditado": 0
+      },
+      {
+        "qualificacao": 0,
+        "id": "PTI-1776170317378",
+        "manutencao": 0,
+        "teste": 0,
+        "nomeInstrumento": "Medidor Multiparâmetro (pH, Condutividade e Temperatura)",
+        "ensaio": 0,
+        "valorRastreavel": 350,
+        "valorAcreditado": 450
+      },
+      {
+        "manutencao": 0,
+        "id": "PTI-1776260223214",
+        "logistica": 0,
+        "valorAcreditado": 160,
+        "valorRastreavel": 200,
+        "ensaio": 0,
+        "nomeInstrumento": "Manômetro Analógico (Urgência)",
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 360,
+        "ensaio": 0,
+        "nomeInstrumento": "Válvula de segurança (Urgência)",
+        "id": "PTI-1776260254984",
+        "teste": 0,
+        "manutencao": 0,
+        "qualificacao": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Hidrômetro ",
+        "id": "PTI-1776338992521",
+        "manutencao": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 550
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Detector de gás",
+        "ensaio": 0,
+        "valorRastreavel": 600,
+        "valorAcreditado": 0,
+        "logistica": 0,
+        "id": "PTI-1776371141882",
+        "manutencao": 0
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Espectrofotômetro",
+        "valorRastreavel": 1800,
+        "valorAcreditado": 2000,
+        "id": "PTI-1776435522068",
+        "logistica": 0,
+        "manutencao": 0
+      },
+      {
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1776437044843",
+        "valorAcreditado": 0,
+        "valorRastreavel": 1100,
+        "ensaio": 0,
+        "nomeInstrumento": "Máquina de tração",
+        "qualificacao": 0,
+        "teste": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Logística (Deslocamento técnico) - Distrito I",
+        "teste": 0,
+        "qualificacao": 0,
+        "manutencao": 0,
+        "logistica": 100,
+        "id": "PTI-1776437101685",
+        "valorAcreditado": 0,
+        "valorRastreavel": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 350,
+        "nomeInstrumento": "Balança de precisão com capela",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776715152359"
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 120,
+        "ensaio": 0,
+        "nomeInstrumento": "RELÓGIO COMPARADOR",
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776715170563",
+        "qualificacao": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 1700,
+        "ensaio": 0,
+        "nomeInstrumento": "Medidor de partículas",
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776717367386",
+        "qualificacao": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 180,
+        "ensaio": 0,
+        "nomeInstrumento": "Dosímetro",
+        "qualificacao": 0,
+        "teste": 0,
+        "id": "PTI-1776870963190",
+        "manutencao": 0
+      },
+      {
+        "nomeInstrumento": "Decibelímetro",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "id": "PTI-1776870979041",
+        "teste": 0,
+        "manutencao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 160
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Phmetro",
+        "qualificacao": 0,
+        "id": "PTI-1776871100605",
+        "teste": 0,
+        "manutencao": 0,
+        "valorAcreditado": 360,
+        "valorRastreavel": 300
+      },
+      {
+        "valorAcreditado": 360,
+        "valorRastreavel": 300,
+        "nomeInstrumento": "Condutivímetro",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "id": "PTI-1776871154002",
+        "manutencao": 0,
+        "teste": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Termômetro digital/analógico",
+        "qualificacao": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776871252629",
+        "valorAcreditado": 160,
+        "valorRastreavel": 130
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776871309676",
+        "ensaio": 0,
+        "nomeInstrumento": "Transmissor de pressão",
+        "valorRastreavel": 200,
+        "valorAcreditado": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 160,
+        "ensaio": 0,
+        "nomeInstrumento": "TORQUÍMETRO",
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776873432936",
+        "qualificacao": 0
+      },
+      {
+        "qualificacao": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776874252482",
+        "nomeInstrumento": "Oxímetro de pulso",
+        "ensaio": 0,
+        "valorRastreavel": 100,
+        "valorAcreditado": 0
+      },
+      {
+        "valorRastreavel": 0,
+        "valorAcreditado": 950,
+        "teste": 0,
+        "id": "PTI-1776957662788",
+        "manutencao": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Válvula de pressão",
+        "ensaio": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 100,
+        "id": "PTI-1777061055848",
+        "logistica": 0,
+        "manutencao": 0,
+        "nomeInstrumento": "Medidor de espessura",
+        "ensaio": 0,
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "valorRastreavel": 180,
+        "valorAcreditado": 0,
+        "id": "PTI-1777291259035",
+        "logistica": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "MULTÍMETRO PINÇA",
+        "ensaio": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 230,
+        "id": "PTI-1777291446602",
+        "manutencao": 0,
+        "logistica": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Medidor de torque",
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "TERMÔMETRO DE GLOBO",
+        "qualificacao": 0,
+        "teste": 0,
+        "valorAcreditado": 250,
+        "valorRastreavel": 150,
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1777293649486"
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Durômetro Rockwell",
+        "qualificacao": 0,
+        "teste": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 900,
+        "id": "PTI-1777298065051",
+        "manutencao": 0,
+        "logistica": 0
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Termômetro bimetálico",
+        "valorRastreavel": 0,
+        "valorAcreditado": 180,
+        "id": "PTI-1777320718373",
+        "manutencao": 0,
+        "logistica": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 100,
+        "manutencao": 0,
+        "id": "PTI-1777382073494",
+        "logistica": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "MANÔMETRO",
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 0,
+        "id": "PTI-1777470940359",
+        "manutencao": 0,
+        "logistica": 100,
+        "ensaio": 0,
+        "nomeInstrumento": "Deslocamento técnico (Novamed)",
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Fluxômetro de argônio",
+        "qualificacao": 0,
+        "teste": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 100,
+        "id": "PTI-1777475569361",
+        "manutencao": 0,
+        "logistica": 0
+      },
+      {
+        "nomeInstrumento": "Hora extra técnica para calibração em final de semana",
         "ensaio": 0,
         "teste": 0,
         "qualificacao": 0,
+        "id": "PTI-1777921364137",
         "logistica": 0,
-        "id": "PTI-1776779801391"
+        "manutencao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 400
+      }
+    ]
+  },
+  {
+    "id": "PT-1776170596588",
+    "items": [
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Balança 1000kg",
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776170620665",
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 900
+      },
+      {
+        "valorRastreavel": 2500,
+        "valorAcreditado": 0,
+        "id": "PTI-1776170660554",
+        "manutencao": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Balança 10.000kg"
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776170775928",
+        "nomeInstrumento": "Diária Técnica",
+        "ensaio": 0,
+        "valorRastreavel": 900,
+        "valorAcreditado": 0
+      },
+      {
+        "valorRastreavel": 160,
+        "valorAcreditado": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776172959458",
+        "ensaio": 0,
+        "nomeInstrumento": "Alicate Amperímetro"
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 130,
+        "ensaio": 0,
+        "nomeInstrumento": "Multímetro",
+        "qualificacao": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776172984681"
+      },
+      {
+        "nomeInstrumento": "Inclinômetro",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776172998193",
+        "valorAcreditado": 0,
+        "valorRastreavel": 160
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 80,
+        "ensaio": 0,
+        "nomeInstrumento": "LCR Check Function",
+        "qualificacao": 0,
+        "teste": 0,
+        "id": "PTI-1776255112676",
+        "manutencao": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 140,
+        "nomeInstrumento": "Luxímetro",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "manutencao": 0,
+        "id": "PTI-1776256082247",
+        "teste": 0
+      },
+      {
+        "qualificacao": 0,
+        "id": "PTI-1776256143454",
+        "manutencao": 0,
+        "teste": 0,
+        "nomeInstrumento": "Decibelímetro",
+        "ensaio": 0,
+        "valorRastreavel": 140,
+        "valorAcreditado": 0
+      },
+      {
+        "nomeInstrumento": "Dosímetro",
+        "ensaio": 0,
+        "manutencao": 0,
+        "id": "PTI-1776256162358",
+        "teste": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 200
+      },
+      {
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776282377987",
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Capela de Fluxo Laminar",
+        "valorRastreavel": 900,
+        "valorAcreditado": 0
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776282392336",
+        "ensaio": 0,
+        "nomeInstrumento": "Espectrofotômetro",
+        "valorRastreavel": 500,
+        "valorAcreditado": 0
+      },
+      {
+        "manutencao": 0,
+        "id": "PTI-1776282407590",
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Turbidímetro",
+        "valorRastreavel": 260,
+        "valorAcreditado": 0
+      },
+      {
+        "nomeInstrumento": "Tapete Isolante",
+        "ensaio": 250,
+        "teste": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 0,
+        "manutencao": 0,
+        "id": "PTI-1776341605597",
+        "logistica": 0
+      },
+      {
+        "nomeInstrumento": "Luva Classe II (Par)",
+        "ensaio": 250,
+        "teste": 0,
+        "qualificacao": 0,
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1776341623306",
+        "valorAcreditado": 0,
+        "valorRastreavel": 0
+      },
+      {
+        "nomeInstrumento": "Paquímetro",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "id": "PTI-1776347557338",
+        "manutencao": 0,
+        "teste": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 90
+      },
+      {
+        "valorRastreavel": 420,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776348477359",
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "PHmetro Portátil Digital Hanna"
+      },
+      {
+        "valorRastreavel": 750,
+        "valorAcreditado": 0,
+        "teste": 0,
+        "id": "PTI-1776349649162",
+        "manutencao": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Monitor Multiparâmetro"
+      },
+      {
+        "qualificacao": 0,
+        "id": "PTI-1776349734357",
+        "manutencao": 0,
+        "teste": 0,
+        "nomeInstrumento": "Ventilador Pulmonar",
+        "ensaio": 0,
+        "valorRastreavel": 870,
+        "valorAcreditado": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 340,
+        "ensaio": 0,
+        "nomeInstrumento": "Cardioversor",
+        "qualificacao": 0,
+        "id": "PTI-1776354068384",
+        "manutencao": 0,
+        "teste": 0
+      },
+      {
+        "qualificacao": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776354138203",
+        "nomeInstrumento": "Oxímetro de mesa",
+        "ensaio": 0,
+        "valorRastreavel": 120,
+        "valorAcreditado": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Refratômetro",
+        "qualificacao": 0,
+        "manutencao": 0,
+        "id": "PTI-1776361094708",
+        "teste": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 380
+      },
+      {
+        "nomeInstrumento": "Hidrômetro",
+        "ensaio": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776361119404",
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 420
+      },
+      {
+        "qualificacao": 0,
+        "manutencao": 0,
+        "id": "PTI-1776425877990",
+        "teste": 0,
+        "nomeInstrumento": "Luva Classe 00 5KV (PAR)",
+        "ensaio": 250,
+        "valorRastreavel": 0,
+        "valorAcreditado": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 0,
+        "ensaio": 300,
+        "nomeInstrumento": "Luva Classe 02 20KV (PAR)",
+        "qualificacao": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776425895299"
+      },
+      {
+        "ensaio": 350,
+        "nomeInstrumento": "Luva Classe 04 40KV (PAR)",
+        "qualificacao": 0,
+        "teste": 0,
+        "id": "PTI-1776425919404",
+        "manutencao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 0
+      },
+      {
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776704902698",
+        "qualificacao": 0,
+        "nomeInstrumento": "Medidor de Vazão",
+        "ensaio": 0,
+        "valorRastreavel": 420,
+        "valorAcreditado": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 130,
+        "ensaio": 0,
+        "nomeInstrumento": "Calibrador de Pneu Analógico",
+        "manutencao": 0,
+        "id": "PTI-1776704951635",
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "nomeInstrumento": "Terrômetro Digital Minipa MTR-1522",
+        "ensaio": 0,
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1776710410337",
+        "valorRastreavel": 150,
+        "valorAcreditado": 0
+      },
+      {
+        "valorRastreavel": 180,
+        "valorAcreditado": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776863559231",
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Calibrador de Nível Sonoro"
+      },
+      {
+        "valorRastreavel": 200,
+        "valorAcreditado": 0,
+        "qualificacao": 0,
+        "id": "PTI-1776863578896",
+        "teste": 0,
+        "manutencao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Dosímetro de Ruído"
+      },
+      {
+        "valorAcreditado": 460,
+        "valorRastreavel": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Termômetro de Globo",
+        "qualificacao": 0,
+        "id": "PTI-1776863605944",
+        "teste": 0,
+        "manutencao": 0
+      },
+      {
+        "qualificacao": 0,
+        "id": "PTI-1776863619544",
+        "teste": 0,
+        "manutencao": 0,
+        "nomeInstrumento": "Decibelímetro Digital",
+        "ensaio": 0,
+        "valorRastreavel": 140,
+        "valorAcreditado": 0
+      },
+      {
+        "valorRastreavel": 275,
+        "valorAcreditado": 0,
+        "id": "PTI-1776863635073",
+        "teste": 0,
+        "manutencao": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Luxímetro Digital"
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 700,
+        "ensaio": 0,
+        "nomeInstrumento": "HIDRÔMETRO",
+        "id": "PTI-1776875276360",
+        "manutencao": 0,
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Válvula de Alívio",
+        "qualificacao": 0,
+        "id": "PTI-1776876986388",
+        "manutencao": 0,
+        "teste": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 450
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 80,
+        "nomeInstrumento": "Paquímetro Analógico",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "id": "PTI-1776951355385",
+        "teste": 0,
+        "manutencao": 0
+      },
+      {
+        "id": "PTI-1776951371498",
+        "teste": 0,
+        "manutencao": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Medidor de Diâmetro Interno com Relógio",
+        "ensaio": 0,
+        "valorRastreavel": 120,
+        "valorAcreditado": 0
+      },
+      {
+        "valorRastreavel": 110,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "id": "PTI-1776951382650",
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Micrômetro Externo",
+        "ensaio": 0
+      },
+      {
+        "nomeInstrumento": "Detector de Gás",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "id": "PTI-1776967669911",
+        "manutencao": 0,
+        "teste": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 750
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 140,
+        "nomeInstrumento": "Pipeta Automática",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776969158994"
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Megômetro Digital ",
+        "valorRastreavel": 338,
+        "valorAcreditado": 0,
+        "id": "PTI-1777033419986",
+        "manutencao": 0,
+        "logistica": 0
+      },
+      {
+        "id": "PTI-1777044236197",
+        "manutencao": 0,
+        "logistica": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 150,
+        "nomeInstrumento": "Terrômetro Digital",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Balança 150kg",
+        "ensaio": 0,
+        "valorRastreavel": 180,
+        "valorAcreditado": 0,
+        "logistica": 0,
+        "id": "PTI-1777311870479",
+        "manutencao": 0
+      },
+      {
+        "id": "PTI-1777311883081",
+        "logistica": 0,
+        "manutencao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 180,
+        "nomeInstrumento": "Balança 200kg",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 1750,
+        "logistica": 0,
+        "id": "PTI-1777315358777",
+        "manutencao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Balança de Sapata CM-1002 para Aeronaves ",
+        "qualificacao": 0,
+        "teste": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Termo Anemômetro",
+        "qualificacao": 0,
+        "teste": 0,
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1777316853133",
+        "valorAcreditado": 0,
+        "valorRastreavel": 280
+      },
+      {
+        "logistica": 0,
+        "id": "PTI-1777316867077",
+        "manutencao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 140,
+        "nomeInstrumento": "Decibelímetro Digital",
+        "ensaio": 0,
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Fluxômetro",
+        "logistica": 0,
+        "id": "PTI-1777320161266",
+        "manutencao": 0,
+        "valorRastreavel": 630,
+        "valorAcreditado": 0
+      },
+      {
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1777320448020",
+        "valorAcreditado": 0,
+        "valorRastreavel": 2640,
+        "ensaio": 0,
+        "nomeInstrumento": "Diária Técnica: Período de 3 dias de disponibilidade do técnico, compreendendo o tempo de deslocamento de ida, a execução da calibração in loco e o retorno.",
+        "qualificacao": 0,
+        "teste": 0
+      },
+      {
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1777320556057",
+        "valorAcreditado": 0,
+        "valorRastreavel": 0,
+        "nomeInstrumento": "Logística e Estadias: A responsabilidade por toda a logística do técnico — incluindo passagens de ida e retorno, hospedagem, transporte local e alimentação — cabe integralmente ao contratante.",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0
+      },
+      {
+        "valorRastreavel": 79020,
+        "valorAcreditado": 0,
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1777321292959",
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Serviço de Ajuste e Reidentificação Documental: Processamento técnico para ajuste de certificados e emissão de 439 novas etiquetas de calibração corrigidas. O escopo compreende o tratamento dos dados e o fornecimento do material de identificação para aplicação in loco pela equipe do contratante."
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Calibrador de Torque",
+        "ensaio": 0,
+        "valorRastreavel": 680,
+        "valorAcreditado": 0,
+        "id": "PTI-1777379665481",
+        "logistica": 0,
+        "manutencao": 0
+      },
+      {
+        "manutencao": 0,
+        "id": "PTI-1777379745127",
+        "logistica": 0,
+        "valorRastreavel": 140,
+        "valorAcreditado": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Estufa"
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 750,
+        "id": "PTI-1777393574049",
+        "logistica": 0,
+        "manutencao": 0,
+        "nomeInstrumento": "Nível Óptico Topográfico",
+        "ensaio": 0,
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1777395032149",
+        "valorRastreavel": 1800,
+        "valorAcreditado": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Alinhador a Laser TKSA"
+      },
+      {
+        "valorRastreavel": 330,
+        "valorAcreditado": 0,
+        "logistica": 0,
+        "id": "PTI-1777395207387",
+        "manutencao": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Medidor de Espessura por Ultrassom "
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Transmissor de Pressão",
+        "qualificacao": 0,
+        "teste": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 330,
+        "logistica": 0,
+        "id": "PTI-1777396868638",
+        "manutencao": 0
+      },
+      {
+        "valorRastreavel": 182,
+        "valorAcreditado": 0,
+        "logistica": 0,
+        "id": "PTI-1777406081649",
+        "manutencao": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Termômetro Infravermelho Fluke"
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "nomeInstrumento": "Relógio Comparador",
+        "ensaio": 0,
+        "valorRastreavel": 100,
+        "valorAcreditado": 0,
+        "id": "PTI-1777407167885",
+        "manutencao": 0,
+        "logistica": 0
+      },
+      {
+        "nomeInstrumento": "Manômetro",
+        "ensaio": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 80,
+        "manutencao": 0,
+        "id": "PTI-1777488851190",
+        "logistica": 0
+      },
+      {
+        "nomeInstrumento": "Termômetro Bimetálico",
+        "ensaio": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 130,
+        "id": "PTI-1777488887415",
+        "manutencao": 0,
+        "logistica": 0
+      }
+    ],
+    "nome": "VALORES ESPECIAIS - PATRICK"
+  },
+  {
+    "id": "PT-1776261297089",
+    "nome": "VALORES ESSILOR",
+    "items": [
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 130,
+        "nomeInstrumento": "Controlador de Temperatura",
+        "ensaio": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776262183013",
+        "qualificacao": 0
+      },
+      {
+        "valorRastreavel": 230,
+        "valorAcreditado": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776262199797",
+        "qualificacao": 0,
+        "nomeInstrumento": "Banho de Coloração",
+        "ensaio": 0
+      },
+      {
+        "nomeInstrumento": "Medidor de Temperatura",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "manutencao": 0,
+        "id": "PTI-1776262216446",
+        "teste": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 130
+      },
+      {
+        "nomeInstrumento": "Termômetro de Vidro",
+        "ensaio": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776262239493",
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 100
+      },
+      {
+        "teste": 0,
+        "id": "PTI-1776262269503",
+        "manutencao": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Paquímetro Quadrimensional",
+        "valorRastreavel": 80,
+        "valorAcreditado": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 60,
+        "nomeInstrumento": "Esferômetro",
+        "ensaio": 0,
+        "manutencao": 0,
+        "id": "PTI-1776262279789",
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 100,
+        "ensaio": 0,
+        "nomeInstrumento": "Medidor de Espessura",
+        "qualificacao": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776262390756"
+      }
+    ]
+  },
+  {
+    "id": "PT-1776264928761",
+    "nome": "VALORES - MANAUS TRANSMISSORA DE ENERGIA ",
+    "items": [
+      {
+        "valorRastreavel": 160,
+        "valorAcreditado": 0,
+        "logistica": 0,
+        "id": "PTI-1776343213701",
+        "manutencao": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "nomeInstrumento": "Alicate Amperímetro",
+        "ensaio": 0
+      },
+      {
+        "id": "PTI-1776343231252",
+        "logistica": 0,
+        "manutencao": 0,
+        "valorRastreavel": 230,
+        "valorAcreditado": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "nomeInstrumento": "Alicate Terrômetro",
+        "ensaio": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Câmera Termográfica",
+        "qualificacao": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1776343251983",
+        "valorAcreditado": 0,
+        "valorRastreavel": 600
+      },
+      {
+        "nomeInstrumento": "Capacímetro CB10",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1776343268235",
+        "valorAcreditado": 0,
+        "valorRastreavel": 250
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 280,
+        "manutencao": 0,
+        "id": "PTI-1776343283451",
+        "logistica": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Capacímetro Digital - Hikari",
+        "qualificacao": 0,
+        "teste": 0
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "CPC 100 + CP TD12",
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1776343306164",
+        "valorRastreavel": 550,
+        "valorAcreditado": 0
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "nomeInstrumento": "Detector de Tensão",
+        "ensaio": 0,
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1776343319796",
+        "valorRastreavel": 260,
+        "valorAcreditado": 0
+      },
+      {
+        "valorRastreavel": 340,
+        "valorAcreditado": 0,
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1776343340478",
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Hipot Test - 80KV",
+        "ensaio": 0
+      },
+      {
+        "logistica": 0,
+        "id": "PTI-1776343356325",
+        "manutencao": 0,
+        "valorRastreavel": 300,
+        "valorAcreditado": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Indicador de Sequência de Fase"
+      },
+      {
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1776343378172",
+        "valorRastreavel": 280,
+        "valorAcreditado": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Medidor de Capacitância",
+        "ensaio": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 240,
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1776343393987",
+        "nomeInstrumento": "Medidor de Fuga Terra - Bender",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Megômetro",
+        "ensaio": 0,
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1776343432075",
+        "valorRastreavel": 260,
+        "valorAcreditado": 0
+      },
+      {
+        "nomeInstrumento": "Micro-Ohmímetro Digital",
+        "ensaio": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 220,
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1776343581150"
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Multímetro Digital",
+        "ensaio": 0,
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1776343610522",
+        "valorRastreavel": 130,
+        "valorAcreditado": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Omicron CMC356+CMTRL",
+        "qualificacao": 0,
+        "teste": 0,
+        "logistica": 0,
+        "id": "PTI-1776343686978",
+        "manutencao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 950
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "nomeInstrumento": "Optical Power Meter",
+        "ensaio": 0,
+        "valorRastreavel": 240,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "id": "PTI-1776343706978",
+        "logistica": 0
+      },
+      {
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1776343777004",
+        "valorAcreditado": 0,
+        "valorRastreavel": 450,
+        "ensaio": 0,
+        "nomeInstrumento": "Oscilógrafo - Dv Power Cat Series",
+        "qualificacao": 0,
+        "teste": 0
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Termo-Higrômetro Digital",
+        "ensaio": 0,
+        "valorRastreavel": 130,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1776343799897"
+      }
+    ]
+  },
+  {
+    "id": "PT-1776430246371",
+    "nome": "Qualificações e Ensaios",
+    "items": [
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Câmara térmica",
+        "qualificacao": 1800,
+        "teste": 0,
+        "id": "PTI-1776430268019",
+        "manutencao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 0,
+        "nomeInstrumento": "Corda",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 1500,
+        "manutencao": 0,
+        "id": "PTI-1776430379832"
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 0,
+        "nomeInstrumento": "Luva",
+        "ensaio": 120,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776430457780",
+        "qualificacao": 0
+      },
+      {
+        "qualificacao": 0,
+        "id": "PTI-1776878584767",
+        "teste": 0,
+        "manutencao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Estufa (2hr 1 ponto)",
+        "valorRastreavel": 2000,
+        "valorAcreditado": 2500
+      },
+      {
+        "valorRastreavel": 0,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "id": "PTI-1776957497448",
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 950,
+        "nomeInstrumento": "Válvula de pressão"
+      }
+    ]
+  },
+  {
+    "id": "PT-1776430948400",
+    "nome": "VALORES ECOSEGME",
+    "items": [
+      {
+        "qualificacao": 0,
+        "manutencao": 0,
+        "id": "PTI-1776431013943",
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Anemômetro Digital",
+        "valorRastreavel": 120,
+        "valorAcreditado": 0
+      },
+      {
+        "valorRastreavel": 120,
+        "valorAcreditado": 0,
+        "qualificacao": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776431034825",
+        "nomeInstrumento": "Bomba Gravimétrica",
+        "ensaio": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Luxímetro",
+        "qualificacao": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776431045230",
+        "valorAcreditado": 0,
+        "valorRastreavel": 120
+      },
+      {
+        "valorRastreavel": 120,
+        "valorAcreditado": 0,
+        "id": "PTI-1776431062697",
+        "teste": 0,
+        "manutencao": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Medidor de Vibração"
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 120,
+        "ensaio": 0,
+        "nomeInstrumento": "Hi-Voll",
+        "qualificacao": 0,
+        "teste": 0,
+        "id": "PTI-1776431075608",
+        "manutencao": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Monitor de Monoxído de Carbono",
+        "id": "PTI-1776431100143",
+        "teste": 0,
+        "manutencao": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 120
+      }
+    ]
+  },
+  {
+    "id": "PT-1776691707114",
+    "nome": "VALORES ADUTORA AZULÃO - ETA",
+    "items": [
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 160,
+        "nomeInstrumento": "ALICATE AMPERIMETRO DIGITAL",
+        "ensaio": 0,
+        "manutencao": 0,
+        "id": "PTI-1776691723297",
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 240,
+        "ensaio": 0,
+        "nomeInstrumento": "ANALISADOR DE CLORO",
+        "qualificacao": 0,
+        "manutencao": 0,
+        "id": "PTI-1776691734859",
+        "teste": 0
+      },
+      {
+        "nomeInstrumento": "ANALISADOR DE PHMETRO",
+        "ensaio": 0,
+        "id": "PTI-1776691744892",
+        "manutencao": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 240
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "ANALISADOR DE TURBIDEZ",
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776691758451",
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 240
+      },
+      {
+        "nomeInstrumento": "CALIBRE DE SOLDA",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776691769297",
+        "valorAcreditado": 0,
+        "valorRastreavel": 120
+      },
+      {
+        "qualificacao": 0,
+        "manutencao": 0,
+        "id": "PTI-1776691777591",
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "INDICADOR DE NÍVEL TIPO RADAR",
+        "valorRastreavel": 390,
+        "valorAcreditado": 0
+      },
+      {
+        "valorRastreavel": 80,
+        "valorAcreditado": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776691788625",
+        "ensaio": 0,
+        "nomeInstrumento": "MANÔMETRO ANALÓGICO"
+      },
+      {
+        "qualificacao": 0,
+        "id": "PTI-1776691798605",
+        "manutencao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "MEDIDOR DE VAZÃO ELETROMAGNÉTICO",
+        "valorRastreavel": 449,
+        "valorAcreditado": 0
+      },
+      {
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776691808681",
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "PAQUÍMETRO QUADRIMENSIONAL DIGITAL",
+        "valorRastreavel": 120,
+        "valorAcreditado": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 720,
+        "ensaio": 0,
+        "nomeInstrumento": "SENSOR DE NÍVEL ULTRASSÔNICO ",
+        "id": "PTI-1776691820561",
+        "manutencao": 0,
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 720,
+        "nomeInstrumento": "SENSOR DE VAZÃO ELETROMAGNÉTICO",
+        "ensaio": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776691831289",
+        "qualificacao": 0
+      },
+      {
+        "valorRastreavel": 130,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "id": "PTI-1776691840193",
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "TERMO-HIGRÔMETRO"
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "TERMÔMETRO TIPO ESPETO",
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776691848625",
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 150
+      },
+      {
+        "id": "PTI-1776691856320",
+        "manutencao": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "TRANSMISSOR DE NÍVEL ULTRASSÔNICO",
+        "ensaio": 0,
+        "valorRastreavel": 720,
+        "valorAcreditado": 0
+      },
+      {
+        "nomeInstrumento": "TRANSMISSOR DE PRESSÃO",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776691870193",
+        "valorAcreditado": 0,
+        "valorRastreavel": 720
+      },
+      {
+        "nomeInstrumento": "TRANSMISSOR DE TEMPERATURA",
+        "ensaio": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776691899034",
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 449
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 449,
+        "ensaio": 0,
+        "nomeInstrumento": "TERMO ELEMENTO STP3",
+        "qualificacao": 0,
+        "teste": 0,
+        "id": "PTI-1776691909536",
+        "manutencao": 0
+      },
+      {
+        "valorRastreavel": 449,
+        "valorAcreditado": 0,
+        "qualificacao": 0,
+        "id": "PTI-1776691918568",
+        "teste": 0,
+        "manutencao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "TERMORESISTENCIA"
+      },
+      {
+        "valorRastreavel": 720,
+        "valorAcreditado": 0,
+        "id": "PTI-1776691929594",
+        "manutencao": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "TRANSMISSOR DE VAZÃO  ",
+        "ensaio": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 720,
+        "nomeInstrumento": "TRANSMISSOR DE VAZÃO ELETROMAGNÉTICO",
+        "ensaio": 0,
+        "id": "PTI-1776691939795",
+        "manutencao": 0,
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "qualificacao": 0,
+        "id": "PTI-1776691951816",
+        "teste": 0,
+        "manutencao": 0,
+        "nomeInstrumento": "VALVULA REGULADORA DE PRESSÃO",
+        "ensaio": 0,
+        "valorRastreavel": 650,
+        "valorAcreditado": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "VALVULA DE ALIVIO",
+        "manutencao": 0,
+        "id": "PTI-1776691961882",
+        "teste": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 1152
+      },
+      {
+        "id": "PTI-1776691972579",
+        "teste": 0,
+        "manutencao": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "VALVULA DE SEGURANÇA",
+        "valorRastreavel": 1152,
+        "valorAcreditado": 0
+      },
+      {
+        "manutencao": 0,
+        "id": "PTI-1776691984752",
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "VALVULA DE SEGURANÇA E ALIVIO",
+        "ensaio": 0,
+        "valorRastreavel": 1152,
+        "valorAcreditado": 0
+      },
+      {
+        "qualificacao": 0,
+        "id": "PTI-1776691994232",
+        "teste": 0,
+        "manutencao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "VALVULA ON / OFF",
+        "valorRastreavel": 650,
+        "valorAcreditado": 0
+      },
+      {
+        "valorRastreavel": 754,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1776693965563",
+        "qualificacao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "SENSOR DE VIBRAÇÃO"
+      },
+      {
+        "valorRastreavel": 24300,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "id": "PTI-1777296016864",
+        "logistica": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Execução de ajustes técnicos e documentais em 135 instrumentos, contemplando a atualização de prazos de calibração, aplicação de novas etiquetas e emissão de certificados revisados",
+        "ensaio": 0
+      }
+    ]
+  },
+  {
+    "id": "PT-1776702093230",
+    "nome": "VALORES P.D.F DA AMAZONIA ",
+    "items": [
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 400,
+        "id": "PTI-1776702122341",
+        "logistica": 0,
+        "manutencao": 0,
+        "nomeInstrumento": "Padrão Escalonado 20-660mm",
+        "ensaio": 0,
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "id": "PTI-1776702162469",
+        "logistica": 0,
+        "manutencao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 575,
+        "nomeInstrumento": "Jogo de Bloco Padrão 1,005-50mm",
+        "ensaio": 0,
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 80,
+        "manutencao": 0,
+        "id": "PTI-1776702517068",
+        "logistica": 0,
+        "nomeInstrumento": "Medidor de Campo Eletrostático",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0
+      },
+      {
+        "valorRastreavel": 950,
+        "valorAcreditado": 0,
+        "id": "PTI-1776702639995",
+        "manutencao": 0,
+        "logistica": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Medidor de Vazão"
+      },
+      {
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1776702827290",
+        "valorRastreavel": 180,
+        "valorAcreditado": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Medidor de Camadas"
+      },
+      {
+        "nomeInstrumento": "Peneira Granulométrica",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "logistica": 0,
+        "id": "PTI-1777756856162",
+        "manutencao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 100
+      }
+    ]
+  },
+  {
+    "id": "PT-1776862833291",
+    "nome": "VALORES ONCOCLIN",
+    "items": [
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 70,
+        "nomeInstrumento": "Escala de Aço",
+        "ensaio": 0,
+        "teste": 0,
+        "id": "PTI-1776862847515",
+        "manutencao": 0,
+        "qualificacao": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 80,
+        "nomeInstrumento": "Paquímetro",
+        "ensaio": 0,
+        "teste": 0,
+        "id": "PTI-1776862859598",
+        "manutencao": 0,
+        "qualificacao": 0
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1776862871043",
+        "nomeInstrumento": "Nível de Bolha",
+        "ensaio": 0,
+        "valorRastreavel": 80,
+        "valorAcreditado": 0
+      },
+      {
+        "valorRastreavel": 250,
+        "valorAcreditado": 0,
+        "qualificacao": 0,
+        "id": "PTI-1776862887889",
+        "manutencao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Barômetro com Termômetro"
+      },
+      {
+        "nomeInstrumento": "Termo-higrômetro Digital",
+        "ensaio": 0,
+        "manutencao": 0,
+        "id": "PTI-1776862905753",
+        "teste": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 130
+      },
+      {
+        "nomeInstrumento": "Termômetro de Mercúrio",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "id": "PTI-1776862920746",
+        "teste": 0,
+        "manutencao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 50
+      }
+    ]
+  },
+  {
+    "id": "PT-1776865733208",
+    "nome": "CERAS JOHNSON",
+    "items": [
+      {
+        "logistica": 0,
+        "id": "PTI-1776865753024",
+        "manutencao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 450,
+        "nomeInstrumento": "Medidor de Condutividade",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "nomeInstrumento": "Torquímetro",
+        "ensaio": 0,
+        "id": "PTI-1776865769911",
+        "manutencao": 0,
+        "logistica": 0,
+        "valorRastreavel": 260,
+        "valorAcreditado": 0
+      },
+      {
+        "manutencao": 0,
+        "id": "PTI-1776865799585",
+        "logistica": 0,
+        "valorRastreavel": 90,
+        "valorAcreditado": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Paquímetro Analógico",
+        "ensaio": 0
+      },
+      {
+        "qualificacao": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "id": "PTI-1776865818626",
+        "ensaio": 0,
+        "nomeInstrumento": "Relógio Comparador",
+        "valorRastreavel": 100,
+        "valorAcreditado": 0
+      },
+      {
+        "nomeInstrumento": "Escala de Aço",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 90,
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1776865971215"
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Decibelímetro Digital",
+        "valorRastreavel": 240,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "id": "PTI-1776866006858",
+        "logistica": 0
+      },
+      {
+        "valorRastreavel": 90,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "id": "PTI-1776866038142",
+        "logistica": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Paquímetro Digital",
+        "ensaio": 0
+      },
+      {
+        "id": "PTI-1776866075168",
+        "logistica": 0,
+        "manutencao": 0,
+        "valorRastreavel": 240,
+        "valorAcreditado": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Luxímetro Digital"
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Termo-Higrômetro",
+        "qualificacao": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1776976661239",
+        "valorAcreditado": 0,
+        "valorRastreavel": 180
+      },
+      {
+        "id": "PTI-1777383094988",
+        "manutencao": 0,
+        "logistica": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 650,
+        "ensaio": 0,
+        "nomeInstrumento": "Analisador de Cloro - Digimed",
+        "qualificacao": 0,
+        "teste": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 220,
+        "id": "PTI-1777397555151",
+        "logistica": 0,
+        "manutencao": 0,
+        "nomeInstrumento": "Penetrômetro",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0
+      },
+      {
+        "id": "PTI-1777404267926",
+        "logistica": 0,
+        "manutencao": 0,
+        "valorRastreavel": 450,
+        "valorAcreditado": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Condutivímetro",
+        "ensaio": 0
+      }
+    ]
+  },
+  {
+    "id": "PT-1776968134924",
+    "nome": "VALORES BOA VISTA",
+    "items": [
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 1500,
+        "ensaio": 0,
+        "nomeInstrumento": "Prensa de Concreto",
+        "teste": 0,
+        "id": "PTI-1776968150612",
+        "manutencao": 0,
+        "qualificacao": 0
+      },
+      {
+        "valorRastreavel": 1700,
+        "valorAcreditado": 0,
+        "id": "PTI-1776968221268",
+        "manutencao": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Logística (Serviço In loco)"
+      }
+    ]
+  },
+  {
+    "id": "PT-1777036612559",
+    "nome": "VALORES BMW",
+    "items": [
+      {
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1777036631735",
+        "valorAcreditado": 0,
+        "valorRastreavel": 190,
+        "nomeInstrumento": "ALICATE AMPERÍMETRO",
+        "ensaio": 0,
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 160,
+        "id": "PTI-1777036646519",
+        "logistica": 0,
+        "manutencao": 0,
+        "nomeInstrumento": "BALANÇA DIGITAL 20KG",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "BANHO TÉRMICO",
+        "valorRastreavel": 180,
+        "valorAcreditado": 0,
+        "id": "PTI-1777036664535",
+        "logistica": 0,
+        "manutencao": 0
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "CALIBRADOR DE PRESSÃO NEGATIVA (VÁCUO)",
+        "valorRastreavel": 90,
+        "valorAcreditado": 0,
+        "id": "PTI-1777036679303",
+        "manutencao": 0,
+        "logistica": 0
+      },
+      {
+        "valorRastreavel": 280,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "id": "PTI-1777036706615",
+        "logistica": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "nomeInstrumento": "CALIBRADOR DE TENSÃO DA CORRENTE",
+        "ensaio": 0
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "nomeInstrumento": "CÂMERA INFRAVERMELHA",
+        "ensaio": 0,
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1777036717767",
+        "valorRastreavel": 320,
+        "valorAcreditado": 0
+      },
+      {
+        "valorRastreavel": 320,
+        "valorAcreditado": 0,
+        "id": "PTI-1777036733431",
+        "manutencao": 0,
+        "logistica": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "CÉLULA DE CARGA"
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 240,
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1777036747982",
+        "nomeInstrumento": "CONDUTIVIMETRO",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0
+      },
+      {
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1777036762270",
+        "valorRastreavel": 520,
+        "valorAcreditado": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "DESFIBRILADOR CLINICO"
+      },
+      {
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1777036782527",
+        "valorRastreavel": 150,
+        "valorAcreditado": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "DINAMÔMETRO MANUAL"
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "ESFIGNOMANOMETRO",
+        "id": "PTI-1777036796151",
+        "logistica": 0,
+        "manutencao": 0,
+        "valorRastreavel": 160,
+        "valorAcreditado": 0
+      },
+      {
+        "nomeInstrumento": "MANÔMETRO ANALÓGICO",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 80,
+        "manutencao": 0,
+        "id": "PTI-1777036809926",
+        "logistica": 0
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "MEDIDOR DE FORÇA COMPRESSÍVEL",
+        "ensaio": 0,
+        "valorRastreavel": 1100,
+        "valorAcreditado": 0,
+        "logistica": 0,
+        "id": "PTI-1777036826074",
+        "manutencao": 0
+      },
+      {
+        "valorRastreavel": 260,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "id": "PTI-1777036858166",
+        "logistica": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "MEGÔMETRO "
+      },
+      {
+        "nomeInstrumento": "MICROMETRO DIGITAL",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 130,
+        "id": "PTI-1777036875046",
+        "manutencao": 0,
+        "logistica": 0
+      },
+      {
+        "id": "PTI-1777036888622",
+        "manutencao": 0,
+        "logistica": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 350,
+        "ensaio": 0,
+        "nomeInstrumento": "MICRÔMETRO INTERNO DIGITAL",
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "MULTITESTE DIGITAL",
+        "qualificacao": 0,
+        "teste": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 130,
+        "manutencao": 0,
+        "id": "PTI-1777036905222",
+        "logistica": 0
+      },
+      {
+        "nomeInstrumento": "OXIMETRO CLÍNICO",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 80,
+        "logistica": 0,
+        "id": "PTI-1777036918694",
+        "manutencao": 0
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "PAQUIMETRO DIGITAL DE PROFUNDIDADE",
+        "id": "PTI-1777036929342",
+        "manutencao": 0,
+        "logistica": 0,
+        "valorRastreavel": 80,
+        "valorAcreditado": 0
+      },
+      {
+        "nomeInstrumento": "RELÓGIO APALPADOR ANALÓGICO",
+        "ensaio": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 100,
+        "logistica": 0,
+        "id": "PTI-1777036947719",
+        "manutencao": 0
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "nomeInstrumento": "TERMÔMETRO CLINICO",
+        "ensaio": 0,
+        "valorRastreavel": 50,
+        "valorAcreditado": 0,
+        "id": "PTI-1777036966958",
+        "logistica": 0,
+        "manutencao": 0
+      },
+      {
+        "valorRastreavel": 250,
+        "valorAcreditado": 0,
+        "id": "PTI-1777036978670",
+        "logistica": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "TESTADOR DE BATERIA"
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "TRANSDUTOR DE TORQUE",
+        "valorRastreavel": 160,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "id": "PTI-1777036996096",
+        "logistica": 0
+      },
+      {
+        "valorRastreavel": 250,
+        "valorAcreditado": 0,
+        "id": "PTI-1777037013686",
+        "logistica": 0,
+        "manutencao": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "TRANSFORMADOR DE CORRENTE"
+      },
+      {
+        "valorRastreavel": 300,
+        "valorAcreditado": 0,
+        "logistica": 0,
+        "id": "PTI-1777037033381",
+        "manutencao": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "VALVULA REGULADORA DE VAZÃO"
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "TERMO-HIGRÔMETRO",
+        "valorRastreavel": 130,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "id": "PTI-1777041554894",
+        "logistica": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "PAQUÍMETRO DIGITAL",
+        "teste": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 80,
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1777042833065"
+      },
+      {
+        "id": "PTI-1777981932383",
+        "logistica": 0,
+        "manutencao": 0,
+        "valorRastreavel": 190,
+        "valorAcreditado": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "MEDIDOR DE PRESSÃO E COMPRESSÃO DE MOTORES"
+      }
+    ]
+  },
+  {
+    "id": "PT-1777062241575",
+    "nome": "VALORES ELECNOR",
+    "items": [
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "CALIBRADOR DE PROCESSO",
+        "ensaio": 0,
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1777062253785",
+        "valorRastreavel": 860,
+        "valorAcreditado": 0
+      },
+      {
+        "valorRastreavel": 140,
+        "valorAcreditado": 0,
+        "logistica": 0,
+        "id": "PTI-1777062264400",
+        "manutencao": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "ESPECIMETRO ANALOGICO",
+        "ensaio": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "MANÔMETRO ANALOGICO",
+        "qualificacao": 0,
+        "teste": 0,
+        "id": "PTI-1777062275790",
+        "logistica": 0,
+        "manutencao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 100
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "NIVEL DE DUAS BOLHAS DIGITAL",
+        "manutencao": 0,
+        "id": "PTI-1777062291542",
+        "logistica": 0,
+        "valorRastreavel": 180,
+        "valorAcreditado": 0
+      },
+      {
+        "manutencao": 0,
+        "id": "PTI-1777062307774",
+        "logistica": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 650,
+        "ensaio": 0,
+        "nomeInstrumento": "MODULO DE PRESSÃO",
+        "qualificacao": 0,
+        "teste": 0
+      },
+      {
+        "logistica": 0,
+        "id": "PTI-1777062319514",
+        "manutencao": 0,
+        "valorRastreavel": 170,
+        "valorAcreditado": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "BOMBA DE PRESSÃO PORTATIL"
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "TORQUÍMETRO TIPO ESTALO ANALOGICO (2 SENTIDOS)",
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1777062341598",
+        "valorRastreavel": 160,
+        "valorAcreditado": 0
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "RESISTIVIMETRO",
+        "ensaio": 0,
+        "valorRastreavel": 900,
+        "valorAcreditado": 0,
+        "id": "PTI-1777062351038",
+        "manutencao": 0,
+        "logistica": 0
+      }
+    ]
+  },
+  {
+    "id": "PT-1777313148915",
+    "nome": "VALORES FRIOLINS - MANACAPURU",
+    "items": [
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Termômetro Digital",
+        "teste": 0,
+        "qualificacao": 0,
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1777313309662",
+        "valorAcreditado": 0,
+        "valorRastreavel": 130
+      },
+      {
+        "id": "PTI-1777313325729",
+        "logistica": 0,
+        "manutencao": 0,
+        "valorRastreavel": 140,
+        "valorAcreditado": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Luxímetro"
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Multiparametro Ph e Cloro",
+        "id": "PTI-1777313350818",
+        "manutencao": 0,
+        "logistica": 0,
+        "valorRastreavel": 420,
+        "valorAcreditado": 0
+      },
+      {
+        "nomeInstrumento": "Termômetro Infravermelho",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 130,
+        "manutencao": 0,
+        "id": "PTI-1777313372378",
+        "logistica": 0
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Termômetro Espeto",
+        "valorRastreavel": 100,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1777313387819"
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "Balança 300kg",
+        "ensaio": 0,
+        "logistica": 0,
+        "id": "PTI-1777313416492",
+        "manutencao": 0,
+        "valorRastreavel": 250,
+        "valorAcreditado": 0
+      },
+      {
+        "id": "PTI-1777313438826",
+        "manutencao": 0,
+        "logistica": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 160,
+        "ensaio": 0,
+        "nomeInstrumento": "Balança 50kg",
+        "teste": 0,
+        "qualificacao": 0
+      }
+    ]
+  },
+  {
+    "id": "PT-1777380534612",
+    "nome": "VALORES FCC",
+    "items": [
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "nomeInstrumento": "DETECTOR DE GÁS FIXO",
+        "ensaio": 0,
+        "valorRastreavel": 900,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1777900338688"
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "nomeInstrumento": "PRESSOSTATO",
+        "ensaio": 0,
+        "valorRastreavel": 320,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "id": "PTI-1777900347851",
+        "logistica": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "FLUXOSTATO",
+        "qualificacao": 0,
+        "teste": 0,
+        "logistica": 0,
+        "id": "PTI-1777900357825",
+        "manutencao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 550
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "LUXÍMETRO",
+        "ensaio": 0,
+        "id": "PTI-1777900373711",
+        "logistica": 0,
+        "manutencao": 0,
+        "valorRastreavel": 320,
+        "valorAcreditado": 0
+      },
+      {
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1777900387580",
+        "valorRastreavel": 280,
+        "valorAcreditado": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "DECIBELÍMETRO",
+        "ensaio": 0
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "TERMÔMETRO DE GLOBO",
+        "valorRastreavel": 0,
+        "valorAcreditado": 420,
+        "manutencao": 0,
+        "id": "PTI-1777900409390",
+        "logistica": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "MEDIDOR DE INCLINAÇÃO",
+        "qualificacao": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1777900427488",
+        "logistica": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 240
+      },
+      {
+        "id": "PTI-1777900438194",
+        "manutencao": 0,
+        "logistica": 0,
+        "valorRastreavel": 300,
+        "valorAcreditado": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "TORQUIMETRO RADIAL"
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "CONJUNTO DE PESO PADRÃO",
+        "qualificacao": 0,
+        "teste": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 725,
+        "id": "PTI-1777900454986",
+        "logistica": 0,
+        "manutencao": 0
+      },
+      {
+        "nomeInstrumento": "TERMÔMETRO DE FORNO DE CURA",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1777900467591",
+        "valorAcreditado": 0,
+        "valorRastreavel": 200
+      },
+      {
+        "id": "PTI-1777900516100",
+        "logistica": 0,
+        "manutencao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 170,
+        "ensaio": 0,
+        "nomeInstrumento": "MICRÔMETRO EXTERNO",
+        "teste": 0,
+        "qualificacao": 0
+      }
+    ]
+  },
+  {
+    "id": "PT-1777409273681",
+    "nome": "CONTRATO KAIFA",
+    "items": [
+      {
+        "nomeInstrumento": "DRY BOX - ESTUFA",
+        "ensaio": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "manutencao": 0,
+        "id": "PTI-1777409308089",
+        "logistica": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 300
+      },
+      {
+        "nomeInstrumento": "CÂMARA CLIMÁTICA",
+        "ensaio": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "id": "PTI-1777409319655",
+        "manutencao": 0,
+        "logistica": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 600
+      },
+      {
+        "manutencao": 0,
+        "id": "PTI-1777409333269",
+        "logistica": 0,
+        "valorRastreavel": 180,
+        "valorAcreditado": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "MULTÍMETRO",
+        "ensaio": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 2200,
+        "id": "PTI-1777409363963",
+        "logistica": 0,
+        "manutencao": 0,
+        "nomeInstrumento": "ESPECTROFOTÔMETRO",
+        "ensaio": 0,
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 130,
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1777409378255",
+        "ensaio": 0,
+        "nomeInstrumento": "TERMO-HIGRÔMETRO",
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "TERMÔMETRO PARA FERRO DE SOLDA",
+        "qualificacao": 0,
+        "teste": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 130,
+        "id": "PTI-1777409391102",
+        "manutencao": 0,
+        "logistica": 0
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "BALANÇA 150kg (Plataforma)",
+        "valorRastreavel": 470,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "id": "PTI-1777409583399",
+        "logistica": 0
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "BALANÇA 6kg",
+        "ensaio": 0,
+        "logistica": 0,
+        "id": "PTI-1777409622878",
+        "manutencao": 0,
+        "valorRastreavel": 160,
+        "valorAcreditado": 0
+      },
+      {
+        "manutencao": 0,
+        "id": "PTI-1777409636279",
+        "logistica": 0,
+        "valorRastreavel": 160,
+        "valorAcreditado": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "nomeInstrumento": "BALANÇA 30kg",
+        "ensaio": 0
+      },
+      {
+        "manutencao": 0,
+        "id": "PTI-1777409668283",
+        "logistica": 0,
+        "valorAcreditado": 1600,
+        "valorRastreavel": 0,
+        "nomeInstrumento": "Dispositivo de teste de água (04 balança, 02 sen temp, 02 sen press)",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "TRANSDUTOR DE PRESSÃO (02 CADA BANCADA)",
+        "id": "PTI-1777409832954",
+        "logistica": 0,
+        "manutencao": 0,
+        "valorRastreavel": 0,
+        "valorAcreditado": 500
+      },
+      {
+        "nomeInstrumento": "OSCILOSCÓPIO ",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "manutencao": 0,
+        "id": "PTI-1777409847347",
+        "logistica": 0,
+        "valorAcreditado": 420,
+        "valorRastreavel": 0
+      },
+      {
+        "valorRastreavel": 300,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1777409862613",
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "CARGA ELETRÔNICA "
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Calibrador anel roscado",
+        "id": "PTI-1777477256199",
+        "manutencao": 0,
+        "logistica": 0,
+        "valorRastreavel": 190,
+        "valorAcreditado": 0
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "nomeInstrumento": "Calibrador tampão roscado",
+        "ensaio": 0,
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1777477273805",
+        "valorRastreavel": 180,
+        "valorAcreditado": 0
+      },
+      {
+        "manutencao": 0,
+        "id": "PTI-1777477322069",
+        "logistica": 0,
+        "valorRastreavel": 250,
+        "valorAcreditado": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "nomeInstrumento": "Charging Plate Tester ",
+        "ensaio": 0
+      },
+      {
+        "ensaio": 0,
+        "nomeInstrumento": "Paquímetro",
+        "teste": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 70,
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1777477338548"
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "nomeInstrumento": "Terrômetro",
+        "ensaio": 0,
+        "id": "PTI-1777477349690",
+        "logistica": 0,
+        "manutencao": 0,
+        "valorRastreavel": 200,
+        "valorAcreditado": 0
+      },
+      {
+        "nomeInstrumento": "TESTADOR DE TENSÃO ELETROSTÁTICA",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 200,
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1777477380323"
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "CATRACA ESD",
+        "valorRastreavel": 180,
+        "valorAcreditado": 0,
+        "logistica": 0,
+        "id": "PTI-1777477391846",
+        "manutencao": 0
+      },
+      {
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1777477437664",
+        "valorRastreavel": 170,
+        "valorAcreditado": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "TESTADOR DE PULSEIRA E CALCANHEIRA (HUMAN BODY COMPREHENIVE TESTER)"
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 180,
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1777477446239",
+        "nomeInstrumento": "LUXÍMETRO",
+        "ensaio": 0,
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "nomeInstrumento": "DINAMÔMETRO PUSH-PULL 50KG",
+        "ensaio": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "id": "PTI-1777477474973",
+        "manutencao": 0,
+        "logistica": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 400
+      },
+      {
+        "valorRastreavel": 200,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "id": "PTI-1777477491258",
+        "logistica": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "VISCOSÍMETRO ELETRÔNICO",
+        "ensaio": 0
+      },
+      {
+        "valorRastreavel": 200,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "id": "PTI-1777477507706",
+        "logistica": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "nomeInstrumento": "MEDIDOR DE RESISTÊNCIA",
+        "ensaio": 0
+      },
+      {
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1777477521966",
+        "valorRastreavel": 180,
+        "valorAcreditado": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "TENSIÔMETRO"
+      },
+      {
+        "manutencao": 0,
+        "id": "PTI-1777477567733",
+        "logistica": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 480,
+        "ensaio": 0,
+        "nomeInstrumento": "FREQUÊNCÍMETRO DE 4 CANAIS",
+        "qualificacao": 0,
+        "teste": 0
+      },
+      {
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "TORQUE TESTER",
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1777477583212",
+        "valorRastreavel": 220,
+        "valorAcreditado": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 180,
+        "id": "PTI-1777477598930",
+        "logistica": 0,
+        "manutencao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "NÍVEL DE PRECISÃO",
+        "qualificacao": 0,
+        "teste": 0
+      },
+      {
+        "nomeInstrumento": "COLETOR DE TEMPERATURA (DATAPAQ)",
+        "ensaio": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "valorAcreditado": 350,
+        "valorRastreavel": 0,
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1777477631256"
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 400,
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1777477675249",
+        "ensaio": 0,
+        "nomeInstrumento": "TESTE DE IMPACTO DE MOLA",
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "valorAcreditado": 0,
+        "valorRastreavel": 160,
+        "logistica": 0,
+        "id": "PTI-1777478034590",
+        "manutencao": 0,
+        "nomeInstrumento": "BALANÇA 15kg",
+        "ensaio": 0,
+        "teste": 0,
+        "qualificacao": 0
+      },
+      {
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1777478117969",
+        "valorAcreditado": 0,
+        "valorRastreavel": 200,
+        "ensaio": 0,
+        "nomeInstrumento": "Balança 150kg",
+        "qualificacao": 0,
+        "teste": 0
+      },
+      {
+        "valorRastreavel": 1200,
+        "valorAcreditado": 1200,
+        "id": "PTI-1777980457847",
+        "logistica": 0,
+        "manutencao": 0,
+        "qualificacao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Estufa (Temperaura - 2hr 1 ponto)"
+      },
+      {
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1777980536611",
+        "valorAcreditado": 0,
+        "valorRastreavel": 900,
+        "ensaio": 0,
+        "nomeInstrumento": "Estufa (Umidade - 2hr 1 ponto)",
+        "qualificacao": 0,
+        "teste": 0
+      }
+    ]
+  },
+  {
+    "id": "PT-1777485105967",
+    "nome": "VALORES FOXCONN",
+    "items": [
+      {
+        "valorRastreavel": 240,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1777485127159",
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Mesa de Desempeno de Granito"
+      },
+      {
+        "nomeInstrumento": "Pente de Raios",
+        "ensaio": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "manutencao": 0,
+        "id": "PTI-1777485171791",
+        "logistica": 0,
+        "valorAcreditado": 0,
+        "valorRastreavel": 75
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Termômetro Infravermelho",
+        "valorRastreavel": 130,
+        "valorAcreditado": 0,
+        "manutencao": 0,
+        "id": "PTI-1777485204078",
+        "logistica": 0
+      },
+      {
+        "manutencao": 0,
+        "logistica": 0,
+        "id": "PTI-1777485249606",
+        "valorRastreavel": 900,
+        "valorAcreditado": 0,
+        "teste": 0,
+        "qualificacao": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "Balança de Piso 2000kg"
+      }
+    ]
+  },
+  {
+    "id": "PT-1777927521007",
+    "nome": "SABORES VEGETAIS",
+    "items": [
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "nomeInstrumento": "FOTÔMETRO",
+        "ensaio": 0,
+        "valorRastreavel": 865,
+        "valorAcreditado": 0,
+        "logistica": 0,
+        "manutencao": 0,
+        "id": "PTI-1777927545313"
+      },
+      {
+        "qualificacao": 0,
+        "teste": 0,
+        "ensaio": 0,
+        "nomeInstrumento": "COLORÍMETRO",
+        "valorRastreavel": 390,
+        "valorAcreditado": 0,
+        "id": "PTI-1777927558927",
+        "logistica": 0,
+        "manutencao": 0
       }
     ]
   }

@@ -8,6 +8,7 @@ import { Quote, QuoteItem, Client, ClientStatus, QuoteStatus, PriceTable, Paymen
 import { GENERAL_LETTERHEAD } from '../utils/letterheads';
 import { generateQuotePdf } from '../utils/pdfGenerator';
 import { formatNumber } from '../utils/formatters';
+import { calculateQuoteTotal, calculateQuoteItemTotals, getServicePriceFromTable } from '../utils/quoteUtils';
 
 export interface QuoteEditModalProps {
   quote: Quote | null;
@@ -67,58 +68,23 @@ export default function QuoteEditModal({
 
   const selectedPriceTable = priceTables.find(table => table.nome === formData?.tabelaPrecos);
 
-  const calculateFinalValues = (item: Omit<QuoteItem, 'item'>) => {
-    const valorUnitarioFinal = item.valorUnitario * (1 - (item.desconto / 100));
-    const valorTotal = item.quantidade * valorUnitarioFinal;
-    return { valorUnitarioFinal, valorTotal };
-  };
 
   const isApproved = formData?.status === QuoteStatus.APPROVED;
 
   useEffect(() => {
     if (selectedPriceTable && selectedInstrument && selectedServiceType) {
-      const itemFromTable = selectedPriceTable.items.find(item => item.nomeInstrumento === selectedInstrument);
-      if (itemFromTable) {
-        let valorUnitario = 0;
-        const logistica = itemFromTable.logistica || 0;
-        
-        switch (selectedServiceType) {
-          case 'Rastreável':
-            valorUnitario = itemFromTable.valorRastreavel + logistica;
-            break;
-          case 'Acreditado':
-            valorUnitario = itemFromTable.valorAcreditado + logistica;
-            break;
-          case 'Manutenção':
-            valorUnitario = itemFromTable.manutencao + logistica;
-            break;
-          case 'Ensaio':
-            valorUnitario = itemFromTable.ensaio + logistica;
-            break;
-          case 'Teste':
-            valorUnitario = itemFromTable.teste + logistica;
-            break;
-          case 'Qualificação':
-            valorUnitario = itemFromTable.qualificacao + logistica;
-            break;
-          case 'Logística':
-            valorUnitario = logistica;
-            break;
-          default:
-            valorUnitario = 0;
-        }
-
-        setNewItem(prev => {
-          const updatedItem = {
-            ...prev,
-            descricao: selectedInstrument,
-            tipoServico: selectedServiceType,
-            valorUnitario: valorUnitario,
-          };
-          const { valorUnitarioFinal, valorTotal } = calculateFinalValues(updatedItem);
-          return { ...updatedItem, valorUnitarioFinal, valorTotal };
-        });
-      }
+      const valorUnitario = getServicePriceFromTable(selectedPriceTable, selectedInstrument, selectedServiceType);
+      
+      setNewItem(prev => {
+        const updatedItem = {
+          ...prev,
+          descricao: selectedInstrument,
+          tipoServico: selectedServiceType,
+          valorUnitario: valorUnitario,
+        };
+        const { valorUnitarioFinal, valorTotal } = calculateQuoteItemTotals(updatedItem);
+        return { ...updatedItem, valorUnitarioFinal, valorTotal };
+      });
     }
   }, [selectedPriceTable, selectedInstrument, selectedServiceType, newItem.desconto, newItem.quantidade]);
 
@@ -197,7 +163,7 @@ export default function QuoteEditModal({
         ...prevItem,
         [name]: name === 'quantidade' || name === 'desconto' ? parseFloat(value) || 0 : value,
       };
-      const { valorUnitarioFinal, valorTotal } = calculateFinalValues(updatedItem);
+      const { valorUnitarioFinal, valorTotal } = calculateQuoteItemTotals(updatedItem);
       return { ...updatedItem, valorUnitarioFinal, valorTotal };
     });
   };
@@ -273,7 +239,7 @@ export default function QuoteEditModal({
     }
   };
 
-  const totalQuoteValue = formData.items.reduce((sum, item) => sum + item.valorTotal, 0);
+  const totalQuoteValue = calculateQuoteTotal(formData.items);
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">

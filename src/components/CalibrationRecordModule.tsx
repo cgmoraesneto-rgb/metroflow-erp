@@ -45,6 +45,7 @@ import CalibrationLaunchModal from './CalibrationLaunchModal';
 import EmployeeSelect from './EmployeeSelect';
 import { toast } from 'sonner';
 import { generateCertificatePdf } from '../utils/pdfGenerator';
+import { sanitizeMaskSnapshot } from '../utils/metrologyUtils';
 
 
 interface CalibrationRecordModuleProps {
@@ -330,7 +331,7 @@ export default function CalibrationRecordModule({
                 (result.standardInstrumentIds || mask?.standardInstrumentIds || launchModalRecord.standardInstrumentIds || []).includes(si.id as string)
             ) || [],
             envStandardInstrumentSnapshot: standardInstruments?.find(si => si.id === launchModalRecord.envStandardInstrumentId),
-            maskSnapshot: mask,
+            maskSnapshot: sanitizeMaskSnapshot(mask),
             status: CertificateStatus.IN_ANALYSIS,
             isDraft: false
         };
@@ -367,7 +368,7 @@ export default function CalibrationRecordModule({
                 (result.standardInstrumentIds || mask?.standardInstrumentIds || launchModalRecord.standardInstrumentIds || []).includes(si.id as string)
             ) || [],
             envStandardInstrumentSnapshot: standardInstruments?.find(si => si.id === launchModalRecord.envStandardInstrumentId),
-            maskSnapshot: mask,
+            maskSnapshot: sanitizeMaskSnapshot(mask),
             isDraft: true
         };
 

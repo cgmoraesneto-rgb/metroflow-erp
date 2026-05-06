@@ -4,12 +4,13 @@ import { useAuth } from '../contexts/AuthContext';
 import { Quote, Client, PriceTable, PaymentMethod, QuoteStatus, ServiceOrder, DocumentTemplate } from '../types';
 import QuoteEditModal from './QuoteEditModal';
 import QuoteViewModal from './QuoteViewModal';
-import { Eye, Pencil, Trash2, Plus, LayoutGrid, List, CheckCircle, FileText, History } from 'lucide-react';
+import { Eye, Pencil, Trash2, Plus, LayoutGrid, List, CheckCircle, FileText, History, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDate, formatCurrency, formatNumber } from '../utils/formatters';
 import { generateQuotePdf } from '../utils/pdfGenerator';
 import { generateNextQuoteId } from '../utils/migration';
+import { calculateQuoteTotal, createQuoteRevision } from '../utils/quoteUtils';
 
 const handleDownloadPdf = async (quote: Quote, client: Client | undefined, documentTemplates: DocumentTemplate[]) => {
   try {
@@ -50,7 +51,7 @@ export default function QuotesSection({
   onApproveQuote,
   searchQuery
 }: QuotesSectionProps) {
-  const { documentTemplates } = useData();
+  const { documentTemplates, pagination } = useData();
   const { employee } = useAuth();
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
   const [editingQuote, setEditingQuote] = useState<Quote | null>(null);
@@ -101,25 +102,13 @@ export default function QuotesSection({
 
 
   const handleCreateRevision = (original: Quote) => {
-    // Find all revisions of this quote to determine the next revision number
-    const baseId = original.parentQuoteId || original.id;
     const nextRev = (original.revision || 0) + 1;
-    
-    const revisedQuote: Quote = {
-      ...original,
-      id: `${baseId}-REV${nextRev}`,
-      parentQuoteId: baseId,
-      revision: nextRev,
-      status: QuoteStatus.PENDING, // Revision starts as pending
-      dataEmissao: new Date().toISOString().split('T')[0],
-      criadoEm: new Date().toLocaleString('pt-BR'),
-      criadoPor: employee?.nome || 'Sistema',
-    };
+    const revisedQuote = createQuoteRevision(original, nextRev, employee?.nome || 'Sistema');
     
     onSaveQuote(revisedQuote);
     setEditingQuote(revisedQuote);
     setIsQuoteModalOpen(true);
-    toast.success(`Criando revisão ${nextRev} do orçamento ${baseId}`);
+    toast.success(`Criando revisão ${nextRev} do orçamento ${revisedQuote.parentQuoteId}`);
   };
 
   const handleApproveQuote = (quote: Quote, newSO: ServiceOrder) => {
@@ -226,7 +215,7 @@ export default function QuotesSection({
               </thead>
               <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
                 {filteredQuotes.map(quote => {
-                  const total = quote.items.reduce((s, i) => s + (i.valorTotal || 0), 0);
+                  const total = calculateQuoteTotal(quote.items);
                   const isApproved = quote.status === QuoteStatus.APPROVED;
                   return (
                     <tr key={quote.id} className="rectilinear-tr group">
@@ -281,7 +270,7 @@ export default function QuotesSection({
         ) : (
           <div className="rectilinear-grid">
             {filteredQuotes.map(quote => {
-              const total = quote.items.reduce((s, i) => s + (i.valorTotal || 0), 0);
+              const total = calculateQuoteTotal(quote.items);
               const isApproved = quote.status === QuoteStatus.APPROVED;
               return (
                 <div key={quote.id} className="rectilinear-card group flex flex-col justify-between h-full">
@@ -333,8 +322,26 @@ export default function QuotesSection({
         </div>
       )}
 
+      {pagination.quotes.hasMore && (
+        <div className="flex justify-center mt-8">
+          <button
+            onClick={pagination.quotes.loadMore}
+            disabled={pagination.quotes.loading}
+            className="flex items-center gap-2 px-8 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] shadow-sm hover:shadow-md hover:bg-slate-50 dark:hover:bg-slate-700 transition-all disabled:opacity-50"
+          >
+            {pagination.quotes.loading ? (
+              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Plus className="w-3.5 h-3.5" />
+            )}
+            {pagination.quotes.loading ? 'Carregando...' : 'Ver Mais Orçamentos'}
+          </button>
+        </div>
+      )}
+
       {/* Modals */}
       <QuoteEditModal
+        key={editingQuote ? `edit-${editingQuote.id}` : 'new-quote'}
         quote={editingQuote}
         isOpen={isQuoteModalOpen}
         onClose={() => setIsQuoteModalOpen(false)}
@@ -343,9 +350,10 @@ export default function QuotesSection({
         priceTables={priceTables}
         paymentMethods={paymentMethods}
       />
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {viewingQuote && (
           <QuoteViewModal
+            key={`view-${viewingQuote.id}`}
             quote={viewingQuote}
             client={clients.find(c => c.id === viewingQuote.clienteId)}
             onClose={() => setViewingQuote(null)}

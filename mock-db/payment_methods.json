@@ -1,10 +1,70 @@
 [
   {
-    "description": "10 dias",
-    "id": "1776778653213"
+    "id": "1772838680349",
+    "description": "À vista"
   },
   {
-    "description": "10",
-    "id": "1776779787631"
+    "id": "1772839409987",
+    "description": "BOLETO 15 DIAS"
+  },
+  {
+    "id": "1772839420610",
+    "description": "DEPÓSITO EM CONTA 30 DIAS"
+  },
+  {
+    "id": "1775594421132",
+    "description": "Depósito em conta 15 Dias"
+  },
+  {
+    "id": "1775594430026",
+    "description": "Depósito em conta 10 Dias"
+  },
+  {
+    "id": "1775594445270",
+    "description": "Boleto 30 Dias"
+  },
+  {
+    "id": "1775745716012",
+    "description": "BOLETO 10 DIAS"
+  },
+  {
+    "id": "1775745723443",
+    "description": "BOLETO 7 DIAS"
+  },
+  {
+    "id": "1775745745324",
+    "description": "BOLETO 21 DIAS"
+  },
+  {
+    "id": "1775745782468",
+    "description": "CARTÃO À VISTA"
+  },
+  {
+    "id": "1775745790212",
+    "description": "CARTÃO PARCELADO"
+  },
+  {
+    "id": "1776085831220",
+    "description": "DEPÓSITO EM CONTA 60 DIAS"
+  },
+  {
+    "id": "1776262654875",
+    "description": "Boleto Bancário 20 dias"
+  },
+  {
+    "id": "1776342087432",
+    "description": "Boleto Bancário 28 dias"
+  },
+  {
+    "id": "1776451418770",
+    "description": "Boleto Bancário 5 dias"
+  },
+  {
+    "id": "1776692078927",
+    "description": "Depósito em conta 20 dias"
+  },
+  {
+    "id": "1776945139478",
+    "description": "50% na coleta do equipamento e 50% após a finalização da calibração"
   }
 ]

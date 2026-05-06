@@ -1,1 +1,23 @@
-[]
+[
+  {
+    "id": "5emrjh4mFGL11MPleJNe",
+    "conta": "375269720",
+    "nome": "Inter",
+    "codigo": "077",
+    "agencia": "0001"
+  },
+  {
+    "id": "aEyJQ8kjbRtpjbjtHji0",
+    "codigo": "33",
+    "agencia": "4411",
+    "conta": "13000807-9",
+    "nome": "Santander"
+  },
+  {
+    "id": "sbpOwyGIXlsbV78wZRCP",
+    "nome": "Caixa Econômica Federal",
+    "conta": "4332-2",
+    "agencia": "1457",
+    "codigo": "104"
+  }
+]

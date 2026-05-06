@@ -15,7 +15,8 @@ import {
   ColumnBehavior,
   DigitalSignature,
   Employee,
-  ThirdPartyRecord
+  ThirdPartyRecord,
+  MeasurementGroup
 } from '../types';
 import { formatDate, formatCurrency, parseNumericInput, formatStandardValidity } from './formatters';
 import { getMetrologyValue } from './metrologyMapper';
@@ -24,20 +25,34 @@ import { urlToBase64 } from './imageUtils';
 import { GENERAL_LETTERHEAD, CERTIFICATE_LETTERHEAD } from './letterheads';
 import Chart from 'chart.js/auto';
 
-const findPointCalculation = (record: any, group: any, p: number, repetitions: number) => {
+const findPointCalculation = (record: any, group: any, p: number, repetitions: number, groupIndex?: number) => {
+    if (!record.calculatedPoints) return null;
+    
     const rowIndexPoint = p * repetitions;
     const suffixes = [`_row${rowIndexPoint}`, `-${p}`];
     const prefixes = [group.blockId, group.name, group.groupName];
     
+    // 1. Tenta por chaves explícitas (ID da tabela + Índice da linha)
     for (const pref of prefixes) {
         if (!pref) continue;
         for (const suff of suffixes) {
             const key = `${pref}${suff}`;
-            if (record.calculatedPoints?.[key]) {
-                return record.calculatedPoints[key];
-            }
+            if (record.calculatedPoints[key]) return record.calculatedPoints[key];
         }
     }
+
+    // 2. Fallback de Segurança: Se não achou por ID, tenta por posição absoluta (gi_rowRI)
+    // Isso resolve casos onde o blockId mudou no designer mas o registro mantém a ordem original.
+    if (groupIndex !== undefined) {
+        const fallbackKey = `${groupIndex}_row${rowIndexPoint}`;
+        if (record.calculatedPoints[fallbackKey]) return record.calculatedPoints[fallbackKey];
+    }
+    
+    // 3. Fallback Final: Busca o valor em qualquer chave que termine com o índice da linha
+    // Útil para migrações de dados legados
+    const lastResortKey = Object.keys(record.calculatedPoints).find(k => k.endsWith(`_row${rowIndexPoint}`));
+    if (lastResortKey) return record.calculatedPoints[lastResortKey];
+
     return null;
 };
 
@@ -53,6 +68,58 @@ const fixPdfText = (text: any): string => {
         .replace(/²/g, '^2')
         .replace(/³/g, '^3')
         .replace(/°/g, '°');
+};
+
+/**
+ * Filtra e ordena os grupos do registro de acordo com a estrutura da máscara.
+ * Isso garante que apenas o que está na máscara apareça no PDF, na ordem correta,
+ * e evita que dados duplicados ou legados no registro causem "fantasmas".
+ */
+const getEffectiveGroups = (record: any, mask: CertificateMask | undefined | null) => {
+    const effective: { group: any; maskGroup: MeasurementGroup; gi: number; section?: any }[] = [];
+    if (!record.groups || record.groups.length === 0) return effective;
+
+    const usedRecordIndices = new Set<number>();
+
+    const findMatch = (mg: MeasurementGroup, section?: any) => {
+        // 1. Busca por blockId (mais seguro)
+        let foundIdx = record.groups.findIndex((g: any, idx: number) => 
+            !usedRecordIndices.has(idx) && mg.blockId && g.blockId === mg.blockId
+        );
+
+        // 2. Fallback por nome
+        if (foundIdx === -1) {
+            foundIdx = record.groups.findIndex((g: any, idx: number) => 
+                !usedRecordIndices.has(idx) && (g.groupName === mg.name || g.name === mg.name)
+            );
+        }
+
+        if (foundIdx !== -1) {
+            effective.push({ 
+                group: record.groups[foundIdx], 
+                maskGroup: mg, 
+                gi: foundIdx,
+                section
+            });
+            usedRecordIndices.add(foundIdx);
+        }
+    };
+
+    if (mask?.sections && mask.sections.length > 0) {
+        mask.sections.forEach(sec => {
+            if (sec.groups) sec.groups.forEach(mg => findMatch(mg, sec));
+        });
+    } else if (mask?.measurementGroups && mask.measurementGroups.length > 0) {
+        mask.measurementGroups.forEach(mg => findMatch(mg));
+    } else {
+        // Caso não haja estrutura na máscara (improvável), mantém comportamento original como fallback de segurança
+        record.groups.forEach((g: any, idx: number) => {
+            const mg = findGroupMask(mask, g);
+            if (mg) effective.push({ group: g, maskGroup: mg, gi: idx });
+        });
+    }
+
+    return effective;
 };
 
 /**
@@ -121,7 +188,55 @@ const drawCellWithSymbols = (data: any, doc: jsPDF) => {
     }
 };
 
-const generateChartImage = async (group: any, record: any, groupMask: any): Promise<string | null> => {
+/**
+ * Robustly finds the corresponding mask group definition for a given record group.
+ * Prioritizes blockId (strict), then name/groupName matching.
+ */
+const findGroupMask = (mask: any | undefined | null, group: any): any | null => {
+    if (!mask) return null;
+    
+    const searchInGroups = (groups: any[]): any | null => {
+        // 1. Prioridade Máxima: blockId (ID lógico estável) - Apenas se ambos existirem e não forem vazios
+        const gBlockId = group.blockId || group.id; // Suporte a blockId ou id legado no registro
+        if (gBlockId && typeof gBlockId === 'string' && gBlockId.trim()) {
+            const found = groups.find(mg => mg.blockId === gBlockId);
+            if (found) return found;
+        }
+
+        // 2. Segunda Prioridade: Nome exato (Case sensitive)
+        const gName = group.groupName || group.name;
+        if (gName && typeof gName === 'string') {
+            const found = groups.find(mg => mg.name === gName);
+            if (found) return found;
+        }
+
+        // 3. Fallback: Nome case-insensitive (apenas se for uma string válida)
+        if (gName && typeof gName === 'string') {
+            const upperName = gName.toUpperCase();
+            const found = groups.find(mg => (mg.name || '').toUpperCase() === upperName);
+            if (found) return found;
+        }
+
+        return null;
+    };
+
+    // Tenta em seções (novo formato)
+    if (mask.sections && mask.sections.length > 0) {
+        for (const section of mask.sections) {
+            const found = searchInGroups(section.groups || []);
+            if (found) return found;
+        }
+    }
+
+    // Tenta em measurementGroups (formato legado)
+    if (mask.measurementGroups && mask.measurementGroups.length > 0) {
+        return searchInGroups(mask.measurementGroups);
+    }
+
+    return null;
+};
+
+const generateChartImage = async (group: any, record: any, groupMask: any, groupIndex?: number): Promise<string | null> => {
     return new Promise((resolve) => {
         try {
             const canvas = document.createElement('canvas');
@@ -136,52 +251,67 @@ const generateChartImage = async (group: any, record: any, groupMask: any): Prom
             const repetitions = Math.max(1, groupMask?.repetitions ?? 1);
             const numPoints = Math.ceil(group.rows.length / repetitions);
 
-            // Obter definições visíveis para saber quais colunas procurar
-            const hiddenCols = groupMask?.hiddenColumns || [];
-            const visibleDefs = (groupMask?.columnDefinitions || []).filter((d: any) => !hiddenCols.includes(d.id));
+            // Obter definições do registro (prioridade) ou da máscara (fallback)
+            const definitions = group.columnDefinitions || groupMask?.columnDefinitions || [];
+            const hiddenCols = group.hiddenColumns || groupMask?.hiddenColumns || [];
+            const visibleDefs = definitions.filter((d: any) => !hiddenCols.includes(d.id));
             
             for (let p = 0; p < numPoints; p++) {
-                const calc = findPointCalculation(record, group, p, repetitions);
+                const calc = findPointCalculation(record, group, p, repetitions, groupIndex);
                 if (calc) {
                     const row = group.rows[p * repetitions];
                     
-                    // 1. Identificar X (Referência/VVC) - Busca por Tipo, ID ou Nome
+                    // 1. Identificar X (Referência/VVC) - Busca por Tipo, ID, Nome ou Comportamento
                     const refDef = visibleDefs.find((d: any) => d.type === ColumnType.VVC) || 
                                    visibleDefs.find((d: any) => d.id?.toUpperCase().includes('VVC')) ||
+                                   visibleDefs.find((d: any) => d.metrologyField === 'vvc') ||
                                    visibleDefs.find((d: any) => d.name?.toUpperCase().includes('VALOR VERDADEIRO')) ||
-                                   visibleDefs.find((d: any) => d.name?.toUpperCase().includes('REFERENCIA'));
+                                   visibleDefs.find((d: any) => d.name?.toUpperCase().includes('REFERENCIA')) ||
+                                   visibleDefs.find((d: any) => d.behavior === ColumnBehavior.INPUT); // Fallback para a primeira entrada
                     
                     const xLabel = (refDef && row && row[refDef.id] !== undefined) ? row[refDef.id] : (row && row['VVC'] !== undefined ? row['VVC'] : `P. ${p+1}`);
                     labels.push(xLabel);
 
-                    // 2. Extração Robusta de Erro e Incerteza
+                    // 2. Extração Robusta de Erro e Incerteza (Prioridade: Tipo > Campo > Nome)
                     let errorVal = 0;
                     let uncVal = 0;
+                    let errorFound = false;
+                    let uncFound = false;
 
+                    // Pass 1: Strict Match (Type or metrologyField)
                     visibleDefs.forEach(def => {
                         const val = calc[def.id];
                         if (val === undefined || val === null) return;
-                        
                         const numVal = typeof val === 'number' ? val : parseFloat(String(val).replace(',', '.')) || 0;
-                        const idUpper = def.id?.toUpperCase() || '';
-                        const nameUpper = def.name?.toUpperCase() || '';
 
-                        // Busca por Tipo
-                        if (def.type === ColumnType.ERRO) errorVal = numVal;
-                        if (def.type === ColumnType.INCERTEZA) uncVal = numVal;
-                        
-                        // Busca por ID ou Nome (caso o tipo não esteja setado)
-                        if (idUpper.includes('ERRO') || nameUpper === 'ERRO') errorVal = numVal;
-                        if (idUpper.includes('INCERTEZA') || idUpper === 'U' || nameUpper.includes('INCERTEZA')) uncVal = numVal;
-                        
-                        // Fallback por campo metrológico
-                        if (def.metrologyField === 'error' || def.metrologyField === 'ERRO') errorVal = numVal;
-                        if (def.metrologyField === 'uncertainty' || def.metrologyField === 'U') uncVal = numVal;
+                        if (def.type === ColumnType.ERRO || def.metrologyField === 'error' || def.metrologyField === 'ERRO') {
+                            errorVal = numVal;
+                            errorFound = true;
+                        }
+                        if (def.type === ColumnType.INCERTEZA || def.metrologyField === 'uncertainty' || def.metrologyField === 'U') {
+                            uncVal = numVal;
+                            uncFound = true;
+                        }
                     });
 
-                    // Log para debug em caso de erro (visível no console do inspetor)
-                    if (errorVal === 0 && p === 1) {
-                        console.log(`[ChartDebug] Ponto ${p} com erro zero. Objeto calc:`, calc);
+                    // Pass 2: Fallback Match (Name or ID) - Only if not found in Pass 1
+                    if (!errorFound || !uncFound) {
+                        visibleDefs.forEach(def => {
+                            const val = calc[def.id];
+                            if (val === undefined || val === null) return;
+                            const numVal = typeof val === 'number' ? val : parseFloat(String(val).replace(',', '.')) || 0;
+                            const idUpper = def.id?.toUpperCase() || '';
+                            const nameUpper = (def.name || '').toUpperCase();
+
+                            if (!errorFound && (idUpper.includes('ERRO') || nameUpper.includes('ERRO'))) {
+                                errorVal = numVal;
+                                errorFound = true;
+                            }
+                            if (!uncFound && (idUpper.includes('INCERTEZA') || idUpper === 'U' || nameUpper.includes('INCERTEZA') || nameUpper === 'U')) {
+                                uncVal = numVal;
+                                uncFound = true;
+                            }
+                        });
                     }
 
                     errors.push(errorVal);
@@ -296,30 +426,34 @@ const getImageFormat = (dataUrl: string): any => {
 const addImageToDoc = async (doc: jsPDF, imageData: string, x: number, y: number, w: number, h: number) => {
   if (!imageData || imageData.length < 10) return;
   
+  // Ensure numeric coordinates to avoid NaN errors in jsPDF
+  const safeX = Number(x) || 0;
+  const safeY = Number(y) || 0;
+  const safeW = Number(w) || 10;
+  const safeH = Number(h) || 10;
+
   return new Promise<void>((resolve) => {
     try {
       const format = imageData.startsWith('data:image') ? getImageFormat(imageData) : undefined;
       
-      // If it's a URL, we attempt to load it as an image object for better jsPDF compatibility
       if (imageData.startsWith('http')) {
         const img = new Image();
-        img.crossOrigin = 'anonymous'; // Critical for CORS
+        img.crossOrigin = 'anonymous'; 
         img.src = imageData;
         img.onload = () => {
           try {
-            doc.addImage(img, format || 'PNG', x, y, w, h, undefined, 'FAST');
+            doc.addImage(img, format || 'PNG', safeX, safeY, safeW, safeH, undefined, 'FAST');
           } catch (e) {
             console.error("Error drawing image object:", e);
           }
           resolve();
         };
         img.onerror = () => {
-          console.error("Failed to load image URL for PDF:", imageData);
+          console.warn("Failed to load image URL for PDF (likely CORS):", imageData);
           resolve();
         };
       } else {
-        // It's already base64
-        doc.addImage(imageData, format || 'PNG', x, y, w, h, undefined, 'FAST');
+        doc.addImage(imageData, format || 'PNG', safeX, safeY, safeW, safeH, undefined, 'FAST');
         resolve();
       }
     } catch (e) {
@@ -352,27 +486,25 @@ export const addStandardHeader = ({
   if (letterhead) {
     try {
       const format = letterhead.startsWith('data:image') ? getImageFormat(letterhead) : 'PNG';
-      // Desenha o timbrado no topo ocupando a largura total (A4: 210mm)
-      // Ajustamos a altura para 297 se for um fundo de página inteira, 
-      // ou mantemos menor se for apenas um cabeçalho.
-      // Por compatibilidade com os templates atuais, usaremos 297mm (folha cheia)
       doc.addImage(letterhead, format, 0, 0, 210, 297, undefined, 'FAST');
     } catch (e) {
-      console.error("Erro ao adicionar timbrado ao documento:", e);
+      console.warn("Erro ao adicionar timbrado ao documento (ignorado para evitar crash):", e);
     }
   }
   
-  // ... rest of header logic remains same
+  // Ensure headerTitleY and pageWidth are always finite numbers
+  const headerTitleY = 48; 
+  const safePageWidth = Number.isFinite(pageWidth) && pageWidth > 0 ? pageWidth : 210;
+
   doc.setTextColor(...primaryColor);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(title.length > 30 ? 16 : 18);
   
-  const headerTitleY = 48; 
-  doc.text(title.toUpperCase(), pageWidth / 2, headerTitleY, { align: 'center' });
+  doc.text((title || '').toUpperCase(), safePageWidth / 2, headerTitleY, { align: 'center' });
 
-  if (subtitle) {
+  if (subtitle && typeof subtitle === 'string') {
     doc.setFontSize(10);
-    doc.text(subtitle, pageWidth / 2, headerTitleY + 6, { align: 'center' });
+    doc.text(subtitle, safePageWidth / 2, headerTitleY + 6, { align: 'center' });
   }
 
   if (!hideMeta) {
@@ -385,7 +517,7 @@ export const addStandardHeader = ({
     }
     
     const displayDate = date || new Date().toLocaleDateString('pt-BR');
-    doc.text(`Data da Emissão: ${displayDate}`, pageWidth - margin, headerTitleY + 12, { align: 'right' });
+    doc.text(`Data da Emissão: ${displayDate}`, safePageWidth - margin, headerTitleY + 12, { align: 'right' });
     
     return headerTitleY + 22;
   }
@@ -799,17 +931,15 @@ export const generateCertificatePdf = async (
     currentY += 25;
   }
 
+  // RESOLUÇÃO DOS GRUPOS EFETIVOS (Mask-Centric)
+  // Filtramos o que deve ser impresso baseados na máscara para evitar duplicatas e "fantasmas"
+  const effectiveGroups = getEffectiveGroups(record, mask);
+
   // Pre-generate chart images for groups with hasGraph enabled (must be async before sync render loop)
   const chartImageMap: Record<number, string | null> = {};
-  if (record.groups && record.groups.length > 0) {
-    for (let gi = 0; gi < record.groups.length; gi++) {
-      const grp = record.groups[gi];
-      const grpMask = mask?.measurementGroups.find(
-        mg => mg.name === grp.groupName || (grp.name && mg.name === grp.name)
-      );
-      if (grpMask?.hasGraph) {
-        chartImageMap[gi] = await generateChartImage(grp, record, grpMask);
-      }
+  for (const item of effectiveGroups) {
+    if (item.maskGroup?.hasGraph) {
+      chartImageMap[item.gi] = await generateChartImage(item.group, record, item.maskGroup, item.gi);
     }
   }
 
@@ -822,43 +952,41 @@ export const generateCertificatePdf = async (
     
     currentY = drawSectionTitle(`8. RESULTADOS D${isTest ? 'O ENSAIO' : isMaintenance ? 'O TESTE' : 'A CALIBRAÇÃO'}:`, currentY);
 
-    let lastSectionIdx = -1;
-    for (let gi = 0; gi < record.groups.length; gi++) {
-      const group = record.groups[gi];
+    let lastSectionTitle = '';
+    
+    for (const item of effectiveGroups) {
+      const { group, maskGroup, gi, section } = item;
       if (group.rows.length === 0) continue;
 
-      // Robust matching of group definition in mask (try groupName and name)
-      const groupMask = mask?.measurementGroups.find(mg => mg.name === group.groupName || (group.name && mg.name === group.name));
+      const groupMask = maskGroup;
       
-      // NEW: Renderizar título da seção se houver hierarquia definida
-      if (mask?.sections && mask.sections.length > 0) {
-        const sectionIdx = mask.sections.findIndex(s => s.groups.some(gm => gm.blockId === groupMask?.blockId));
-        if (sectionIdx !== -1 && sectionIdx !== lastSectionIdx) {
-          const section = mask.sections[sectionIdx];
-          if (currentY > pageHeight - marginBottom - 15) {
-            doc.addPage();
-            drawBackgrounds(doc);
-            callHeader(doc);
-          }
-          doc.setFontSize(10);
-          doc.setFont('helvetica', 'bold');
-          doc.setTextColor(0, 51, 102);
-          doc.text(section.title.toUpperCase(), marginX + 2, currentY);
-          currentY += 6;
-          lastSectionIdx = sectionIdx;
+      // NEW: Renderizar título da seção se houver hierarquia definida e mudou de seção
+      if (section && section.title !== lastSectionTitle) {
+        lastSectionTitle = section.title;
+        if (currentY > pageHeight - marginBottom - 15) {
+          doc.addPage();
+          drawBackgrounds(doc);
+          callHeader(doc);
+          currentY = marginTop + 25;
         }
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(0, 51, 102); // Azul escuro para seções
+        doc.text(section.title.toUpperCase(), marginX + 2, currentY);
+        currentY += 6;
       }
 
-      let definitions = groupMask?.columnDefinitions || [];
+      // PRIORIDADE TOTAL: Usar as definições que estão no REGISTRO (o que foi lançado)
+      // Fallback: Se o registro não tiver definições (legado), busca na máscara
+      let definitions = group.columnDefinitions || groupMask?.columnDefinitions || [];
       if (definitions.length === 0 && groupMask?.columns && groupMask.columns.length > 0) {
         definitions = groupMask.columns.map((colName: string) => ({ id: colName, name: colName, type: ColumnType.TEXTO, behavior: ColumnBehavior.METROLOGY }));
       }
 
-      const hiddenCols = groupMask?.hiddenColumns || [];
+      // Mesma lógica para colunas ocultas
+      const hiddenCols = group.hiddenColumns || groupMask?.hiddenColumns || [];
       let visibleDefs = definitions.filter(d => !hiddenCols.includes(d.id));
       if (!isInternalMemory) {
-        // Expandimos os tipos permitidos para incluir LEITURA e MEDIA, que são comuns em certificados
-        // Adicionamos NUMBER pois máscaras customizadas podem usar esse tipo para campos metrológicos (ex: Diâmetro, Pressão)
         const allowedTypes = [
           ColumnType.VVC, 
           ColumnType.LEITURA, 
@@ -881,8 +1009,18 @@ export const generateCertificatePdf = async (
       const numPoints = Math.ceil(group.rows.length / repetitions);
 
       for (let p = 0; p < numPoints; p++) {
-        const calc = findPointCalculation(record, group, p, repetitions);
+        const calc = findPointCalculation(record, group, p, repetitions, gi);
         
+        // Verificação de linha vazia: Se não houver leitura/indicação preenchida (ou for zero e VVC não for zero), pulamos o ponto
+        const firstRow = group.rows[p * repetitions];
+        const hasVVC = firstRow?.[visibleDefs.find(d => d.type === ColumnType.VVC)?.id || ''] !== undefined;
+        const vvcVal = parseFloat(String(firstRow?.[visibleDefs.find(d => d.type === ColumnType.VVC)?.id || '0']).replace(',', '.'));
+        const hasReading = firstRow?.[visibleDefs.find(d => d.type === ColumnType.LEITURA || d.metrologyField === 'LEITURA')?.id || ''] !== undefined;
+        
+        // Se for um ponto onde o VVC não é zero mas não houve leitura (ou leitura é zero/vazia), e não for o primeiro ponto
+        // decidimos se pulamos para evitar as 7 linhas do template
+        if (p > 0 && vvcVal > 0 && !hasReading && !calc?.mean) continue;
+
         for (let r = 0; r < repetitions; r++) {
           const rowIndex = p * repetitions + r;
           const row = group.rows[rowIndex];
@@ -895,15 +1033,12 @@ export const generateCertificatePdf = async (
             
             // Se temos cálculos realizados para este ponto
             if (calc) {
-              // Se for a primeira linha da repetição, mostramos os resultados consolidados (médias, erros, etc.)
               if (r === 0) {
-                // Tenta buscar pelo campo metrológico explícito
                 if (def.metrologyField) {
                   const metVal = getMetrologyValue(def.metrologyField, calc as any, def.decimalPlaces ?? 4);
                   if (metVal.formatted) return fixPdfText(metVal.formatted);
                 }
                 
-                // Mapeamento extra por tipo de coluna (fallback caso metrologyField não esteja setado)
                 if (def.type === ColumnType.MEDIA && (calc as any).mean !== undefined) return fixPdfText((calc as any).mean.toFixed(def.decimalPlaces ?? 4));
                 if (def.type === ColumnType.ERRO && (calc as any).error !== undefined) return fixPdfText((calc as any).error.toFixed(def.decimalPlaces ?? 4));
                 if (def.type === ColumnType.INCERTEZA && (calc as any).U !== undefined) return fixPdfText((calc as any).U.toFixed(def.decimalPlaces ?? 4));
@@ -911,14 +1046,11 @@ export const generateCertificatePdf = async (
                 if (def.type === ColumnType.CONFORMIDADE) return fixPdfText((calc as any).conformity || '');
                 if (def.type === ColumnType.VVC && (calc as any).vvc !== undefined) return fixPdfText((calc as any).vvc.toFixed(def.decimalPlaces ?? 4));
                 
-                // Se a coluna for por ID e existir no calc (caso de colunas customizadas calculadas)
                 if (def.id && (calc as any)[def.id] !== undefined) {
                   const val = (calc as any)[def.id];
                   return typeof val === 'number' ? val.toFixed(def.decimalPlaces ?? 4) : String(val);
                 }
               } else {
-                // Para linhas de repetição (r > 0), limpamos colunas que são resumos do ponto (Erro, U, etc)
-                // mas MANTEMOS a leitura se a coluna for do tipo LEITURA.
                 const isPointSummary = [ColumnType.MEDIA, ColumnType.ERRO, ColumnType.INCERTEZA, ColumnType.CONFORMIDADE].includes(def.type) || 
                                        (isCalculated && def.type !== ColumnType.LEITURA) ||
                                        (isMetrology && !['LEITURA', 'readings'].includes(def.metrologyField || ''));
@@ -927,12 +1059,25 @@ export const generateCertificatePdf = async (
               }
             }
 
-            // Fallback para os dados crus da linha
             const rawVal = row[def.id] !== undefined ? row[def.id] : (def.name ? row[def.name] : undefined);
             return fixPdfText(rawVal !== undefined && rawVal !== null ? String(rawVal) : (r === 0 ? '—' : ''));
           });
           bodyData.push(rowData);
         }
+      }
+
+      if (bodyData.length === 0) continue;
+
+      // AJUSTE DINÂMICO DE CABEÇALHOS PARA INCERTEZA
+      let finalHead = head;
+      const isUncertaintyTable = group.groupName?.toUpperCase().includes('INCERTEZA') || visibleDefs.some(d => d.type === ColumnType.INCERTEZA);
+      if (isUncertaintyTable && visibleDefs.length <= 4) {
+         // Se for a tabela de incerteza/K, garantimos que os nomes façam sentido
+         finalHead = [visibleDefs.map(d => {
+            if (d.type === ColumnType.INCERTEZA || d.metrologyField === 'U') return 'INCERTEZA EXPANDIDA';
+            if (d.id?.toLowerCase().includes('k_factor') || d.name?.toUpperCase().includes('K')) return 'FATOR DE ABRANGÊNCIA (K)';
+            return (d.name || d.id || '').toUpperCase();
+         })];
       }
 
       const estimatedHeaderHeight = 12;
@@ -951,7 +1096,7 @@ export const generateCertificatePdf = async (
 
       autoTable(doc, {
         startY: currentY,
-        head: head,
+        head: finalHead,
         body: bodyData,
         theme: 'grid',
         showHead: 'firstPage', // Evita duplicidade em quebras conforme pedido

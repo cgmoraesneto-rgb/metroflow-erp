@@ -46,7 +46,7 @@ export default function IssuedCertificatesModule({
     searchQuery
 }: IssuedCertificatesModuleProps) {
     const { employee } = useAuth();
-    const { saveItem, deleteItem, procedures, standardInstruments, certificateMasks, employees = [] } = useData();
+    const { saveItem, deleteItem, procedures, standardInstruments, certificateMasks, employees = [], pagination } = useData();
     const [revisionDetailTarget, setRevisionDetailTarget] = useState<CalibrationRecord | null>(null);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
         return (localStorage.getItem('issued_certs_view_mode') as 'grid' | 'list') || 'list';
@@ -329,6 +329,23 @@ export default function IssuedCertificatesModule({
                     ))
                 )}
             </div>
+
+            {pagination.records.hasMore && (
+                <div className="flex justify-center mt-12">
+                    <button
+                        onClick={pagination.records.loadMore}
+                        disabled={pagination.records.loading}
+                        className="flex items-center gap-2 px-10 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-indigo-200 dark:shadow-none transition-all disabled:opacity-50"
+                    >
+                        {pagination.records.loading ? (
+                            <Activity className="w-4 h-4 animate-spin" />
+                        ) : (
+                            <History className="w-4 h-4" />
+                        )}
+                        {pagination.records.loading ? 'Sincronizando...' : 'Carregar Histórico Antigo'}
+                    </button>
+                </div>
+            )}
         </div>
 
         {/* Revision Detail Modal */}

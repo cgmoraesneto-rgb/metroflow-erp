@@ -8,6 +8,7 @@ import { useData } from '../contexts/DataContext';
 import { toast } from 'sonner';
 import { generateServiceOrderPdf, generateCautelaPdf } from '../utils/pdfGenerator';
 import LogisticsProtocolModal from './LogisticsProtocolModal';
+import { determineOSStatus, calculateKmDiff, generateNextCustodyId, generateNextFleetId } from '../utils/logisticsUtils';
 
 interface LogisticsModuleProps {
   serviceOrders: ServiceOrder[];
@@ -94,16 +95,7 @@ export default function LogisticsModule({
 
   const handleSaveOS = async () => {
     if (editingOS) {
-      let newStatus = InstrumentStatus.PENDING;
-      if (editForm.calibracaoConcluida && editForm.certificadosEnviados && editForm.saidaConfirmada && editForm.dataSaida) {
-        newStatus = InstrumentStatus.COMPLETED;
-      } else if (editForm.saidaConfirmada && editForm.dataSaida) {
-        newStatus = InstrumentStatus.DELIVERED;
-      } else if (editForm.calibracaoConcluida) {
-        newStatus = InstrumentStatus.CALIBRATED;
-      } else if (editForm.entradaConfirmada && editForm.dataEntrada) {
-        newStatus = InstrumentStatus.IN_PROGRESS;
-      }
+      const newStatus = determineOSStatus(editForm);
       const updatedOS: ServiceOrder = {
         ...editingOS!,
         dataEntrada: editForm.entradaConfirmada ? editForm.dataEntrada : '',
@@ -159,16 +151,9 @@ export default function LogisticsModule({
 
   // --- Cautelas Logic ---
   const newEmptyCustody = (): StandardCustody => {
-    let maxId = 26000;
-    standardCustodies.forEach(c => {
-      const match = c.id.match(/\d+/);
-      if (match) {
-        const num = parseInt(match[0], 10);
-        if (num > maxId) maxId = num;
-      }
-    });
+    const nextId = generateNextCustodyId(standardCustodies);
     return {
-      id: `${maxId + 1}`,
+      id: nextId,
       items: [{ standardInstrumentId: '', quantidade: 1 }],
       origem: 'Laboratório Central',
       responsavelOrigem: '',
@@ -254,16 +239,9 @@ export default function LogisticsModule({
     if (fleet) {
       setEditingFleet({ ...fleet });
     } else {
-      let maxId = 26000;
-      fleetLogs.forEach(f => {
-        const match = f.id?.match(/\d+/);
-        if (match) {
-          const num = parseInt(match[0], 10);
-          if (num > maxId) maxId = num;
-        }
-      });
+      const nextId = generateNextFleetId(fleetLogs);
       setEditingFleet({
-        id: `${maxId + 1}`,
+        id: nextId,
         motorista: '',
         veiculoId: '',
         trajetoDescricao: '',

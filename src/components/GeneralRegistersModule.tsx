@@ -13,6 +13,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from 'sonner';
 import { migrateERPData } from '../utils/migration';
 import { QuoteStatus } from '../types';
+import { executeDataMigration, fixOrphanQuoteStatus } from '../services/adminService';
 
 interface GeneralRegistersModuleProps {
   employees: Employee[];
@@ -78,39 +79,8 @@ export default function GeneralRegistersModule({
   const handleRunMigration = async () => {
     setIsMigrating(true);
     try {
-      const result = migrateERPData(quotes, serviceOrders, calibrationRecords, financialControls);
-      
       toast.info('Iniciando atualização dos registros...');
-
-      // Save Quotes one by one to ensure stability and status update
-      for (const q of result.quotes) {
-        await saveItem('quotes', q);
-      }
-
-      // Save Service Orders
-      for (const os of result.serviceOrders) {
-        await saveItem('service_orders', os);
-      }
-
-      // Save Calibration Records
-      for (const r of result.calibrationRecords) {
-        await saveItem('calibration_records', r);
-      }
-
-      // Save Financial Controls
-      for (const f of result.financialControls) {
-        await saveItem('financial_controls', f as any);
-      }
-
-      // Clean up old records
-      const oldQuoteIds = Object.entries(result.quoteMapping)
-        .filter(([oldId, newId]) => oldId !== newId).map(([oldId]) => oldId);
-      const oldOsIds = Object.entries(result.osMapping)
-        .filter(([oldId, newId]) => oldId !== newId).map(([oldId]) => oldId);
-
-      for (const id of oldQuoteIds) await deleteItem('quotes', id);
-      for (const id of oldOsIds) await deleteItem('service_orders', id);
-
+      await executeDataMigration(quotes, serviceOrders, calibrationRecords, financialControls, saveItem, deleteItem);
       toast.success(`Migração e Sincronização de Status concluída!`);
       setMigrationDone(true);
       setMigrationConfirm(false);
@@ -127,25 +97,15 @@ export default function GeneralRegistersModule({
   const handleFixQuoteStatus = async () => {
     setIsFixingStatus(true);
     try {
-      // Build set of quoteIds that have linked OS
-      const linkedQuoteIds = new Set(serviceOrders.map(os => os.orcamentoId));
-      const quotesNeedingFix = quotes.filter(q =>
-        linkedQuoteIds.has(q.id) && q.status !== QuoteStatus.APPROVED
-      );
+      toast.info(`Iniciando verificação de orçamentos...`);
+      const fixedCount = await fixOrphanQuoteStatus(quotes, serviceOrders);
 
-      if (quotesNeedingFix.length === 0) {
+      if (fixedCount === 0) {
         toast.info('Todos os orçamentos vinculados já estão como Aprovados.');
         return;
       }
 
-      toast.info(`Corrigindo status de ${quotesNeedingFix.length} orçamento(s)...`);
-
-      for (const q of quotesNeedingFix) {
-        const docRef = doc(db, 'quotes', q.id);
-        await updateDoc(docRef, { status: QuoteStatus.APPROVED });
-      }
-
-      toast.success(`✓ ${quotesNeedingFix.length} orçamento(s) atualizados para APROVADO!`);
+      toast.success(`✓ ${fixedCount} orçamento(s) atualizados para APROVADO!`);
     } catch (error: any) {
       console.error('Status fix error:', error);
       toast.error(`Erro: ${error.message}`);
@@ -163,23 +123,30 @@ export default function GeneralRegistersModule({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error('Assinatura muito grande. Limite de 2MB.');
+    if (file.size > 500 * 1024) {
+      toast.error('Assinatura muito grande. Limite de 500KB para assinaturas.');
       return;
     }
 
     setIsUploadingSignature(true);
     try {
-      const employeeId = editingEmployeeId || `EMP-${Date.now()}`;
-      const storageRef = ref(storage, `employees/${employeeId}/signature`);
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
-      setEmployeeForm(prev => ({ ...prev, signatureBase64: url }));
-      toast.success('Assinatura carregada com sucesso!');
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64 = event.target?.result as string;
+        if (base64) {
+          setEmployeeForm(prev => ({ ...prev, signatureBase64: base64 }));
+          toast.success('Assinatura processada com sucesso!');
+        }
+        setIsUploadingSignature(false);
+      };
+      reader.onerror = () => {
+        toast.error('Erro ao ler arquivo de assinatura.');
+        setIsUploadingSignature(false);
+      };
+      reader.readAsDataURL(file);
     } catch (error: any) {
-      console.error("Error uploading signature:", error);
-      toast.error(`Erro ao carregar assinatura: ${error.message || "Conexão falhou"}`);
-    } finally {
+      console.error("Error processing signature:", error);
+      toast.error(`Erro ao processar assinatura: ${error.message || "Falha local"}`);
       setIsUploadingSignature(false);
     }
   };

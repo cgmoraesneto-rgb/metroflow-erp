@@ -13,7 +13,8 @@ import {
     Download,
     Calendar,
     AlertTriangle,
-    RefreshCw
+    RefreshCw,
+    Plus
 } from 'lucide-react';
 import { formatDate } from '../utils/formatters';
 
@@ -53,6 +54,7 @@ export default function QualityApprovalModule({
     searchQuery
 }: QualityApprovalModuleProps) {
     const { employee } = useAuth();
+    const { pagination } = useData();
     const { pdfState, previewUrl: previewPdfUrl, generate: generatePdf, reset: resetPdf } = usePdfGenerator();
     const [returnJustification, setReturnJustification] = useState<Record<string, string>>({});
     const [returnModalId, setReturnModalId] = useState<string | null>(null);
@@ -172,9 +174,6 @@ export default function QualityApprovalModule({
                 </div>
             </div>
 
-            <div>
-            </div>
-
             {viewMode === 'list' ? (
                 <div className="rectilinear-container custom-scrollbar shadow-sm">
                     <table className="rectilinear-table">
@@ -279,6 +278,23 @@ export default function QualityApprovalModule({
                             </div>
                         );
                     })}
+                </div>
+            )}
+
+            {pagination.records.hasMore && (
+                <div className="flex justify-center mt-12">
+                    <button
+                        onClick={pagination.records.loadMore}
+                        disabled={pagination.records.loading}
+                        className="flex items-center gap-2 px-10 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-indigo-200 dark:shadow-none transition-all disabled:opacity-50"
+                    >
+                        {pagination.records.loading ? (
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                        ) : (
+                            <Plus className="w-4 h-4" />
+                        )}
+                        {pagination.records.loading ? 'Sincronizando...' : 'Ver Mais Pendências'}
+                    </button>
                 </div>
             )}
 

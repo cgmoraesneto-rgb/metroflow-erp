@@ -122,21 +122,22 @@ export default function CalibrationLaunchModal({
         let allGroups: any[] = [];
         
         if (currentMask.sections && currentMask.sections.length > 0) {
-          allGroups = currentMask.sections.map((sec) => {
+          allGroups = currentMask.sections.map((sec, sIdx) => {
             const mg = sec.groups?.[0] || { name: sec.title, columnDefinitions: [], templateRows: [] };
             return {
               ...mg,
               groupName: sec.title,
-              blockId: mg.blockId || sec.id,
+              blockId: mg.blockId || `T${sIdx + 1}`,
               rows: (mg.templateRows && mg.templateRows.length > 0) ? JSON.parse(JSON.stringify(mg.templateRows)) : [{}, {}, {}],
               columnDefinitions: mg.columnDefinitions || []
             };
           });
         } else {
           // Fallback para máscaras legadas
-          allGroups = currentMask.measurementGroups.map((mg) => ({
+          allGroups = currentMask.measurementGroups.map((mg, mIdx) => ({
             ...mg,
             groupName: mg.name,
+            blockId: mg.blockId || `T${mIdx + 1}`,
             rows: (mg.templateRows && mg.templateRows.length > 0) ? JSON.parse(JSON.stringify(mg.templateRows)) : [{}, {}, {}],
             columnDefinitions: mg.columnDefinitions || []
           }));
@@ -230,12 +231,27 @@ export default function CalibrationLaunchModal({
                         const m = certificateMasks.find(mask => mask.id === e.target.value) || null;
                         setSelectedMask(m);
                         if (m) {
-                          const allGroups = m.measurementGroups.map(mg => ({ 
-                            ...mg, 
-                            rows: (mg.templateRows && mg.templateRows.length > 0) ? JSON.parse(JSON.stringify(mg.templateRows)) : [], 
-                            groupName: mg.name, 
-                            columns: (mg.columnDefinitions || []).map(d => d.id) 
-                          }));
+                          let allGroups: any[] = [];
+                          if (m.sections && m.sections.length > 0) {
+                            allGroups = m.sections.map((sec, sIdx) => {
+                              const mg = sec.groups?.[0] || { name: sec.title, columnDefinitions: [], templateRows: [] };
+                              return {
+                                ...mg,
+                                groupName: sec.title,
+                                blockId: mg.blockId || `T${sIdx + 1}`, // Garante ID estável
+                                rows: (mg.templateRows && mg.templateRows.length > 0) ? JSON.parse(JSON.stringify(mg.templateRows)) : [{}, {}, {}],
+                                columnDefinitions: mg.columnDefinitions || []
+                              };
+                            });
+                          } else {
+                            allGroups = m.measurementGroups.map((mg, mIdx) => ({ 
+                              ...mg, 
+                              rows: (mg.templateRows && mg.templateRows.length > 0) ? JSON.parse(JSON.stringify(mg.templateRows)) : [], 
+                              groupName: mg.name, 
+                              blockId: mg.blockId || `T${mIdx + 1}`, // Garante ID estável para legado
+                              columns: (mg.columnDefinitions || []).map(d => d.id) 
+                            }));
+                          }
                           setGroups(allGroups as any);
                         }
                         setIsDirty(true);

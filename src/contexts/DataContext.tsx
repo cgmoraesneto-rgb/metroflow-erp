@@ -52,6 +52,11 @@ interface DataContextType {
   addClient: () => Promise<void>;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  pagination: {
+    clients: { hasMore: boolean; loadMore: () => Promise<void>; loading: boolean };
+    quotes: { hasMore: boolean; loadMore: () => Promise<void>; loading: boolean };
+    records: { hasMore: boolean; loadMore: () => Promise<void>; loading: boolean };
+  };
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -93,6 +98,23 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
   const [inventoryMovements, setInventoryMovements] = useState<InventoryMovement[]>([]);
   const [thirdPartyRecords, setThirdPartyRecords] = useState<ThirdPartyRecord[]>([]);
+
+  // Pagination cursors
+  const [cursors, setCursors] = useState<{ [key: string]: any }>({
+    clients: null,
+    quotes: null,
+    records: null
+  });
+  const [hasMore, setHasMore] = useState({
+    clients: true,
+    quotes: true,
+    records: true
+  });
+  const [paginationLoading, setPaginationLoading] = useState({
+    clients: false,
+    quotes: false,
+    records: false
+  });
 
   const hasPermission = (module: Module) => {
     // Admins always have full access to all modules
@@ -303,6 +325,29 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
+  const loadMore = async (collection: 'clients' | 'quotes' | 'records') => {
+    if (!hasMore[collection] || paginationLoading[collection]) return;
+
+    setPaginationLoading(prev => ({ ...prev, [collection]: true }));
+    try {
+      const url = collection === 'records' ? '/api/mock/calibration_records' : `/api/mock/${collection}`;
+      const orderField = collection === 'clients' ? 'id' : 'createdAt';
+      
+      const result = await apiClient.fetchPaginated<any>(url, 20, cursors[collection], orderField, 'desc');
+      
+      if (collection === 'clients') setClients(prev => [...prev, ...result.data]);
+      if (collection === 'quotes') setQuotes(prev => [...prev, ...result.data]);
+      if (collection === 'records') setCalibrationRecords(prev => [...prev, ...result.data]);
+      
+      setCursors(prev => ({ ...prev, [collection]: result.lastVisible }));
+      setHasMore(prev => ({ ...prev, [collection]: result.data.length === 20 }));
+    } catch (e) {
+      console.error(`Error loading more ${collection}:`, e);
+    } finally {
+      setPaginationLoading(prev => ({ ...prev, [collection]: false }));
+    }
+  };
+
   const fetchCoreData = async () => {
     setIsSyncing(true);
     try {
@@ -322,8 +367,19 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const [clientsData, quotesData, soData, stdData, empData] = results;
 
-      setClients(safeGet(clientsData));
-      setQuotes(safeGet(quotesData));
+      // Inicia com paginação se for Real Database
+      if (apiClient.useRealDatabase) {
+         const cRes = await apiClient.fetchPaginated<Client>('/api/mock/clients', 20, null, 'id', 'desc');
+         const qRes = await apiClient.fetchPaginated<Quote>('/api/mock/quotes', 20, null, 'createdAt', 'desc');
+         setClients(cRes.data);
+         setQuotes(qRes.data);
+         setCursors(prev => ({ ...prev, clients: cRes.lastVisible, quotes: qRes.lastVisible }));
+         setHasMore(prev => ({ ...prev, clients: cRes.data.length === 20, quotes: qRes.data.length === 20 }));
+      } else {
+        setClients(safeGet(clientsData));
+        setQuotes(safeGet(quotesData));
+      }
+
       setServiceOrders(safeGet(soData));
       setStandardInstruments(safeGet(stdData));
       setEmployees(safeGet(empData));
@@ -364,7 +420,15 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const [calData, resData, finData, expData, fleetData, vehData, custodyData, ptData, itData, cmData, procData, pmData, bankData, uomData, dtRawResult, invData, movData, tpData] = results;
 
-      setCalibrationRecords(safeGet(calData));
+      if (apiClient.useRealDatabase) {
+        const rRes = await apiClient.fetchPaginated<CalibrationRecord>('/api/mock/calibration_records', 20, null, 'createdAt', 'desc');
+        setCalibrationRecords(rRes.data);
+        setCursors(prev => ({ ...prev, records: rRes.lastVisible }));
+        setHasMore(prev => ({ ...prev, records: rRes.data.length === 20 }));
+      } else {
+        setCalibrationRecords(safeGet(calData));
+      }
+
       setCalibrationResults(safeGet(resData));
       setFinancialControls(safeGet(finData));
       setFinancialExpenses(safeGet(expData));
@@ -461,7 +525,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       standardCustodies, fleetLogs, vehicles, documentTemplates,
       inventoryItems, inventoryMovements, thirdPartyRecords,
       loading, isSyncing, saveItem, deleteItem, hasPermission, addClient,
-      searchQuery, setSearchQuery
+      searchQuery, setSearchQuery,
+      pagination: {
+        clients: { hasMore: hasMore.clients, loadMore: () => loadMore('clients'), loading: paginationLoading.clients },
+        quotes: { hasMore: hasMore.quotes, loadMore: () => loadMore('quotes'), loading: paginationLoading.quotes },
+        records: { hasMore: hasMore.records, loadMore: () => loadMore('records'), loading: paginationLoading.records }
+      }
     }}>
       {children}
     </DataContext.Provider>

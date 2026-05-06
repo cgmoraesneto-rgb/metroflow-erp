@@ -28,43 +28,34 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({ isOpen,
     const file = e.target.files?.[0];
     if (!file || !form) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Imagem muito grande. Limite de 5MB.");
+    // Limite de 600KB para garantir que caiba no Firestore (limite de 1MB por documento)
+    if (file.size > 600 * 1024) {
+      toast.error("Imagem muito grande para o banco de dados. Reduza o tamanho para menos de 600KB para garantir a compatibilidade.");
       return;
     }
 
     setIsUploading(true);
     try {
-      const pathId = form.id || 'default';
-      const storageRef = ref(storage, `document_templates/${pathId}/${field}`);
-      
-      console.log(`Iniciando upload para: document_templates/${pathId}/${field}`);
-
-      const uploadTask = async () => {
-        await uploadBytes(storageRef, file);
-        console.log("Upload concluído, obtendo URL...");
-        return await getDownloadURL(storageRef);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64 = event.target?.result as string;
+        if (base64) {
+          setForm(prev => {
+            if (!prev) return prev;
+            return { ...prev, [field]: base64 };
+          });
+          toast.success("Imagem processada com sucesso!");
+        }
+        setIsUploading(false);
       };
-
-      const timeoutPromise = new Promise<string>((_, reject) => 
-        setTimeout(() => reject(new Error("Tempo limite excedido (30s). Verifique sua conexão com o Firebase.")), 30000)
-      );
-
-      const downloadURL = await Promise.race([uploadTask(), timeoutPromise]);
-      console.log("URL obtida com sucesso.");
-      
-      setForm(prev => {
-        if (!prev) return prev;
-        return { ...prev, [field]: downloadURL };
-      });
-      toast.success("Imagem enviada com sucesso!");
+      reader.onerror = () => {
+        toast.error("Erro ao ler o arquivo de imagem.");
+        setIsUploading(false);
+      };
+      reader.readAsDataURL(file);
     } catch (error: any) {
-      console.error("Erro detalhado no upload:", error);
-      const isAuthError = error.code === 'storage/unauthorized';
-      toast.error(isAuthError 
-        ? "Erro de Permissão: Você precisa estar logado com um usuário real do Firebase para enviar arquivos."
-        : `Erro ao enviar: ${error.message || "Verifique a conexão"}`);
-    } finally {
+      console.error("Erro ao processar imagem:", error);
+      toast.error(`Erro ao processar: ${error.message || "Verifique o arquivo"}`);
       setIsUploading(false);
     }
   };

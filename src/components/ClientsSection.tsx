@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Users, ShieldCheck, Trash2, Search, Plus, Eye, Pencil, LayoutGrid, List, FileText, ClipboardList } from 'lucide-react';
+import { Users, ShieldCheck, Trash2, Search, Plus, Eye, Pencil, LayoutGrid, List, FileText, ClipboardList, RefreshCw } from 'lucide-react';
+import { useData } from '../contexts/DataContext';
 import { Client, ClientStatus, Quote, ServiceOrder, QuoteStatus, CertificateStatus, InstrumentStatus } from '../types';
 import ClientEditModal from './ClientEditModal';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -27,6 +28,7 @@ const ClientsSection: React.FC<ClientsSectionProps> = ({
     documentTemplates = [],
     searchQuery
 }) => {
+    const { pagination } = useData();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingClient, setEditingClient] = useState<Client | null>(null);
     const [viewingClient, setViewingClient] = useState<Client | null>(null);
@@ -396,6 +398,23 @@ const ClientsSection: React.FC<ClientsSectionProps> = ({
                         Não encontramos nenhum cliente com os termos pesquisados. Tente outro termo ou cadastre um novo.
                     </p>
                 </motion.div>
+            )}
+
+            {pagination.clients.hasMore && (
+                <div className="flex justify-center mt-8">
+                    <button
+                        onClick={pagination.clients.loadMore}
+                        disabled={pagination.clients.loading}
+                        className="flex items-center gap-2 px-8 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] shadow-sm hover:shadow-md hover:bg-slate-50 dark:hover:bg-slate-700 transition-all disabled:opacity-50"
+                    >
+                        {pagination.clients.loading ? (
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                            <Plus className="w-3.5 h-3.5" />
+                        )}
+                        {pagination.clients.loading ? 'Carregando...' : 'Ver Mais Clientes'}
+                    </button>
+                </div>
             )}
 
             <ClientEditModal

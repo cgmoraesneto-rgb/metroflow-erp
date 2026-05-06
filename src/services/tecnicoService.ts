@@ -51,6 +51,14 @@ export const tecnicoService = {
   },
 
   async deleteProcedure(id: string): Promise<void> {
+    IdSchema.parse(id);
+    
+    // Integrity Check: See if any calibration record uses this procedure
+    const records = await this.getCalibrationRecords();
+    if (records.some(r => r.procedureId === id)) {
+      throw new Error("Não é possível excluir o procedimento pois ele está sendo utilizado em registros de calibração.");
+    }
+
     return apiClient.delete(`/api/mock/procedures/${id}`);
   }
 };

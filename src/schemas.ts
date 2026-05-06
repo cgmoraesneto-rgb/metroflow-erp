@@ -7,8 +7,8 @@ export const IdSchema = z.string().min(1);
 // --- Clientes ---
 export const ClientSchema = z.object({
   id: z.string().optional(),
-  razaoSocial: z.string({ message: 'Razão Social é obrigatória' }).trim().min(1, 'Razão Social é obrigatória').optional(),
-  cnpj: z.string().optional(),
+  razaoSocial: z.string({ message: 'Razão Social é obrigatória' }).trim().min(1, 'Razão Social é obrigatória'),
+  cnpj: z.string().min(1, 'CNPJ é obrigatório'),
   enderecoPrincipal: z.string().optional(),
   enderecoColeta: z.string().optional(),
   solicitanteNome: z.string().optional(),

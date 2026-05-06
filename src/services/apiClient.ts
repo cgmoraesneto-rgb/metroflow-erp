@@ -47,6 +47,22 @@ export const apiClient = {
     }
   },
 
+  async fetchPaginated<T extends { id?: string }>(
+    url: string, 
+    pageSize: number = 20, 
+    lastVisible: any = null,
+    orderField: string = 'id',
+    orderDir: 'asc' | 'desc' = 'desc'
+  ): Promise<{ data: T[]; lastVisible: any }> {
+    if (this.useRealDatabase) {
+      return firebaseClient.fetchPaginated<T>(url, pageSize, lastVisible, orderField, orderDir);
+    }
+    
+    // Simulação básica para Mock: retorna tudo e sem cursor
+    const data = await apiClient.fetch<T>(url);
+    return { data, lastVisible: null };
+  },
+
   async post<T extends { id?: string }>(url: string, body: any, schema?: z.ZodSchema<T>): Promise<T> {
     if (this.useRealDatabase) {
       return firebaseClient.post<T>(url, body, schema);

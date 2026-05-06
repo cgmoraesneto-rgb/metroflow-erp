@@ -23,12 +23,24 @@ export const comercialService = {
 
   async deleteClient(id: string): Promise<void> {
     IdSchema.parse(id);
+    
+    // Verificação de Integridade Referencial
+    const quotes = await this.getQuotes();
+    if (quotes.some(q => q.clienteId === id)) {
+      throw new Error("Não é possível excluir o cliente pois ele possui orçamentos vinculados. Remova os orçamentos primeiro.");
+    }
+
+    // Nota: A verificação de OS seria ideal aqui, mas para evitar dependência circular pesada, 
+    // dependemos do DataContext ou de uma query centralizada no futuro.
+    
     return apiClient.delete(`/api/mock/clients/${id}`);
   },
 
   // --- Orçamentos ---
   async getQuotes(): Promise<Quote[]> {
-    return apiClient.fetch<Quote>('/api/mock/quotes');
+    const all = await apiClient.fetch<Quote>('/api/mock/quotes');
+    // Filtro básico para garantir que não mostramos itens marcados como deletados (se usarmos soft delete no futuro)
+    return all.filter(q => !q.isDeleted);
   },
 
   async saveQuote(quote: Partial<Quote>): Promise<Quote> {
@@ -38,6 +50,12 @@ export const comercialService = {
 
   async deleteQuote(id: string): Promise<void> {
     IdSchema.parse(id);
-    return apiClient.delete(`/api/mock/quotes/${id}`);
+    const all = await this.getQuotes();
+    const quote = all.find(q => q.id === id);
+    if (quote) {
+      await apiClient.post(`/api/mock/quotes`, { ...quote, isDeleted: true });
+      return;
+    }
+    await apiClient.delete(`/api/mock/quotes/${id}`);
   }
 };

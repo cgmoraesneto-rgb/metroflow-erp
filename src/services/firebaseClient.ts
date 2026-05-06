@@ -8,6 +8,9 @@ import {
   query, 
   where, 
   getDoc,
+  limit as firestoreLimit,
+  orderBy,
+  startAfter,
   DocumentData,
   FirestoreDataConverter,
   QueryDocumentSnapshot,
@@ -57,6 +60,36 @@ export const firebaseClient = {
       return data;
     } catch (error) {
       captureError(error, { path, method: 'FIREBASE_FETCH' });
+      throw error;
+    }
+  },
+
+  async fetchPaginated<T extends { id?: string }>(
+    path: string, 
+    pageSize: number = 20, 
+    lastVisibleDoc: QueryDocumentSnapshot | null = null,
+    orderField: string = 'createdAt',
+    orderDir: 'asc' | 'desc' = 'desc'
+  ): Promise<{ data: T[]; lastVisible: QueryDocumentSnapshot | null }> {
+    try {
+      const collectionName = path.replace('/api/mock/', '');
+      let q = query(
+        collection(db, collectionName),
+        orderBy(orderField, orderDir),
+        firestoreLimit(pageSize)
+      );
+
+      if (lastVisibleDoc) {
+        q = query(q, startAfter(lastVisibleDoc));
+      }
+
+      const snapshot = await getDocs(q.withConverter(genericConverter<T>()));
+      const data = snapshot.docs.map(doc => doc.data());
+      const lastVisible = snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null;
+
+      return { data, lastVisible };
+    } catch (error) {
+      captureError(error, { path, method: 'FIREBASE_FETCH_PAGINATED' });
       throw error;
     }
   },

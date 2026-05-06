@@ -1,262 +1,1097 @@
 [
   {
+    "id": "mask-1776438347952",
+    "uncertaintyBudget": [],
     "type": "CALIBRATION_CERTIFICATE",
-    "id": "mask-1776778687276",
-    "title": "Teste",
-    "description": "Paquimetro",
-    "procedureId": "",
+    "createdAt": "2026-04-17T15:05:47.952Z",
+    "description": "Balança Digital",
     "standardInstrumentIds": [],
     "version": 1,
-    "createdAt": "2026-04-21T13:38:07.276Z",
-    "updatedAt": "2026-05-05T02:21:17.854Z",
+    "updatedAt": "2026-04-17T15:29:53.580Z",
+    "procedureId": "TE44k39Pmepk8vIEdpHM",
+    "title": "balança",
     "measurementGroups": [
       {
-        "name": "Tabela de Resultados 1",
-        "blockId": "T1",
         "columnDefinitions": [
           {
-            "id": "TAG_1",
-            "name": "Nova Coluna",
-            "type": "NUMBER",
-            "behavior": "INPUT"
-          },
-          {
-            "id": "TAG_2",
-            "name": "Nova Coluna",
-            "type": "NUMBER",
-            "behavior": "INPUT",
-            "displayFormat": "percent"
-          },
-          {
-            "id": "TAG_3",
-            "name": "Nova Coluna",
-            "type": "NUMBER",
+            "formula": "",
+            "name": "Unidade",
             "behavior": "CALCULATED",
-            "formula": "[TAG_2]+[TAG_3]",
-            "decimalPlaces": 1,
-            "displayFormat": "percent"
+            "type": "NUMBER",
+            "id": "TAG_1"
           },
           {
-            "id": "TAG_4",
-            "name": "Nova Coluna",
+            "formula": "",
+            "name": "Valor Indicado no Padrão",
+            "behavior": "CALCULATED",
+            "id": "TAG_2",
+            "type": "NUMBER"
+          },
+          {
+            "behavior": "CALCULATED",
+            "id": "TAG_3",
             "type": "NUMBER",
-            "behavior": "INPUT"
+            "formula": "",
+            "name": "Valor Indicado no Instrumento"
+          },
+          {
+            "formula": "([TAG_3]-[TAG_2])",
+            "name": "Erro",
+            "behavior": "CALCULATED",
+            "type": "NUMBER",
+            "id": "TAG_4"
+          },
+          {
+            "name": "Incerteza de Medição (mg)",
+            "formula": "[U_PADRAO]",
+            "id": "TAG_5",
+            "type": "NUMBER",
+            "behavior": "CALCULATED"
+          },
+          {
+            "formula": "",
+            "name": "Medição 1",
+            "behavior": "CALCULATED",
+            "type": "NUMBER",
+            "id": "TAG_6"
+          },
+          {
+            "formula": "",
+            "name": "Medição 2",
+            "behavior": "CALCULATED",
+            "type": "NUMBER",
+            "id": "TAG_7"
+          },
+          {
+            "name": "Medição 3",
+            "formula": "",
+            "id": "TAG_8",
+            "type": "NUMBER",
+            "behavior": "CALCULATED"
+          },
+          {
+            "formula": "([TAG_6]+[TAG_7]+[TAG_8]) / 3",
+            "name": "Média",
+            "behavior": "CALCULATED",
+            "type": "NUMBER",
+            "id": "TAG_9"
           }
         ],
+        "blockId": "T1",
+        "name": "Tabela de Resultados 1",
         "isDynamic": true,
-        "templateRows": [
-          {
-            "TAG_1": "",
-            "TAG_2": "",
-            "TAG_3": "",
-            "TAG_4": ""
-          },
-          {
-            "TAG_1": "",
-            "TAG_2": "",
-            "TAG_3": "",
-            "TAG_4": ""
-          },
-          {
-            "TAG_1": "",
-            "TAG_2": "",
-            "TAG_3": "",
-            "TAG_4": ""
-          }
-        ]
-      }
-    ],
-    "uncertaintyBudget": [],
-    "sections": [
-      {
-        "id": "default-sec",
-        "title": "Seção Principal",
-        "groups": [
-          {
-            "name": "Tabela de Resultados 1",
-            "blockId": "T1",
-            "columnDefinitions": [
-              {
-                "id": "TAG_1",
-                "name": "Nova Coluna",
-                "type": "NUMBER",
-                "behavior": "INPUT"
-              },
-              {
-                "id": "TAG_2",
-                "name": "Nova Coluna",
-                "type": "NUMBER",
-                "behavior": "INPUT",
-                "displayFormat": "percent"
-              },
-              {
-                "id": "TAG_3",
-                "name": "Nova Coluna",
-                "type": "NUMBER",
-                "behavior": "CALCULATED",
-                "formula": "[TAG_2]+[TAG_3]",
-                "decimalPlaces": 1,
-                "displayFormat": "percent"
-              },
-              {
-                "id": "TAG_4",
-                "name": "Nova Coluna",
-                "type": "NUMBER",
-                "behavior": "INPUT"
-              }
-            ],
-            "isDynamic": true,
-            "templateRows": [
-              {
-                "TAG_1": "",
-                "TAG_2": "",
-                "TAG_3": "",
-                "TAG_4": ""
-              },
-              {
-                "TAG_1": "",
-                "TAG_2": "",
-                "TAG_3": "",
-                "TAG_4": ""
-              },
-              {
-                "TAG_1": "",
-                "TAG_2": "",
-                "TAG_3": "",
-                "TAG_4": ""
-              }
-            ]
-          }
+        "hiddenColumns": [
+          "TAG_7",
+          "TAG_8",
+          "TAG_6"
         ]
       }
     ]
   },
   {
-    "id": "mask-1777947586890",
-    "title": "Nova Máscara de Calibração",
-    "description": "",
-    "procedureId": "",
-    "standardInstrumentIds": [],
-    "version": 1,
-    "createdAt": "2026-05-05T02:19:46.890Z",
-    "updatedAt": "2026-05-05T02:21:04.714Z",
+    "id": "mask-1777039195430",
     "measurementGroups": [
       {
-        "name": "",
-        "blockId": "T1",
+        "hiddenColumns": [
+          "TAG_3",
+          "TAG_4",
+          "TAG_5"
+        ],
+        "isDynamic": true,
+        "columnDefinitions": [
+          {
+            "type": "NUMBER",
+            "decimalPlaces": 1,
+            "id": "TAG_1",
+            "behavior": "INPUT",
+            "name": "Indicação no Instrumento",
+            "formula": ""
+          },
+          {
+            "displayFormat": "text",
+            "formula": "",
+            "name": "Unidade de Medida",
+            "behavior": "INPUT",
+            "id": "TAG_2",
+            "decimalPlaces": 0,
+            "type": "NUMBER"
+          },
+          {
+            "behavior": "INPUT",
+            "id": "TAG_3",
+            "type": "NUMBER",
+            "decimalPlaces": 4,
+            "name": "Leitura 1"
+          },
+          {
+            "name": "Leitura 2",
+            "behavior": "INPUT",
+            "id": "TAG_4",
+            "decimalPlaces": 5,
+            "type": "NUMBER"
+          },
+          {
+            "id": "TAG_5",
+            "decimalPlaces": 5,
+            "type": "NUMBER",
+            "behavior": "INPUT",
+            "name": "Leitura 3"
+          },
+          {
+            "behavior": "CALCULATED",
+            "decimalPlaces": 4,
+            "type": "NUMBER",
+            "id": "TAG_6",
+            "formula": "([TAG_3]+[TAG_4]+[TAG_5])/3",
+            "name": "Valor Verdadeiro Convencional"
+          },
+          {
+            "id": "TAG_7",
+            "type": "NUMBER",
+            "decimalPlaces": 4,
+            "behavior": "CALCULATED",
+            "name": "Erro Percentual",
+            "displayFormat": "percent",
+            "formula": "([TAG_6]-[TAG_1])/[TAG_1]"
+          }
+        ],
+        "name": "escala : resistência",
+        "blockId": "T1"
+      },
+      {
+        "hiddenColumns": [
+          "TAG_3",
+          "TAG_4",
+          "TAG_5"
+        ],
+        "isDynamic": true,
         "columnDefinitions": [
           {
             "id": "TAG_1",
-            "name": "Nova Coluna",
+            "decimalPlaces": 1,
+            "type": "NUMBER",
+            "behavior": "INPUT",
+            "name": "Indicação no Instrumento",
+            "formula": ""
+          },
+          {
+            "formula": "",
+            "displayFormat": "text",
+            "name": "Unidade de Medida",
+            "behavior": "INPUT",
+            "type": "NUMBER",
+            "decimalPlaces": 0,
+            "id": "TAG_2"
+          },
+          {
+            "name": "Leitura 1",
+            "behavior": "INPUT",
+            "decimalPlaces": 4,
+            "type": "NUMBER",
+            "id": "TAG_3"
+          },
+          {
+            "behavior": "INPUT",
+            "type": "NUMBER",
+            "decimalPlaces": 5,
+            "id": "TAG_4",
+            "name": "Leitura 2"
+          },
+          {
+            "behavior": "INPUT",
+            "id": "TAG_5",
+            "decimalPlaces": 5,
+            "type": "NUMBER",
+            "name": "Leitura 3"
+          },
+          {
+            "behavior": "CALCULATED",
+            "id": "TAG_6",
+            "type": "NUMBER",
+            "decimalPlaces": 4,
+            "formula": "([TAG_3]+[TAG_4]+[TAG_5])/3",
+            "name": "Valor Verdadeiro Convencional"
+          },
+          {
+            "displayFormat": "percent",
+            "formula": "([TAG_6]-[TAG_1])/[TAG_1]",
+            "name": "Erro Percentual",
+            "behavior": "CALCULATED",
+            "decimalPlaces": 4,
+            "type": "NUMBER",
+            "id": "TAG_7"
+          }
+        ],
+        "blockId": "T2",
+        "name": "escala : tensão"
+      },
+      {
+        "columnDefinitions": [
+          {
+            "name": "Indicação no Instrumento",
+            "formula": "",
+            "id": "TAG_1",
+            "decimalPlaces": 1,
             "type": "NUMBER",
             "behavior": "INPUT"
           },
           {
+            "name": "Unidade de Medida",
+            "displayFormat": "text",
+            "formula": "",
             "id": "TAG_2",
-            "name": "Nova Coluna",
             "type": "NUMBER",
-            "behavior": "INPUT",
-            "isLocked": false
+            "decimalPlaces": 0,
+            "behavior": "INPUT"
           },
           {
+            "name": "Leitura 1",
             "id": "TAG_3",
-            "name": "Nova Coluna",
+            "decimalPlaces": 4,
+            "type": "NUMBER",
+            "behavior": "INPUT"
+          },
+          {
+            "name": "Leitura 2",
+            "behavior": "INPUT",
+            "id": "TAG_4",
+            "type": "NUMBER",
+            "decimalPlaces": 5
+          },
+          {
+            "id": "TAG_5",
+            "decimalPlaces": 5,
             "type": "NUMBER",
             "behavior": "INPUT",
-            "isLocked": false
+            "name": "Leitura 3"
+          },
+          {
+            "formula": "([TAG_3]+[TAG_4]+[TAG_5])/3",
+            "name": "Valor Verdadeiro Convencional",
+            "behavior": "CALCULATED",
+            "type": "NUMBER",
+            "decimalPlaces": 4,
+            "id": "TAG_6"
+          },
+          {
+            "name": "Erro Percentual",
+            "displayFormat": "percent",
+            "formula": "([TAG_6]-[TAG_1])/[TAG_1]",
+            "id": "TAG_7",
+            "type": "NUMBER",
+            "decimalPlaces": 4,
+            "behavior": "CALCULATED"
+          }
+        ],
+        "blockId": "T3",
+        "name": "escala : tensão AC (60 hz)",
+        "isDynamic": true,
+        "hiddenColumns": [
+          "TAG_3",
+          "TAG_4",
+          "TAG_5"
+        ]
+      },
+      {
+        "name": "escala : corrente dc",
+        "blockId": "T4",
+        "columnDefinitions": [
+          {
+            "name": "Indicação no Instrumento",
+            "formula": "",
+            "type": "NUMBER",
+            "decimalPlaces": 1,
+            "id": "TAG_1",
+            "behavior": "INPUT"
+          },
+          {
+            "formula": "",
+            "displayFormat": "text",
+            "name": "Unidade de Medida",
+            "behavior": "INPUT",
+            "type": "NUMBER",
+            "decimalPlaces": 0,
+            "id": "TAG_2"
+          },
+          {
+            "behavior": "INPUT",
+            "id": "TAG_3",
+            "decimalPlaces": 4,
+            "type": "NUMBER",
+            "name": "Leitura 1"
+          },
+          {
+            "name": "Leitura 2",
+            "decimalPlaces": 5,
+            "type": "NUMBER",
+            "id": "TAG_4",
+            "behavior": "INPUT"
+          },
+          {
+            "name": "Leitura 3",
+            "id": "TAG_5",
+            "type": "NUMBER",
+            "decimalPlaces": 5,
+            "behavior": "INPUT"
+          },
+          {
+            "behavior": "CALCULATED",
+            "id": "TAG_6",
+            "type": "NUMBER",
+            "decimalPlaces": 4,
+            "formula": "([TAG_3]+[TAG_4]+[TAG_5])/3",
+            "name": "Valor Verdadeiro Convencional"
+          },
+          {
+            "formula": "([TAG_6]-[TAG_1])/[TAG_1]",
+            "displayFormat": "percent",
+            "name": "Erro Percentual",
+            "behavior": "CALCULATED",
+            "id": "TAG_7",
+            "decimalPlaces": 4,
+            "type": "NUMBER"
+          }
+        ],
+        "hiddenColumns": [
+          "TAG_3",
+          "TAG_4",
+          "TAG_5"
+        ],
+        "isDynamic": true
+      },
+      {
+        "isDynamic": true,
+        "hiddenColumns": [
+          "TAG_3",
+          "TAG_4",
+          "TAG_5"
+        ],
+        "name": "escala : corrente ac",
+        "blockId": "T5",
+        "columnDefinitions": [
+          {
+            "decimalPlaces": 1,
+            "type": "NUMBER",
+            "id": "TAG_1",
+            "behavior": "INPUT",
+            "name": "Indicação no Instrumento",
+            "formula": ""
+          },
+          {
+            "id": "TAG_2",
+            "decimalPlaces": 0,
+            "type": "NUMBER",
+            "behavior": "INPUT",
+            "name": "Unidade de Medida",
+            "formula": "",
+            "displayFormat": "text"
+          },
+          {
+            "decimalPlaces": 4,
+            "type": "NUMBER",
+            "id": "TAG_3",
+            "behavior": "INPUT",
+            "name": "Leitura 1"
           },
           {
             "id": "TAG_4",
-            "name": "Nova Coluna",
+            "decimalPlaces": 5,
             "type": "NUMBER",
             "behavior": "INPUT",
-            "isLocked": false
-          }
-        ],
-        "isDynamic": true,
-        "templateRows": [
-          {
-            "TAG_1": ""
+            "name": "Leitura 2"
           },
           {
-            "TAG_1": "",
-            "TAG_2": "",
-            "TAG_3": "",
-            "TAG_4": ""
+            "name": "Leitura 3",
+            "behavior": "INPUT",
+            "id": "TAG_5",
+            "type": "NUMBER",
+            "decimalPlaces": 5
           },
           {
-            "TAG_1": "",
-            "TAG_2": "",
-            "TAG_3": "",
-            "TAG_4": ""
-          }
-        ]
-      }
-    ],
-    "sections": [
-      {
-        "id": "sec-1777947586890",
-        "title": "Nova Seção",
-        "groups": [
+            "name": "Valor Verdadeiro Convencional",
+            "formula": "([TAG_3]+[TAG_4]+[TAG_5])/3",
+            "type": "NUMBER",
+            "decimalPlaces": 4,
+            "id": "TAG_6",
+            "behavior": "CALCULATED"
+          },
           {
-            "name": "",
-            "blockId": "T1",
-            "columnDefinitions": [
-              {
-                "id": "TAG_1",
-                "name": "Nova Coluna",
-                "type": "NUMBER",
-                "behavior": "INPUT"
-              },
-              {
-                "id": "TAG_2",
-                "name": "Nova Coluna",
-                "type": "NUMBER",
-                "behavior": "INPUT",
-                "isLocked": false
-              },
-              {
-                "id": "TAG_3",
-                "name": "Nova Coluna",
-                "type": "NUMBER",
-                "behavior": "INPUT",
-                "isLocked": false
-              },
-              {
-                "id": "TAG_4",
-                "name": "Nova Coluna",
-                "type": "NUMBER",
-                "behavior": "INPUT",
-                "isLocked": false
-              }
-            ],
-            "isDynamic": true,
-            "templateRows": [
-              {
-                "TAG_1": ""
-              },
-              {
-                "TAG_1": "",
-                "TAG_2": "",
-                "TAG_3": "",
-                "TAG_4": ""
-              },
-              {
-                "TAG_1": "",
-                "TAG_2": "",
-                "TAG_3": "",
-                "TAG_4": ""
-              }
-            ]
+            "id": "TAG_7",
+            "decimalPlaces": 4,
+            "type": "NUMBER",
+            "behavior": "CALCULATED",
+            "name": "Erro Percentual",
+            "displayFormat": "percent",
+            "formula": "([TAG_6]-[TAG_1])/[TAG_1]"
           }
         ]
       },
       {
-        "id": "sec-1777947636390",
-        "title": "Nova Seção",
-        "groups": []
+        "name": "escala : temperatura",
+        "blockId": "T6",
+        "columnDefinitions": [
+          {
+            "behavior": "INPUT",
+            "id": "TAG_1",
+            "type": "NUMBER",
+            "decimalPlaces": 1,
+            "formula": "",
+            "name": "Indicação no Instrumento"
+          },
+          {
+            "behavior": "INPUT",
+            "id": "TAG_2",
+            "decimalPlaces": 0,
+            "type": "NUMBER",
+            "formula": "",
+            "displayFormat": "text",
+            "name": "Unidade de Medida"
+          },
+          {
+            "name": "Leitura 1",
+            "type": "NUMBER",
+            "decimalPlaces": 4,
+            "id": "TAG_3",
+            "behavior": "INPUT"
+          },
+          {
+            "id": "TAG_4",
+            "type": "NUMBER",
+            "decimalPlaces": 5,
+            "behavior": "INPUT",
+            "name": "Leitura 2"
+          },
+          {
+            "behavior": "INPUT",
+            "decimalPlaces": 5,
+            "type": "NUMBER",
+            "id": "TAG_5",
+            "name": "Leitura 3"
+          },
+          {
+            "type": "NUMBER",
+            "decimalPlaces": 4,
+            "id": "TAG_6",
+            "behavior": "CALCULATED",
+            "name": "Valor Verdadeiro Convencional",
+            "formula": "([TAG_3]+[TAG_4]+[TAG_5])/3"
+          },
+          {
+            "name": "Erro Percentual",
+            "formula": "([TAG_6]-[TAG_1])/[TAG_1]",
+            "displayFormat": "percent",
+            "id": "TAG_7",
+            "type": "NUMBER",
+            "decimalPlaces": 4,
+            "behavior": "CALCULATED"
+          }
+        ],
+        "isDynamic": true,
+        "hiddenColumns": [
+          "TAG_3",
+          "TAG_4",
+          "TAG_5"
+        ]
+      },
+      {
+        "columnDefinitions": [
+          {
+            "id": "TAG_1",
+            "decimalPlaces": 1,
+            "type": "NUMBER",
+            "behavior": "INPUT",
+            "name": "Indicação no Instrumento",
+            "formula": ""
+          },
+          {
+            "name": "Unidade de Medida",
+            "displayFormat": "text",
+            "formula": "",
+            "decimalPlaces": 0,
+            "type": "NUMBER",
+            "id": "TAG_2",
+            "behavior": "INPUT"
+          },
+          {
+            "behavior": "INPUT",
+            "type": "NUMBER",
+            "decimalPlaces": 4,
+            "id": "TAG_3",
+            "name": "Leitura 1"
+          },
+          {
+            "name": "Leitura 2",
+            "id": "TAG_4",
+            "type": "NUMBER",
+            "decimalPlaces": 5,
+            "behavior": "INPUT"
+          },
+          {
+            "name": "Leitura 3",
+            "id": "TAG_5",
+            "decimalPlaces": 5,
+            "type": "NUMBER",
+            "behavior": "INPUT"
+          },
+          {
+            "decimalPlaces": 4,
+            "type": "NUMBER",
+            "id": "TAG_6",
+            "behavior": "CALCULATED",
+            "name": "Valor Verdadeiro Convencional",
+            "formula": "([TAG_3]+[TAG_4]+[TAG_5])/3"
+          },
+          {
+            "id": "TAG_7",
+            "decimalPlaces": 4,
+            "type": "NUMBER",
+            "behavior": "CALCULATED",
+            "name": "Erro Percentual",
+            "formula": "([TAG_6]-[TAG_1])/[TAG_1]",
+            "displayFormat": "percent"
+          }
+        ],
+        "blockId": "T7",
+        "name": "escala : capacitância",
+        "isDynamic": true,
+        "hiddenColumns": [
+          "TAG_3",
+          "TAG_4",
+          "TAG_5"
+        ]
+      },
+      {
+        "blockId": "T8",
+        "name": "escala : frequência (hz) - 1 v",
+        "columnDefinitions": [
+          {
+            "behavior": "INPUT",
+            "type": "NUMBER",
+            "decimalPlaces": 1,
+            "id": "TAG_1",
+            "formula": "",
+            "name": "Indicação no Instrumento"
+          },
+          {
+            "name": "Unidade de Medida",
+            "formula": "",
+            "displayFormat": "text",
+            "decimalPlaces": 0,
+            "type": "NUMBER",
+            "id": "TAG_2",
+            "behavior": "INPUT"
+          },
+          {
+            "name": "Leitura 1",
+            "decimalPlaces": 4,
+            "type": "NUMBER",
+            "id": "TAG_3",
+            "behavior": "INPUT"
+          },
+          {
+            "name": "Leitura 2",
+            "behavior": "INPUT",
+            "decimalPlaces": 5,
+            "type": "NUMBER",
+            "id": "TAG_4"
+          },
+          {
+            "name": "Leitura 3",
+            "behavior": "INPUT",
+            "id": "TAG_5",
+            "decimalPlaces": 5,
+            "type": "NUMBER"
+          },
+          {
+            "id": "TAG_6",
+            "type": "NUMBER",
+            "decimalPlaces": 4,
+            "behavior": "CALCULATED",
+            "name": "Valor Verdadeiro Convencional",
+            "formula": "([TAG_3]+[TAG_4]+[TAG_5])/3"
+          },
+          {
+            "displayFormat": "percent",
+            "formula": "([TAG_6]-[TAG_1])/[TAG_1]",
+            "name": "Erro Percentual",
+            "behavior": "CALCULATED",
+            "id": "TAG_7",
+            "type": "NUMBER",
+            "decimalPlaces": 4
+          }
+        ],
+        "isDynamic": true,
+        "hiddenColumns": [
+          "TAG_3",
+          "TAG_4",
+          "TAG_5"
+        ]
       }
     ],
-    "uncertaintyBudget": []
+    "procedureId": "bfEwP4Mw8cXN9R1hOaXf",
+    "title": "multímetro",
+    "version": 1,
+    "updatedAt": "2026-04-28T00:09:41.495Z",
+    "description": "Multímetro",
+    "standardInstrumentIds": [],
+    "createdAt": "2026-04-24T13:59:55.430Z",
+    "uncertaintyBudget": [],
+    "type": "CALIBRATION_CERTIFICATE"
+  },
+  {
+    "id": "mask-1777040972083",
+    "title": "Manômetro",
+    "procedureId": "UMPsFucxXMrT14b20qLy",
+    "measurementGroups": [
+      {
+        "columnDefinitions": [
+          {
+            "behavior": "INPUT",
+            "id": "TAG_1",
+            "type": "NUMBER",
+            "decimalPlaces": 1,
+            "name": "Indicação no Instrumento"
+          },
+          {
+            "name": "Leitura 1",
+            "behavior": "INPUT",
+            "type": "NUMBER",
+            "decimalPlaces": 2,
+            "id": "TAG_2"
+          },
+          {
+            "name": "Leitura 2",
+            "type": "NUMBER",
+            "decimalPlaces": 2,
+            "id": "TAG_3",
+            "behavior": "INPUT"
+          },
+          {
+            "name": "Leitura 3",
+            "id": "TAG_4",
+            "decimalPlaces": 2,
+            "type": "NUMBER",
+            "behavior": "INPUT"
+          },
+          {
+            "decimalPlaces": 2,
+            "type": "NUMBER",
+            "id": "TAG_5",
+            "behavior": "CALCULATED",
+            "name": "Valor Verdadeiro Convencional",
+            "formula": "([TAG_2]+[TAG_3]+[TAG_4])/3"
+          },
+          {
+            "id": "TAG_6",
+            "decimalPlaces": 2,
+            "type": "NUMBER",
+            "behavior": "CALCULATED",
+            "name": "Erro",
+            "formula": "[TAG_5]-[TAG_1]"
+          },
+          {
+            "id": "TAG_7",
+            "type": "NUMBER",
+            "decimalPlaces": 2,
+            "behavior": "CALCULATED",
+            "name": "Erro Percentual (% do fundo de escala)",
+            "displayFormat": "percent",
+            "formula": "[TAG_6]/[TAG_8]"
+          },
+          {
+            "behavior": "INPUT",
+            "id": "TAG_8",
+            "type": "NUMBER",
+            "decimalPlaces": 1,
+            "name": "Fundo da Escala"
+          }
+        ],
+        "name": "sentido ascendente da calibração",
+        "hasGraph": true,
+        "blockId": "T1",
+        "hiddenColumns": [
+          "TAG_2",
+          "TAG_3",
+          "TAG_4",
+          "TAG_8"
+        ],
+        "isDynamic": true,
+        "graphType": "error_curve"
+      },
+      {
+        "blockId": "T2",
+        "hasGraph": true,
+        "name": "sentido Descendente da calibração",
+        "columnDefinitions": [
+          {
+            "behavior": "INPUT",
+            "id": "TAG_1",
+            "type": "NUMBER",
+            "decimalPlaces": 1,
+            "name": "Indicação no Instrumento"
+          },
+          {
+            "name": "Leitura 1",
+            "behavior": "INPUT",
+            "type": "NUMBER",
+            "decimalPlaces": 2,
+            "id": "TAG_2"
+          },
+          {
+            "id": "TAG_3",
+            "type": "NUMBER",
+            "decimalPlaces": 2,
+            "behavior": "INPUT",
+            "name": "Leitura 2"
+          },
+          {
+            "name": "Leitura 3",
+            "id": "TAG_4",
+            "type": "NUMBER",
+            "decimalPlaces": 2,
+            "behavior": "INPUT"
+          },
+          {
+            "id": "TAG_5",
+            "decimalPlaces": 2,
+            "type": "NUMBER",
+            "behavior": "CALCULATED",
+            "name": "Valor Verdadeiro Convencional",
+            "formula": "([TAG_2]+[TAG_3]+[TAG_4])/3"
+          },
+          {
+            "name": "Erro",
+            "formula": "[TAG_5]-[TAG_1]",
+            "type": "NUMBER",
+            "decimalPlaces": 2,
+            "id": "TAG_6",
+            "behavior": "CALCULATED"
+          },
+          {
+            "name": "Erro Percentual (% do fundo de escala)",
+            "displayFormat": "percent",
+            "formula": "[TAG_6]/[TAG_8]",
+            "id": "TAG_7",
+            "decimalPlaces": 2,
+            "type": "NUMBER",
+            "behavior": "CALCULATED"
+          },
+          {
+            "name": "Fundo da Escala",
+            "id": "TAG_8",
+            "type": "NUMBER",
+            "decimalPlaces": 1,
+            "behavior": "INPUT"
+          }
+        ],
+        "graphType": "error_curve",
+        "hiddenColumns": [
+          "TAG_2",
+          "TAG_3",
+          "TAG_4",
+          "TAG_8"
+        ],
+        "isDynamic": true
+      }
+    ],
+    "standardInstrumentIds": [],
+    "description": "Manômetro",
+    "updatedAt": "2026-04-24T15:08:04.430Z",
+    "version": 1,
+    "type": "CALIBRATION_CERTIFICATE",
+    "uncertaintyBudget": [],
+    "createdAt": "2026-04-24T14:29:32.083Z"
+  },
+  {
+    "id": "mask-1777952246260",
+    "createdAt": "2026-05-05T03:37:26.260Z",
+    "type": "CALIBRATION_CERTIFICATE",
+    "uncertaintyBudget": [],
+    "updatedAt": "2026-05-05T14:35:37.306Z",
+    "version": 1,
+    "standardInstrumentIds": [],
+    "description": "medidor de espessura",
+    "measurementGroups": [
+      {
+        "columnDefinitions": [
+          {
+            "id": "TAG_1",
+            "type": "NUMBER",
+            "behavior": "INPUT",
+            "name": "Unidade de Medida",
+            "displayFormat": "text"
+          },
+          {
+            "name": "Valor Verdadeiro Convencional (mm)",
+            "isLocked": false,
+            "id": "COL2",
+            "decimalPlaces": 3,
+            "type": "NUMBER",
+            "behavior": "INPUT"
+          },
+          {
+            "isLocked": false,
+            "name": "Leitura 1",
+            "behavior": "INPUT",
+            "id": "COL3",
+            "decimalPlaces": 3,
+            "type": "NUMBER"
+          },
+          {
+            "id": "COL4",
+            "decimalPlaces": 3,
+            "type": "NUMBER",
+            "behavior": "INPUT",
+            "name": "Leitura 2",
+            "isLocked": false
+          },
+          {
+            "behavior": "INPUT",
+            "id": "COL5",
+            "type": "NUMBER",
+            "decimalPlaces": 3,
+            "isLocked": false,
+            "name": "Leitura 3"
+          },
+          {
+            "decimalPlaces": 3,
+            "type": "NUMBER",
+            "id": "COL6",
+            "behavior": "CALCULATED",
+            "name": "Indicação no Instrumento (mm)",
+            "formula": "(COL3+COL4+COL5)/3",
+            "isLocked": true
+          },
+          {
+            "decimalPlaces": 3,
+            "type": "NUMBER",
+            "id": "COL7",
+            "behavior": "CALCULATED",
+            "name": "Erro (mm)",
+            "isLocked": false,
+            "formula": "[COL6]-[COL2]"
+          }
+        ],
+        "name": "",
+        "blockId": "T1",
+        "hasGraph": true,
+        "hiddenColumns": [
+          "COL3",
+          "COL4",
+          "COL5"
+        ],
+        "isDynamic": true,
+        "graphType": "error_curve",
+        "templateRows": [
+          {
+            "COL6": "",
+            "COL2": "0,000",
+            "TAG_1": "mm"
+          },
+          {
+            "TAG_1": "mm",
+            "COL2": "1,000"
+          },
+          {
+            "COL2": "2,000",
+            "TAG_1": "mm"
+          },
+          {
+            "COL2": "3,000",
+            "TAG_1": "mm"
+          },
+          {
+            "TAG_1": "mm",
+            "COL2": "4,000"
+          },
+          {
+            "TAG_1": "mm",
+            "COL2": "5,000"
+          },
+          {
+            "TAG_1": "mm",
+            "COL2": "10,000"
+          }
+        ]
+      },
+      {
+        "blockId": "T2",
+        "name": "",
+        "templateRows": [
+          {
+            "COL2": "2,08",
+            "COL1": "± 0,001 mm"
+          }
+        ],
+        "columnDefinitions": [
+          {
+            "id": "COL1",
+            "decimalPlaces": 4,
+            "type": "NUMBER",
+            "behavior": "INPUT",
+            "name": "Incerteza de Medição",
+            "formula": "",
+            "displayFormat": "text"
+          },
+          {
+            "displayFormat": "text",
+            "isLocked": false,
+            "formula": "",
+            "name": "Coeficiente K",
+            "behavior": "INPUT",
+            "id": "COL2",
+            "type": "NUMBER"
+          }
+        ]
+      }
+    ],
+    "title": "medidor de espessura",
+    "procedureId": "UMPsFucxXMrT14b20qLy",
+    "sections": [
+      {
+        "groups": [
+          {
+            "name": "",
+            "hasGraph": true,
+            "blockId": "T1",
+            "columnDefinitions": [
+              {
+                "name": "Unidade de Medida",
+                "displayFormat": "text",
+                "id": "TAG_1",
+                "type": "NUMBER",
+                "behavior": "INPUT"
+              },
+              {
+                "name": "Valor Verdadeiro Convencional (mm)",
+                "isLocked": false,
+                "id": "COL2",
+                "decimalPlaces": 3,
+                "type": "NUMBER",
+                "behavior": "INPUT"
+              },
+              {
+                "decimalPlaces": 3,
+                "type": "NUMBER",
+                "id": "COL3",
+                "behavior": "INPUT",
+                "name": "Leitura 1",
+                "isLocked": false
+              },
+              {
+                "isLocked": false,
+                "name": "Leitura 2",
+                "behavior": "INPUT",
+                "decimalPlaces": 3,
+                "type": "NUMBER",
+                "id": "COL4"
+              },
+              {
+                "isLocked": false,
+                "name": "Leitura 3",
+                "behavior": "INPUT",
+                "decimalPlaces": 3,
+                "type": "NUMBER",
+                "id": "COL5"
+              },
+              {
+                "isLocked": true,
+                "formula": "(COL3+COL4+COL5)/3",
+                "name": "Indicação no Instrumento (mm)",
+                "behavior": "CALCULATED",
+                "id": "COL6",
+                "decimalPlaces": 3,
+                "type": "NUMBER"
+              },
+              {
+                "formula": "[COL6]-[COL2]",
+                "isLocked": false,
+                "name": "Erro (mm)",
+                "behavior": "CALCULATED",
+                "type": "NUMBER",
+                "decimalPlaces": 3,
+                "id": "COL7"
+              }
+            ],
+            "graphType": "error_curve",
+            "templateRows": [
+              {
+                "COL6": "",
+                "COL2": "0,000",
+                "TAG_1": "mm"
+              },
+              {
+                "TAG_1": "mm",
+                "COL2": "1,000"
+              },
+              {
+                "COL2": "2,000",
+                "TAG_1": "mm"
+              },
+              {
+                "COL2": "3,000",
+                "TAG_1": "mm"
+              },
+              {
+                "TAG_1": "mm",
+                "COL2": "4,000"
+              },
+              {
+                "TAG_1": "mm",
+                "COL2": "5,000"
+              },
+              {
+                "TAG_1": "mm",
+                "COL2": "10,000"
+              }
+            ],
+            "hiddenColumns": [
+              "COL3",
+              "COL4",
+              "COL5"
+            ],
+            "isDynamic": true
+          }
+        ],
+        "title": "",
+        "id": "sec-1777952246260"
+      },
+      {
+        "groups": [
+          {
+            "blockId": "T2",
+            "name": "",
+            "templateRows": [
+              {
+                "COL2": "2,08",
+                "COL1": "± 0,001 mm"
+              }
+            ],
+            "columnDefinitions": [
+              {
+                "displayFormat": "text",
+                "formula": "",
+                "name": "Incerteza de Medição",
+                "behavior": "INPUT",
+                "type": "NUMBER",
+                "decimalPlaces": 4,
+                "id": "COL1"
+              },
+              {
+                "behavior": "INPUT",
+                "id": "COL2",
+                "type": "NUMBER",
+                "isLocked": false,
+                "formula": "",
+                "displayFormat": "text",
+                "name": "Coeficiente K"
+              }
+            ]
+          }
+        ],
+        "title": "",
+        "id": "sec-1777952491085"
+      }
+    ]
   }
 ]

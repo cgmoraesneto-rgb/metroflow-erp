@@ -9,7 +9,9 @@
     "seed:demo": "node scripts/seed-demo.mjs",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "db:backup": "node scripts/db-maintenance.mjs backup",
+    "db:sync": "node scripts/db-maintenance.mjs sync"
   },
   "dependencies": {
     "@google/genai": "^1.29.0",

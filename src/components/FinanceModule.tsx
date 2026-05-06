@@ -6,6 +6,7 @@ import { Plus, Edit2, Trash2, Receipt, CircleDollarSign, Download, CheckCircle, 
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatNumber } from '../utils/formatters';
+import { calculateCommission } from '../utils/financeUtils';
 
 interface FinanceModuleProps {
   quotes: Quote[];
@@ -194,7 +195,7 @@ export default function FinanceModule({
         const rows = data.map(f => {
             const quote = quotes.find(q => q.id === f.orcamentoId);
             const perc = f.percentualComissao || 0;
-            const val = (f.valorBruto || 0) * (perc / 100);
+            const val = calculateCommission(f.valorBruto || 0, perc);
             return [
                 f.numeroNF,
                 f.orcamentoId,
@@ -793,39 +794,28 @@ export default function FinanceModule({
                       }).map((fc) => {
                         const quote = quotes.find(q => q.id === fc.orcamentoId);
                         const comissaoPerc = fc.percentualComissao || 0;
-                        const vComiss = ((fc.valorBruto || 0) * (comissaoPerc / 100));
+                        const vComiss = calculateCommission(fc.valorBruto || 0, comissaoPerc);
                         return (
                           <tr key={fc.id || fc.numeroNF} className="rectilinear-tr group">
                             <td className="rectilinear-td text-center pl-8 font-black text-slate-900 tabular-nums">
                               {fc.numeroNF}
                             </td>
-                            <td className="rectilinear-td text-center text-xs font-bold text-indigo-600">
+                            <td className="rectilinear-td text-center text-xs font-bold text-slate-500 uppercase tabular-nums">
                               {fc.orcamentoId}
                             </td>
+                            <td className="rectilinear-td text-center text-sm font-bold text-slate-700">
+                              {quote?.nomeComissionado || '—'}
+                            </td>
+                            <td className="rectilinear-td text-center font-bold text-slate-900 tabular-nums">
+                              R$ {formatNumber(fc.valorBruto || 0)}
+                            </td>
                             <td className="rectilinear-td text-center">
-                              <input
-                                type="text"
-                                className="w-full text-center border-none bg-transparent font-bold text-slate-700 dark:text-slate-300 outline-none hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-indigo-500 rounded px-2 py-1 transition-all"
-                                value={quote?.nomeComissionado || quote?.criadoPor || ''}
-                                placeholder="—"
-                                onChange={(e) => {
-                                  if (quote && onSaveQuote) {
-                                    onSaveQuote({ ...quote, nomeComissionado: e.target.value });
-                                  }
-                                }}
-                                title="Editar nome do comissionado"
+                              <input 
+                                  type="number"
+                                  className="w-16 text-center text-xs border border-slate-200 rounded-lg p-1.5 font-black text-indigo-600"
+                                  value={comissaoPerc}
+                                  onChange={(e) => onSaveFinancialControl({ ...fc, percentualComissao: parseFloat(e.target.value) || 0 })}
                               />
-                            </td>
-                            <td className="rectilinear-td text-center text-sm font-black text-slate-500 tabular-nums">
-                              R$ {formatNumber(fc.valorBruto ?? 0)}
-                            </td>
-                            <td className="rectilinear-td text-center">
-                              <input
-                                type="number"
-                                className="w-16 p-1 text-center border rounded bg-transparent"
-                                value={comissaoPerc}
-                                onChange={(e) => onSaveFinancialControl({ ...fc, percentualComissao: Number(e.target.value) })}
-                              /> %
                             </td>
                             <td className="rectilinear-td text-center font-black text-indigo-600 tabular-nums">
                               R$ {formatNumber(vComiss)}
