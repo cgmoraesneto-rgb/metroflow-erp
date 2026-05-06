@@ -19,6 +19,7 @@ import {
 import { db } from '../firebaseConfig';
 import { z } from 'zod';
 import { captureError } from '../sentry';
+import { documentId } from 'firebase/firestore';
 
 // Generic converter for Firestore to keep it type-safe
 const genericConverter = <T extends { id?: string }>(): FirestoreDataConverter<T> => ({
@@ -73,9 +74,15 @@ export const firebaseClient = {
   ): Promise<{ data: T[]; lastVisible: QueryDocumentSnapshot | null }> {
     try {
       const collectionName = path.replace('/api/mock/', '');
+      
+      let firestoreOrderField: any = orderField;
+      if (orderField === 'id') {
+        firestoreOrderField = documentId();
+      }
+
       let q = query(
         collection(db, collectionName),
-        orderBy(orderField, orderDir),
+        orderBy(firestoreOrderField, orderDir),
         firestoreLimit(pageSize)
       );
 

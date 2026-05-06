@@ -1,4 +1,4 @@
-const CACHE_NAME = 'metroflow-cache-v4';
+const CACHE_NAME = 'metroflow-cache-v5';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -36,9 +36,12 @@ self.addEventListener('fetch', event => {
         .then(response => {
           const copy = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
-          return response;
         })
-        .catch(() => caches.match('/index.html') || caches.match('/'))
+        .catch(async () => {
+          const indexCache = await caches.match('/index.html');
+          if (indexCache) return indexCache;
+          return await caches.match('/');
+        })
     );
     return;
   }
